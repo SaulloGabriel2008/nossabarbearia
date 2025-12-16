@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lopes Barbearia | Agendamento Real</title>
+    <!-- Desabilita aviso de source maps do Firebase -->
+    <meta http-equiv="x-ua-compatible" content="IE=edge">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    
+    <style>
+        :root {
+            --primary: #d4af37;
+            --dark: #1a1a1a;
+            --gray: #333;
+            --light: #f4f4f4;
+            --disabled: #555;
+            --red: #e74c3c;
+            --blue: #3498db;
+            --green: #2ecc71;
+            --orange: #ff9900;
+        }
+
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--dark); color: var(--light); }
+        header { background: black; padding: 20px; text-align: center; border-bottom: 3px solid var(--primary); }
+        h1 { color: var(--primary); margin: 0; text-transform: uppercase; }
+        
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        
+        /* Inputs */
+        input, select {
+            width: 100%; padding: 12px; margin: 10px 0;
+            background: var(--gray); border: 1px solid #444; color: white;
+            border-radius: 5px; box-sizing: border-box; font-size: 1rem;
+        }
+        
+        /* Estilo para Textarea */
+        textarea {
+            width: 100%; padding: 12px; margin: 10px 0;
+            background: var(--gray); border: 1px solid #444; color: white;
+            border-radius: 5px; box-sizing: border-box; font-size: 1rem;
+            resize: vertical;
+        }
+
+        /* Grid de Horários */
+        .horarios-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .time-btn {
+            padding: 15px;
+            background-color: var(--gray);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .time-btn.combo-slot { 
+            background-color: #585800; 
+            border-color: #ffff00;
+        }
+
+        .time-btn:hover { background-color: var(--primary); color: black; }
+        
+        /* Estilo para horário bloqueado */
+        .time-btn.blocked {
+            background-color: #2c2c2c;
+            border-color: #444;
+            color: #666;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
+
+        /* Estilo para horário selecionado */
+        .time-btn.selected {
+            background-color: var(--primary);
+            color: black;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .action-btn {
+            width: 100%; padding: 15px; background: var(--primary);
+            border: none; color: black; font-weight: bold; font-size: 1.1em;
+            cursor: pointer; margin-top: 20px; border-radius: 5px;
+        }
+        .action-btn:disabled { background: #555; cursor: not-allowed; }
+
+        /* Lista de Serviços (Visual) */
+        .services-list {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .services-list li {
+            background: #222;
+            padding: 10px 0;
+            border-bottom: 1px solid #444;
+            display: flex;
+            justify-content: space-between;
+        }
+        .services-list .price {
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        .location-info a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .location-info a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Login/Auth Section Styles */
+        .auth-section {
+            background: #2a2a2a;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border: 1px solid #444;
+            text-align: center;
+        }
+        
+        /* Controles de Autenticação */
+        #emailAuthInputs {
+            margin-bottom: 15px;
+            border-bottom: 1px dashed #444;
+            padding-bottom: 15px;
+        }
+
+        .auth-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .auth-actions button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        #loginBtn, #registerBtn { background-color: var(--primary); color: black; }
+        
+        #googleBtn { 
+            background-color: #dd4b39; 
+            color: white; 
+            width: 100%; 
+            margin-top: 10px;
+        }
+        
+        #anonymousBtn { background-color: var(--blue); color: white; margin-top: 10px;}
+        #logoutBtn { background-color: var(--red); color: white; margin-top: 15px; }
+
+        .auth-welcome {
+            background: #2ecc7133;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 5px solid #2ecc71;
+            text-align: left;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--primary);
+            font-size: 1.2em;
+            user-select: none;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        
+        .password-toggle:hover {
+            opacity: 0.8;
+        }
+        
+        .form-group input[type="password"],
+        .form-group input[type="text"].password-visible {
+            padding-right: 40px;
+        }
+
+        /* Minha Agenda Styles */
+        .my-appointments-section {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #444;
+        }
+        .my-appointment-item {
+            background: #2a2a2a;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 5px solid var(--primary);
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .my-appointment-item p { margin: 5px 0; }
+        .cancel-client-btn {
+            background-color: var(--red);
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .slot-extra {
+            border-left-color: #585800;
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+        
+        .empty-message {
+            text-align: center;
+            padding: 20px;
+            background: #222;
+            border-radius: 5px;
+            color: #888;
+        }
+
+        @media (max-width: 500px) { 
+            .horarios-grid { grid-template-columns: repeat(3, 1fr); } 
+            .auth-actions { flex-direction: column; }
+            .my-appointment-item { flex-direction: column; align-items: flex-start; }
+            .cancel-client-btn { margin-top: 10px; width: 100%; }
+        }
+
+        /* Estilos para botões sociais (Google / Anônimo) */
+        .social-login { display: flex; gap: 10px; margin-top: 12px; }
+        .social-btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 10px 12px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; box-shadow: 0 2px 6px rgba(0,0,0,0.25); }
+        .social-btn .social-icon { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 4px; font-weight: 800; }
+        .google-btn { background: #ffffff; color: #222; border: 1px solid #ddd; }
+        .google-btn .social-icon { background: transparent; color: #DB4437; font-size: 18px; }
+        .anon-btn { background: linear-gradient(90deg, #4a7ef9, #2c5de0); color: #fff; }
+        .social-btn.secondary { background: #2a2a2a; color: var(--light); border: 1px solid #444; }
+
+        @media (max-width: 500px) {
+            .social-login { flex-direction: column; }
+        }
+    </style>
+    
+    <script>
+        // Função global para alternar visibilidade da senha
+        function togglePasswordVisibility(inputId, btn) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                btn.textContent = '👁️';
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <header>
+        <img id="barberLogo" 
+            src="https://media.istockphoto.com/id/1446474893/pt/vetorial/barbershop-logo-vector-salon-logo.jpg?s=612x612&w=0&k=20&c=Ctt2bw9V05sMx0iOmlhbgXiGQxRgsBxxxZ3k7UWj7YA=" 
+            alt="Logo Lopes Barbearia" 
+            style="height: 100px; margin-bottom: 10px; border-radius: 50%; border: 3px solid var(--primary);">
+        
+        <h1>✂️ LOPES BARBEARIA</h1>
+        
+        <div class="location-info">
+            <p style="margin: 5px 0 5px 0; font-size: 0.95em;">
+                📍 Avenida Central 149 - 29345000 Marataízes, ES, Brazil
+            </p>
+            <p style="margin: 0 0 5px 0;">
+                <a href="https://www.google.com/maps/search/?api=1&query=Avenida+Central+149+Marata%C3%ADzes+ES" target="_blank">Ver no Google Maps</a>
+            </p>
+            <p style="margin: 0; font-weight: bold; color: var(--light);">
+                ⏰ HORÁRIO: Segunda a Sábado, das 09:00h às 19:00h.
+            </p>
+        </div>
+        
+        <p>Intervalos de 40 minutos.</p>
+    </header>
+    
+    <div class="container">
+        
+        <div id="authSection" class="auth-section">
+            <h3 id="authTitle" style="color: var(--light); margin-top: 0;">Acesse ou Cadastre-se</h3>
+            
+            <div id="authForm">
+                <div id="emailAuthInputs">
+                    <div class="form-group">
+                        <input type="email" id="authEmail" placeholder="Seu Email" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="authPassword" placeholder="Sua Senha" required>
+                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility('authPassword', this)">👁️</button>
+                    </div>
+                    
+                    <div class="auth-actions">
+                        <button id="loginBtn">Entrar</button>
+                        <button id="registerBtn">Cadastrar</button>
+                    </div>
+                </div>
+                
+                <button id="googleBtn">🔑 Entrar com Google</button>
+                
+                <button id="anonymousBtn">Continuar Anônimo</button>
+            </div>
+            
+            <div id="userInfoDisplay" class="auth-welcome" style="display: none;">
+                <p style="margin: 0; font-weight: bold;">Bem-vindo(a), <span id="userNameDisplay">Cliente</span>!</p>
+                <p style="margin: 5px 0 0 0; font-size: 0.9em;">Seu agendamento será associado à sua conta.</p>
+                <button id="logoutBtn">Sair</button>
+            </div>
+        </div>
+        <div id="agendamentoForm" style="display:none;">
+            <label>Tabela de Serviços:</label>
+            <ul class="services-list">
+                <li><span>Corte de Cabelo/Barba (40 min)</span> <span class="price">R$ 40,00</span></li>
+                <li><span>Combo (Cabelo e Barba - 80 min)</span> <span class="price">R$ 75,00</span></li>
+                <li><span>Corte Infantil - Autismo (80 min)</span> <span class="price" style="color: var(--orange);">R$ 60,00</span></li> 
+            </ul>
+
+            <label>1. Seu Nome:</label>
+            <input type="text" id="nomeCliente" placeholder="Digite seu nome..." required>
+            
+            <label>2. Escolha o Serviço:</label>
+            <select id="servicoSelecionado">
+                <option value="Corte de Cabelo (40 min)">Corte de Cabelo (R$ 40)</option>
+                <option value="Barba (40 min)">Barba (R$ 40)</option>
+                <option value="Combo Cabelo e Barba (80 min)">Combo (Cabelo e Barba) (R$ 75)</option>
+            </select>
+
+            <div style="margin-top: 15px;">
+                <input type="checkbox" id="isInfantil" style="width: auto; margin-right: 10px;">
+                <label for="isInfantil" style="display: inline;">Agendamento Infantil (Apenas para Corte)</label>
+            </div>
+
+            <div id="autismoOption" style="display:none; margin-left: 20px; margin-top: 10px; border-left: 2px solid var(--primary); padding-left: 10px;">
+                <input type="checkbox" id="isAutismo" style="width: auto; margin-right: 10px;">
+                <label for="isAutismo" style="display: inline; color: var(--primary); font-weight: bold;">Cliente no Espectro Autista (80 min / R$ 60)</label>
+            </div>
+
+            <label style="margin-top: 20px;">Observações (Opcional):</label>
+            <textarea id="observacoes" placeholder="Ex: Cabelo liso, cliente com sensibilidade ao barulho, etc." rows="3"></textarea>
+
+
+            <label>3. Escolha o Dia:</label>
+            <input type="date" id="dataAgendamento">
+
+            <div id="areaHorarios" style="display:none; margin-top: 20px;">
+                <label>4. Escolha um Horário Disponível:</label>
+                <div class="horarios-grid" id="gridHorarios">
+                    </div>
+                <p style="font-size: 0.8em; color: #aaa; text-align: center; margin-top: 10px;">Horários riscados já estão ocupados.</p>
+            </div>
+            <p id="avisoDomingo" style="display: none; color: var(--red); text-align: center;">⛔ Domingo não é um dia de agendamento. Por favor, escolha outra data.</p>
+
+
+            <button id="btnConfirmar" class="action-btn" disabled>CONFIRMAR AGENDAMENTO</button>
+        </div>
+        
+        <div id="myAppointmentsSection" class="my-appointments-section" style="display:none;">
+            <h3 style="color: var(--primary);">🗓️ Meus Próximos Agendamentos</h3>
+            <div id="myAppointmentsList">
+                <p class="empty-message">Carregando seus agendamentos...</p>
+            </div>
+        </div>
+        </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, where, getDocs, deleteDoc, doc, orderBy, setDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, signInAnonymously, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+
+
+        // ============================================================
+        // ✅ SUAS CHAVES DO FIREBASE INTEGRADA
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyBLBFTLC7sqM9VUhlsypPugQ-LhcX7-0Rw",
+            authDomain: "barbearia-do-rei.firebaseapp.com",
+            projectId: "barbearia-do-rei",
+            storageBucket: "barbearia-do-rei.firebasestorage.app",
+            messagingSenderId: "546744214164",
+            appId: "1:546744214164:web:5bd367381afbef253d0a81"
+        };
+        // ============================================================
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app); 
+        const googleProvider = new GoogleAuthProvider(); 
+
+        // ============================================================
+        // Variáveis Globais e Mapeamento de DOM
+        // ============================================================
+        const horariosPossiveis = [
+            "09:00", "09:40", "10:20", "11:00", "11:40", 
+            "13:00", "13:40", "14:20", "15:00", "15:40", 
+            "16:20", "17:00", "17:40", "18:20" 
+        ];
+
+        const dataInput = document.getElementById('dataAgendamento');
+        const areaHorarios = document.getElementById('areaHorarios');
+        const gridHorarios = document.getElementById('gridHorarios');
+        const btnConfirmar = document.getElementById('btnConfirmar');
+        const nomeInput = document.getElementById('nomeCliente');
+        const servicoInput = document.getElementById('servicoSelecionado');
+        const avisoDomingo = document.getElementById('avisoDomingo');
+        const agendamentoForm = document.getElementById('agendamentoForm');
+        
+        const isInfantilInput = document.getElementById('isInfantil'); 
+        const autismoOptionDiv = document.getElementById('autismoOption'); 
+        const isAutismoInput = document.getElementById('isAutismo'); 
+        const observacoesInput = document.getElementById('observacoes'); 
+
+        // Elementos de Autenticação
+        const authForm = document.getElementById('authForm');
+        const userInfoDisplay = document.getElementById('userInfoDisplay');
+        const userNameDisplay = document.getElementById('userNameDisplay');
+        const authEmail = document.getElementById('authEmail');
+        const authPassword = document.getElementById('authPassword');
+        const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const googleBtn = document.getElementById('googleBtn'); 
+        const anonymousBtn = document.getElementById('anonymousBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        
+        // Elementos de Meus Agendamentos
+        const myAppointmentsSection = document.getElementById('myAppointmentsSection');
+        const myAppointmentsList = document.getElementById('myAppointmentsList');
+        
+        let horarioSelecionado = null;
+        let horariosOcupadosGlobal = [];
+        let currentUser = null; 
+        
+        // ============================================================
+        // FUNÇÕES DE UTILIDADE
+        // ============================================================
+        
+        // A rotina automática de remoção de agendamentos antigos foi removida.
+        // Para fins de auditoria ou limpeza, execute ações manuais no console do Firebase.
+        
+        function formatarData(dataISO) {
+             if (dataISO instanceof Date) {
+                 return dataISO.toLocaleDateString('pt-BR');
+             }
+             if (typeof dataISO === 'string' && dataISO.includes('-')) {
+                 return dataISO.split('-').reverse().join('/');
+             }
+             if (dataISO && dataISO.seconds) {
+                 const date = new Date(dataISO.seconds * 1000);
+                 return date.toLocaleDateString('pt-BR');
+             }
+             return String(dataISO); 
+        }
+
+        function getProximoHorario(horaAtual) {
+            const indexAtual = horariosPossiveis.indexOf(horaAtual);
+            return indexAtual !== -1 && indexAtual + 1 < horariosPossiveis.length 
+                ? horariosPossiveis[indexAtual + 1] 
+                : null;
+        }
+
+        // ============================================================
+        // FUNÇÃO PARA CALCULAR HORÁRIO FIM
+        // ============================================================
+        function calcularHorarioFim(horaInicio, duracao) {
+            const [horas, minutos] = horaInicio.split(':').map(Number);
+            const totalMinutos = horas * 60 + minutos + duracao;
+            const novasHoras = Math.floor(totalMinutos / 60);
+            const novosMinutos = totalMinutos % 60;
+            return `${String(novasHoras).padStart(2, '0')}:${String(novosMinutos).padStart(2, '0')}`;
+        }
+
+        // ============================================================
+        // FUNÇÃO PARA VERIFICAR DISPONIBILIDADE DE SLOT
+        // ============================================================
+        async function isSlotAvailable(data, hora) {
+            const q = query(
+                collection(db, "agendamentos"),
+                where("data", "==", data),
+                where("hora", "==", hora)
+            );
+            const snapshot = await getDocs(q);
+            return snapshot.empty; // Retorna true se não há agendamentos
+        }
+
+        // ============================================================
+        // FUNÇÃO PARA RECARREGAR A AGENDA (RECARREGA HORÁRIOS)
+        // ============================================================
+        function loadAgenda(data) {
+            if (data) {
+                carregarHorarios(data);
+            }
+        }
+
+        
+       // ============================================================
+        // LÓGICA DE CANCELAMENTO DO CLIENTE (DELETA DIRETO DO FIREBASE E GERA WHATSAPP)
+        // SEM CLOUD FUNCTION
+        // ============================================================
+        window.cancelarAgendamentoCliente = async function(idAgendamento, data, hora, isComboPrincipal, nomeCliente, servico) {
+            const confirmacao = confirm(`Tem certeza que deseja cancelar o agendamento das ${hora}h do dia ${formatarData(data)}?`);
+            if (!confirmacao) return;
+
+            if (!currentUser) {
+                alert("Você precisa estar logado para cancelar agendamentos.");
+                return;
+            }
+
+            try {
+                // 1. DELETA O AGENDAMENTO PRINCIPAL
+                await deleteDoc(doc(db, "agendamentos", idAgendamento));
+
+                // 2. Se for um serviço de 80 min, deleta o slot extra
+                if (isComboPrincipal) {
+                    const q = query(
+                        collection(db, "agendamentos"),
+                        where("data", "==", data),
+                        where("referencia", "==", hora) 
+                    );
+                    const snapshot = await getDocs(q);
+                    
+                    snapshot.forEach(async (docSnapshot) => {
+                        await deleteDoc(doc(db, "agendamentos", docSnapshot.id));
+                    });
+                }
+                
+                // 3. GERA O LINK DO WHATSAPP DE CANCELAMENTO
+                
+                // 🚨 AJUSTE NECESSÁRIO: SUBSTITUA PELO NÚMERO DO BARBEIRO (55 + DDD + NÚMERO)
+                const numeroBarbeiro = '28999082741'; 
+                
+                // O nome e serviço virão da função (se você os passa na chamada HTML)
+                const nome = nomeCliente || 'Cliente (Nome não salvo)';
+                const servicoAgendado = servico || 'Serviço não especificado';
+
+                // Monta a mensagem
+                const mensagemCancelamento = `🚨 *CANCELAMENTO DE AGENDAMENTO* 🚨
+
+👤 *Cliente:* ${nome}
+📅 *Data:* ${formatarData(data)}
+⏰ *Horário:* ${hora}h
+✂️ *Serviço:* ${servicoAgendado}
+
+✅ *Vaga liberada para novo agendamento!*`;
+                
+                const urlEncodedMessage = encodeURIComponent(mensagemCancelamento);
+                const whatsappLink = `https://api.whatsapp.com/send?phone=${numeroBarbeiro}&text=${urlEncodedMessage}`;
+
+                // 4. ALERTA E ABRE O WHATSAPP
+                alert(`Agendamento das ${hora}h cancelado com sucesso.
+                
+                ✅ POR FAVOR, clique em OK para enviar a notificação de cancelamento para o Barbeiro via WhatsApp.`);
+                
+                // Abre o link do WhatsApp em uma nova aba
+                window.open(whatsappLink, '_blank');
+                
+                // 5. RECARREGA A LISTA
+                loadMyHistoricalAppointments(currentUser.uid); 
+
+            } catch (e) {
+                console.error("Erro ao cancelar:", e);
+                alert("Erro ao cancelar agendamento. Verifique se as regras de DELETE do Firebase estão ativas.");
+            }
+        }
+
+        // ============================================================
+        // LÓGICA DE CARREGAMENTO DE AGENDAMENTOS DO CLIENTE
+        // ============================================================
+
+       // ... (código anterior) ...
+
+        // ============================================================
+        // LÓGICA DE CARREGAMENTO DE AGENDAMENTOS DO CLIENTE (CORRIGIDA)
+        // ============================================================
+
+        async function loadMyHistoricalAppointments(userId) {
+            myAppointmentsList.innerHTML = '<p class="empty-message" style="color:var(--primary);">Buscando seus agendamentos...</p>';
+            
+            // Usamos a data de HOJE no formato ISO (YYYY-MM-DD) para filtrar.
+            // Isso evita problemas de fuso horário na query do Firestore.
+            const hojeISO = new Date().toISOString().split('T')[0];
+            
+            try {
+                // Filtra agendamentos do usuário e ordena pela data e hora
+                const q = query(
+                    collection(db, "agendamentos"), 
+                    where("userId", "==", userId),
+                    where("data", ">=", hojeISO), // Busca apenas agendamentos a partir de hoje
+                    orderBy("data", "asc"),
+                    orderBy("hora", "asc")
+                );
+
+                const snapshot = await getDocs(q);
+                
+                if (snapshot.empty) {
+                    myAppointmentsList.innerHTML = '<p class="empty-message">Você não possui agendamentos futuros.</p>';
+                    return;
+                }
+
+                myAppointmentsList.innerHTML = '';
+                let hasFutureAppointments = false;
+                
+                snapshot.forEach(docSnapshot => {
+                    const agendamento = docSnapshot.data();
+                    agendamento.id = docSnapshot.id;
+                    
+                    // Não mostra slots de bloqueio total ou slots extras (continuação)
+                    if (agendamento.idBloqueio === "BLOQUEIO_TOTAL") {
+                        return;
+                    }
+                    
+                    const isSlotExtra = agendamento.duracao && agendamento.duracao.includes("Slot 2/2");
+                    if (isSlotExtra) {
+                        return; // Esconde o slot de continuação do cliente
+                    }
+                    
+                    hasFutureAppointments = true;
+                    
+                    const isComboPrincipal = agendamento.duracao && agendamento.duracao.includes("80 min");
+
+                    const li = document.createElement('div');
+                    li.className = `my-appointment-item`; // Classe ajustada
+                    
+                    // Adiciona a duração para exibição (ex: Combo Cabelo e Barba (80 min))
+                    // Isso corrige o problema de exibição (que pode ter sido a última pendência)
+                    const duracaoFormatada = agendamento.duracao.split('(')[0].trim();
+                    const servicoText = `${agendamento.servico} (${duracaoFormatada})`; 
+
+                    const obsText = agendamento.observacoes ? ` | Obs: ${agendamento.observacoes}` : '';
+                    
+                    li.innerHTML = `
+                        <div>
+                            <p style="font-weight: bold;">${formatarData(agendamento.data)} às ${agendamento.hora}h</p>
+                            <p style="color: var(--primary);">✂️ ${servicoText}</p> 
+                            <p style="font-size: 0.9em; color: #ccc;">R$ ${agendamento.preco.toFixed(2).replace('.', ',')} ${obsText}</p>
+                        </div>
+                        <button class="cancel-client-btn" onclick="cancelarAgendamentoCliente('${agendamento.id}', '${agendamento.data}', '${agendamento.hora}', ${isComboPrincipal})">Cancelar</button>
+                    `;
+                    myAppointmentsList.appendChild(li);
+                });
+
+                if (!hasFutureAppointments) {
+                     myAppointmentsList.innerHTML = '<p class="empty-message">Você não possui agendamentos futuros.</p>';
+                }
+
+            } catch (error) {
+                console.error("Erro ao carregar agendamentos do usuário:", error);
+                // ESTE ERRO É O QUE VOCÊ ESTÁ VENDO. SE ESTIVER ACONTECENDO AQUI, 
+                // A REGRA DE SEGURANÇA AINDA ESTÁ ERRADA OU BLOQUEANDO ALGO.
+                myAppointmentsList.innerHTML = '<p class="empty-message" style="color:var(--red);">Erro ao carregar seus agendamentos. (Verifique as permissões de leitura no Firebase!)</p>';
+            }
+        }
+
+        // ============================================================
+        // LÓGICA DE AUTENTICAÇÃO
+        // ============================================================
+
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (user) {
+                authForm.style.display = 'none';
+                userInfoDisplay.style.display = 'block';
+                agendamentoForm.style.display = 'block';
+                myAppointmentsSection.style.display = 'block'; 
+
+                let suggestedName = '';
+
+                if (user.isAnonymous) {
+                    userNameDisplay.textContent = 'Cliente Anônimo';
+                    suggestedName = ''; 
+                } else if (user.displayName) {
+                    userNameDisplay.textContent = user.displayName;
+                    suggestedName = user.displayName;
+                } else {
+                    userNameDisplay.textContent = user.email;
+                    suggestedName = user.email.split('@')[0]; 
+                }
+
+                if (!nomeInput.value.trim()) {
+                    nomeInput.value = suggestedName;
+                }
+                
+                nomeInput.placeholder = 'Digite seu nome (Obrigatório)';
+                nomeInput.disabled = false;
+
+                // A rotina automática de remoção de agendamentos antigos foi desativada.
+
+                loadMyHistoricalAppointments(user.uid);
+                checkInputs(); 
+                
+            } else {
+                authForm.style.display = 'block';
+                userInfoDisplay.style.display = 'none';
+                agendamentoForm.style.display = 'none';
+                myAppointmentsSection.style.display = 'none'; 
+                
+                currentUser = null;
+                nomeInput.value = '';
+                nomeInput.disabled = false;
+            }
+        });
+
+        loginBtn.addEventListener('click', async () => {
+            const email = authEmail.value;
+            const password = authPassword.value;
+            if (!email || !password) return alert("Preencha email e senha para entrar.");
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                alert("Erro ao fazer login: " + error.message);
+            }
+        });
+
+        registerBtn.addEventListener('click', async () => {
+            const email = authEmail.value;
+            const password = authPassword.value;
+            if (!email || !password || password.length < 6) return alert("O email e a senha (mínimo 6 caracteres) são obrigatórios para o cadastro.");
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                alert("Erro ao cadastrar: " + error.message);
+            }
+        });
+        
+        googleBtn.addEventListener('click', async () => {
+            try {
+                // Ao usar o Google, você verá o erro "auth/unauthorized-domain" 
+                // se o seu domínio (o link do Netlify) não estiver na lista de domínios 
+                // autorizados do Firebase Console.
+                await signInWithPopup(auth, googleProvider);
+            } catch (error) {
+                alert("Erro ao fazer login com Google: " + error.message);
+            }
+        });
+
+
+        anonymousBtn.addEventListener('click', async () => {
+            try {
+                await signInAnonymously(auth);
+            } catch (error) {
+                alert("Erro ao continuar anônimo: " + error.message);
+            }
+        });
+
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                alert("Você saiu da conta.");
+            } catch (error) {
+                alert("Erro ao sair: " + error.message);
+            }
+        });
+
+
+        // ============================================================
+        // LÓGICA DE AGENDAMENTO 
+        // ============================================================
+
+        function controlarCamposInfantis(servico) {
+            const isCorte = servico.includes("Corte");
+            const isBarbaOuCombo = servico.includes("Barba") || servico.includes("Combo");
+            
+            if (isCorte && !isBarbaOuCombo) {
+                isInfantilInput.disabled = false;
+            } else {
+                isInfantilInput.checked = false;
+                isAutismoInput.checked = false;
+                isInfantilInput.disabled = true;
+            }
+            autismoOptionDiv.style.display = isInfantilInput.checked ? 'block' : 'none';
+        }
+        
+        servicoInput.addEventListener('change', () => {
+             const servico = servicoInput.value;
+             controlarCamposInfantis(servico);
+             if (dataInput.value) {
+                carregarHorarios(dataInput.value); // Recarrega horários para garantir a nova duração
+                checkInputs();
+            }
+        });
+
+        isInfantilInput.addEventListener('change', () => {
+            autismoOptionDiv.style.display = isInfantilInput.checked ? 'block' : 'none';
+            if (!isInfantilInput.checked) {
+                isAutismoInput.checked = false;
+            }
+            if (dataInput.value) {
+                carregarHorarios(dataInput.value); // Recarrega horários
+                checkInputs();
+            }
+        });
+
+        isAutismoInput.addEventListener('change', () => {
+            if (dataInput.value) {
+                carregarHorarios(dataInput.value); // Recarrega horários
+                checkInputs();
+            }
+        });
+        
+        dataInput.addEventListener('change', async function() {
+            const dataEscolhida = this.value;
+            if(!dataEscolhida) return;
+
+            controlarCamposInfantis(servicoInput.value);
+
+            // Verifica se a data já passou
+            const dataSelecionada = new Date(dataEscolhida + 'T00:00:00');
+            const dataHoje = new Date();
+            dataHoje.setHours(0, 0, 0, 0);
+
+            if (dataSelecionada < dataHoje) {
+                areaHorarios.style.display = 'none';
+                avisoDomingo.style.display = 'block';
+                avisoDomingo.textContent = '⛔ Não é possível agendar em datas que já passaram. Por favor, escolha uma data futura.';
+                avisoDomingo.style.display = 'block';
+                btnConfirmar.disabled = true;
+                return;
+            }
+
+            const diaDaSemana = new Date(dataEscolhida + 'T00:00:00').getDay();
+            
+            // 0 = Domingo (Bloqueia)
+            if (diaDaSemana === 0) { 
+                areaHorarios.style.display = 'none';
+                avisoDomingo.style.display = 'block';
+                avisoDomingo.textContent = '⛔ Domingo não é um dia de agendamento. Por favor, escolha outra data.';
+                btnConfirmar.disabled = true;
+                return;
+            }
+            
+            avisoDomingo.style.display = 'none';
+            areaHorarios.style.display = 'block';
+            horarioSelecionado = null;
+            btnConfirmar.disabled = true;
+            btnConfirmar.innerText = "CONFIRMAR AGENDAMENTO";
+            
+            carregarHorarios(dataEscolhida);
+        });
+        
+        async function carregarHorarios(data) {
+            gridHorarios.innerHTML = '<p style="color:var(--primary);">Carregando horários...</p>';
+            
+            const q = query(collection(db, "agendamentos"), where("data", "==", data));
+            const querySnapshot = await getDocs(q);
+            
+            horariosOcupadosGlobal = [];
+            let diaFechado = false; 
+
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                if (data.idBloqueio === "BLOQUEIO_TOTAL") {
+                    diaFechado = true;
+                }
+                horariosOcupadosGlobal.push(data.hora);
+            });
+
+            if (diaFechado) {
+                gridHorarios.innerHTML = `<p style="color:var(--red); font-weight: bold; text-align: center;">🚫 A agenda para o dia ${formatarData(data)} está FECHADA pelo Barbeiro.</p>`;
+                btnConfirmar.disabled = true;
+                return;
+            }
+
+            renderizarBotoes(horariosOcupadosGlobal);
+        }
+
+        function getSlotsNecessarios() {
+            const servicoAtual = servicoInput.value;
+            const isAutismo = isAutismoInput.checked;
+
+            if (isAutismo) {
+                return 2;
+            }
+            
+            if (servicoAtual.includes("Combo")) {
+                return 2;
+            }
+            
+            return 1;
+        }
+
+
+        function renderizarBotoes(ocupados) {
+            gridHorarios.innerHTML = ''; 
+            const slotsNecessarios = getSlotsNecessarios();
+            const isDoisSlots = slotsNecessarios === 2;
+
+            // Verifica se é hoje para validar horários que já passaram
+            const dataSelecionada = dataInput.value;
+            const dataHoje = new Date();
+            const dataHojeFormatada = dataHoje.toISOString().split('T')[0];
+            const ehHoje = dataSelecionada === dataHojeFormatada;
+            const horaAgora = new Date();
+
+            horariosPossiveis.forEach(hora => {
+                const btn = document.createElement('button');
+                btn.className = 'time-btn';
+                btn.innerText = hora;
+
+                const isOcupado = ocupados.includes(hora);
+                let deveBloquear = isOcupado;
+                
+                // Verifica se é um horário que já passou
+                let eHorarioPassado = false;
+                if (ehHoje) {
+                    const [horario, minuto] = hora.split(':').map(Number);
+                    const horarioSlot = new Date();
+                    horarioSlot.setHours(horario, minuto, 0, 0);
+                    
+                    if (horarioSlot < horaAgora) {
+                        eHorarioPassado = true;
+                        deveBloquear = true;
+                        btn.title = 'Horário já passou';
+                    }
+                }
+                
+                if (!isOcupado && isDoisSlots) {
+                    const proximoHorario = getProximoHorario(hora);
+                    
+                    if (!proximoHorario || ocupados.includes(proximoHorario)) {
+                        deveBloquear = true;
+                        btn.title = proximoHorario ? `O próximo slot (${proximoHorario}) está OCUPADO ou não existe.` : `Serviço de 80 min não cabe neste horário.`;
+                    } else {
+                        btn.classList.add('combo-slot'); 
+                    }
+                }
+                
+                if (deveBloquear) {
+                    btn.classList.add('blocked');
+                    btn.disabled = true;
+                } else {
+                    btn.onclick = () => selecionarHorario(btn, hora);
+                }
+
+                gridHorarios.appendChild(btn);
+            });
+        }
+        
+        function selecionarHorario(btn, hora) {
+            document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('selected'));
+            
+            btn.classList.add('selected');
+            horarioSelecionado = hora;
+            
+            checkInputs();
+        }
+        
+        function checkInputs() {
+             if(horarioSelecionado && nomeInput.value.trim() !== "" && dataInput.value.trim() !== "" && currentUser) {
+                btnConfirmar.disabled = false;
+            } else {
+                btnConfirmar.disabled = true;
+            }
+        }
+        
+        nomeInput.addEventListener('input', checkInputs);
+        dataInput.addEventListener('change', checkInputs);
+
+
+/// ... (Seu código até a linha 968, que termina a lógica de controle de inputs)
+
+// ============================================================
+// LÓGICA DE AGENDAMENTO (COMPLETA E CORRIGIDA)
+// ============================================================
+
+// Assumindo que você já definiu: dataInput, horarioSelecionado, servicoInput, 
+// nomeInput, observacoesInput, isAutismoInput, isInfantilInput
+// e as funções: calcularHorarioFim, isSlotAvailable, formatarData, loadAgenda, loadMyHistoricalAppointments
+// e o objeto: currentUser
+
+async function agendar() {
+    // 1. CHECAGEM DE REQUISITOS
+    if (!currentUser) {
+        alert("Você precisa estar logado (mesmo que anonimamente) para agendar.");
+        return;
+    }
+
+    const dataSelecionada = dataInput.value;
+    const horaSelecionada = horarioSelecionado; // Usa a variável global
+    const servicoSelecionado = servicoInput.options[servicoInput.selectedIndex];
+    
+    // O nome do serviço no select está formatado de forma diferente agora, 
+    // então precisamos calcular a duração e preço de forma diferente:
+    let preco = 0;
+    let duracaoTotal = 40; // Default
+    let servicoNome = servicoInput.value.split('(')[0].trim(); // Pega o nome base
+
+    // Lógica para determinar preço e duração
+    const isAutismo = isAutismoInput.checked;
+    const isCombo = servicoNome.includes("Combo");
+    const isInfantil = isInfantilInput.checked;
+
+    if (isAutismo) {
+        servicoNome = `Corte Infantil - Autismo`;
+        duracaoTotal = 80;
+        preco = 60.00;
+    } else if (isCombo) {
+        servicoNome = `Combo Cabelo e Barba`;
+        duracaoTotal = 80;
+        preco = 75.00;
+    } else {
+        // Serviços de 40 min (Corte ou Barba)
+        duracaoTotal = 40;
+        preco = 40.00;
+        if (isInfantil) {
+            servicoNome = `${servicoNome} (Infantil)`;
+        }
+    }
+
+    const observacoes = observacoesInput.value.trim();
+    const nomeCliente = nomeInput.value.trim();
+    const emailCliente = currentUser && !currentUser.isAnonymous ? currentUser.email : null; 
+
+    if (!dataSelecionada || !horaSelecionada || !servicoNome || !nomeCliente) {
+        alert("Por favor, preencha a data, o horário e seu nome.");
+        return;
+    }
+    
+    const isDoisSlots = duracaoTotal === 80;
+    
+    // Assumindo que calcularHorarioFim está definido
+    const horarioFim = calcularHorarioFim(horaSelecionada, duracaoTotal); 
+
+    btnConfirmar.innerText = "Agendando...";
+    btnConfirmar.disabled = true;
+
+    try {
+        // 2. VERIFICAR DISPONIBILIDADE
+        // Assumindo que isSlotAvailable existe
+        if (!await isSlotAvailable(dataSelecionada, horaSelecionada)) {
+            throw new Error("Este horário não está mais disponível.");
+        }
+
+        if (isDoisSlots) {
+            const horaExtra = calcularHorarioFim(horaSelecionada, 40);
+            if (!await isSlotAvailable(dataSelecionada, horaExtra)) {
+                throw new Error("O slot de 80 minutos não pode ser reservado, pois o horário seguinte está ocupado.");
+            }
+        }
+        
+        // 3. SALVAR AGENDAMENTOS
+        const baseData = {
+            nome: nomeCliente,
+            email: emailCliente,
+            observacoes: observacoes,
+            userId: currentUser.uid, 
+            servico: servicoNome,
+            preco: preco,
+            criadoEm: new Date(),
+        };
+
+        // Slot Principal
+        const novoAgendamentoRef = doc(collection(db, "agendamentos"));
+        await setDoc(novoAgendamentoRef, {
+            ...baseData,
+            data: dataSelecionada,
+            hora: horaSelecionada,
+            duracao: duracaoTotal + ' min',
+        });
+
+        // Slot Extra (80 min)
+        if (isDoisSlots) {
+            const horaExtra = calcularHorarioFim(horaSelecionada, 40);
+            const agendamentoExtraRef = doc(collection(db, "agendamentos"));
+            
+            await setDoc(agendamentoExtraRef, {
+                ...baseData,
+                data: dataSelecionada,
+                hora: horaExtra,
+                duracao: "40 min (Slot 2/2)", 
+                preco: 0, // Preço zero, cobrado no primeiro slot
+                referencia: horaSelecionada, 
+            });
+        }
+        
+        // 4. NOTIFICAÇÃO VIA WHATSAPP (com número de contato)
+        const numeroBarbeiro = '5528999082741'; 
+        const precoFormatado = preco.toFixed(2).replace('.', ',');
+
+        const mensagem = `💈 *NOVO AGENDAMENTO CONFIRMADO!* 💈
+
+👤 *Cliente:* ${nomeCliente}
+📅 *Data:* ${formatarData(dataSelecionada)}
+⏰ *Horário:* ${horaSelecionada}h - ${horarioFim}h
+✂️ *Serviço:* ${servicoNome} (${duracaoTotal} min)
+💰 *Valor:* R$ ${precoFormatado}
+${observacoes ? `📝 *Obs:* ${observacoes}` : ''}
+`;
+        
+        const urlEncodedMessage = encodeURIComponent(mensagem);
+        const whatsappLink = `https://api.whatsapp.com/send?phone=${numeroBarbeiro}&text=${urlEncodedMessage}`;
+
+        alert(`Agendamento de ${servicoNome} para ${formatarData(dataSelecionada)} às ${horaSelecionada}h CONFIRMADO!
+        
+        ✅ Clique em OK para notificar o Barbeiro via WhatsApp.`);
+
+        window.open(whatsappLink, '_blank');
+        
+        // 5. LIMPEZA E RECARREGAMENTO
+        loadAgenda(dataSelecionada); // Assumindo que esta função existe
+        loadMyHistoricalAppointments(currentUser.uid); // Assumindo que esta função existe
+        
+        // Limpar inputs
+        servicoInput.value = servicoInput.options[0].value;
+        observacoesInput.value = '';
+        horarioSelecionado = null;
+        gridHorarios.innerHTML = ''; // Limpa a grade de horários
+        isAutismoInput.checked = false;
+        isInfantilInput.checked = false;
+        
+        checkInputs(); // Re-checa para desabilitar o botão
+
+    } catch (e) {
+        console.error("Erro ao agendar: ", e);
+        alert("Erro ao salvar agendamento: " + e.message);
+        btnConfirmar.disabled = false;
+        btnConfirmar.innerText = "CONFIRMAR AGENDAMENTO";
+    }
+}
+
+// ----------------------------------------------------
+// ✅ LISTENER CORRETO PARA O BOTÃO
+// ----------------------------------------------------
+btnConfirmar.addEventListener('click', agendar);
+
+
+
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const googleBtn = document.getElementById('googleBtn');
+    const anonymousBtn = document.getElementById('anonymousBtn');
+    const authForm = document.getElementById('authForm');
+    if (!authForm) return;
+
+    // Aplica classes sem alterar IDs (a lógica JS existente continua funcionando)
+    if (googleBtn) {
+        googleBtn.classList.add('social-btn', 'google-btn');
+        // Se o botão não tiver ícone, cria ícone simples/texto
+        if (!googleBtn.innerHTML.trim()) {
+            googleBtn.innerHTML = '<span class="social-icon">G</span><span>Entrar com Google</span>';
+        } else {
+            googleBtn.innerHTML = '<span class="social-icon">G</span>' + googleBtn.innerHTML;
+        }
+    }
+
+    if (anonymousBtn) {
+        anonymousBtn.classList.add('social-btn', 'anon-btn');
+        if (!anonymousBtn.innerHTML.trim()) {
+            anonymousBtn.innerHTML = '<span class="social-icon">👤</span><span>Continuar como visitante</span>';
+        } else {
+            anonymousBtn.innerHTML = '<span class="social-icon">👤</span>' + anonymousBtn.innerHTML;
+        }
+    }
+
+    // Agrupa os botões em um container visual abaixo dos inputs de e-mail
+    const container = document.createElement('div');
+    container.className = 'social-login';
+
+    if (googleBtn) container.appendChild(googleBtn);
+    if (anonymousBtn) container.appendChild(anonymousBtn);
+
+    // Insere após a seção de email auth (se existir) ou no final do form
+    const emailAuth = document.getElementById('emailAuthInputs');
+    if (emailAuth && emailAuth.parentNode) {
+        emailAuth.parentNode.insertBefore(container, emailAuth.nextSibling);
+    } else {
+        authForm.appendChild(container);
+    }
+});
+</script>
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+</body>
+</html>
