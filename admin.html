@@ -1356,10 +1356,10 @@
                     }
                 } catch(e) { console.error("Erro config grade", e); }
                 
-                // 2. Carregar Agendamentos
+                // 2. Carregar Agendamentos (SEM ORDERBY DO FIREBASE PARA EVITAR ERRO DE INDEX)
                 const q = query(collection(db, "agendamentos"), 
-                                where("data", "==", data), 
-                                orderBy("hora", "asc"));
+                                where("data", "==", data)); // <-- Alterado aqui (removido orderBy)
+                
                 const querySnapshot = await getDocs(q);
 
                 querySnapshot.forEach((doc) => {
@@ -1369,6 +1369,11 @@
                     } else {
                         agendamentosDiaCache.push({ id: doc.id, ...agendamentoData });
                     }
+                });
+
+                // Ordenação feita via JavaScript
+                agendamentosDiaCache.sort((a, b) => {
+                    return a.hora.localeCompare(b.hora);
                 });
 
                 // Lógica de fechamento de dia
