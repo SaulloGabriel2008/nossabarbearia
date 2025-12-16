@@ -132,6 +132,24 @@
             opacity: 0.8;
         }
 
+        /* Botão WhatsApp (melhoria de visibilidade) */
+        .whatsapp-btn {
+            background-color: #072f5f; /* azul escuro */
+            color: #fff;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .whatsapp-btn:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+
         .empty-message, .error-message {
             text-align: center;
             padding: 20px;
@@ -799,8 +817,7 @@
             // 'firebase-uid-aqui'
         ];
         
-        // Taxa por corte (R$ 0,50 por cada corte ou combo)
-        const CORTE_TAX = 0.50; 
+
 
         // Normaliza a lista de e-mails para comparação (lowercase + trim)
         const ALLOWED_ADMIN_EMAILS_NORMALIZED = ALLOWED_ADMIN_EMAILS.map(e => String(e).toLowerCase().trim());
@@ -1370,7 +1387,7 @@
             // FIM DA CORREÇÃO 1
 
             // Botão de Enviar Mensagem Padrão (usa a versão limpa do número ou string vazia)
-            html += `<button class="admin-action whatsapp-btn" style="background-color: var(--blue);" 
+            html += `<button class="admin-action whatsapp-btn" 
                         onclick="sendMessageToClient(
                             '${numeroLimpo || ''}', // Corrigido para passar string vazia se nulo
                             '${data.nome}', 
@@ -1737,8 +1754,8 @@
         // LÓGICA DE RELATÓRIOS
         // ============================================================
         
-        function formatReportResults(results, periodoLabel) {
-            
+        // Novo formato de relatório: inclui despesas, remove taxa de desenvolvedor e adiciona gráfico
+        function formatReportResults(results, periodoLabel, despesasTotal = 0) {
             // Filtra agendamentos de slots extras e bloqueios
             const agendamentosValidos = results.filter(a => 
                 !a.servico.includes('SLOT_EXTRA') && 
@@ -1747,57 +1764,77 @@
 
             const totalBruto = agendamentosValidos.reduce((sum, a) => sum + (a.preco || 0), 0);
             const totalCortes = agendamentosValidos.length;
-            const taxaTotal = totalCortes * CORTE_TAX;
-            const totalLiquido = totalBruto - taxaTotal;
+
+            // Lucro líquido = receita - despesas (removida qualquer "taxa de desenvolvedor")
+            const totalLiquido = totalBruto - (despesasTotal || 0);
 
             // Agrupar por data
             const resumoPorDia = agendamentosValidos.reduce((acc, a) => {
                 const dia = formatarData(a.data);
                 if (!acc[dia]) {
-                    acc[dia] = { receita: 0, cortes: 0, taxa: 0 };
+                    acc[dia] = { receita: 0, cortes: 0 };
                 }
                 acc[dia].receita += a.preco || 0;
                 acc[dia].cortes += 1;
-                acc[dia].taxa += CORTE_TAX;
+                return acc;
+            }, {});
+
+            // Agregar por serviço para o gráfico/detalhe
+            const resumoPorServico = agendamentosValidos.reduce((acc, a) => {
+                const key = a.servico || 'Outros';
+                acc[key] = (acc[key] || 0) + (a.preco || 0);
                 return acc;
             }, {});
 
             let tableHtml = `
                 <p class="report-period">Período Selecionado: <strong>${periodoLabel}</strong></p>
-                <div class="total-geral">
-                    <h3 style="margin: 0 0 5px 0;">🟢 TOTAL LÍQUIDO (APÓS TAXA)</h3>
-                    <div style="font-size: 1.5em; font-weight: bold;">${formatarPreco(totalLiquido)}</div>
-                </div>
-                
-                <div class="total-taxa">
-                    <h3 style="margin: 0 0 5px 0;">🔵 TOTAL BRUTO DE RECEITA</h3>
-                    <div style="font-size: 1.5em; font-weight: bold;">${formatarPreco(totalBruto)}</div>
+
+                <div class="report-summary" style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
+                    <div class="total-geral" style="flex:1; min-width:220px;">
+                        <h3 style="margin: 0 0 5px 0;">🟢 RECEITA TOTAL (AGENDAMENTOS)</h3>
+                        <div style="font-size: 1.5em; font-weight: bold;">${formatarPreco(totalBruto)}</div>
+                    </div>
+
+                    <div class="total-taxa" style="flex:1; min-width:220px; background: #a33;">
+                        <h3 style="margin: 0 0 5px 0;">🔴 TOTAL DE DESPESAS NO PERÍODO</h3>
+                        <div style="font-size: 1.5em; font-weight: bold;">${formatarPreco(despesasTotal || 0)}</div>
+                    </div>
+
+                    <div class="total-geral" style="flex:1; min-width:220px; background: #166c2b;">
+                        <h3 style="margin: 0 0 5px 0;">💚 LUCRO LÍQUIDO</h3>
+                        <div style="font-size: 1.5em; font-weight: bold;">${formatarPreco(totalLiquido)}</div>
+                    </div>
                 </div>
 
-                <div class="dev-tax-info">
-                    <h4>Informações Detalhadas (Taxas e Totais)</h4>
-                    <table>
-                        <tr><th>Total de Cortes/Serviços:</th><td>${totalCortes}</td></tr>
-                        <tr><th>Total Bruto (Receita):</th><td>${formatarPreco(totalBruto)}</td></tr>
-                        <tr><th>Taxa por Serviço (${formatarPreco(CORTE_TAX)}):</th><td>${formatarPreco(taxaTotal)}</td></tr>
-                        <tr><th>Total Líquido:</th><td>${formatarPreco(totalLiquido)}</td></tr>
-                    </table>
-                </div>
+                <div style="margin-top:8px;">
+                    <h3 style="color: var(--primary);">Detalhe por Serviço</h3>
+                    <table style="width:100%; margin-bottom:12px;">
+                        <thead><tr><th>Serviço</th><th>Total Arrecadado</th></tr></thead>
+                        <tbody>`;
 
-                <h3 style="color: var(--primary); margin-top: 20px;">Detalhe por Dia</h3>
+            Object.keys(resumoPorServico).forEach(s => {
+                tableHtml += `<tr><td>${s}</td><td>${formatarPreco(resumoPorServico[s])}</td></tr>`;
+            });
+
+            tableHtml += `</tbody></table>`;
+
+            // Canvas para gráfico (Chart.js)
+            tableHtml += `<div style="margin-bottom:12px; background:#222; padding:12px; border-radius:6px;"><canvas id="reportPieChart" height="150"></canvas></div>`;
+
+            tableHtml += `
+                <h3 style="color: var(--primary); margin-top: 10px;">Detalhe por Dia</h3>
                 <table>
                     <thead>
                         <tr>
                             <th>Data</th>
                             <th>Nº Cortes</th>
                             <th>Receita Bruta</th>
-                            <th>Taxa (${formatarPreco(CORTE_TAX)})</th>
                             <th>Líquido do Dia</th>
                         </tr>
                     </thead>
                     <tbody>
             `;
-            
+
             // Ordenar por data
             const sortedDias = Object.keys(resumoPorDia).sort((a, b) => {
                 const [dA, mA, aA] = a.split('/').map(Number);
@@ -1807,21 +1844,50 @@
 
             sortedDias.forEach(dia => {
                 const resumo = resumoPorDia[dia];
-                const liquidoDia = resumo.receita - resumo.taxa;
+                // Aloca parte das despesas proporcionalmente à receita do dia (se houver receita)
+                const shareDespesa = (totalBruto > 0) ? (resumo.receita / totalBruto) * (despesasTotal || 0) : 0;
+                const liquidoDia = resumo.receita - shareDespesa;
                 tableHtml += `
                     <tr>
                         <td>${dia}</td>
                         <td>${resumo.cortes}</td>
                         <td>${formatarPreco(resumo.receita)}</td>
-                        <td>${formatarPreco(resumo.taxa)}</td>
                         <td><strong>${formatarPreco(liquidoDia)}</strong></td>
                     </tr>
                 `;
             });
 
             tableHtml += `</tbody></table>`;
-            
+
             reportResults.innerHTML = tableHtml;
+
+            // Renderiza gráfico de pizza com Chart.js
+            try {
+                const ctx = document.getElementById('reportPieChart').getContext('2d');
+                // destrói gráfico anterior se existir
+                if (window._reportPie) window._reportPie.destroy();
+
+                const labels = Object.keys(resumoPorServico);
+                const dataVals = labels.map(l => resumoPorServico[l]);
+                window._reportPie = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels,
+                        datasets: [{
+                            data: dataVals,
+                            backgroundColor: labels.map((_,i) => ['#f1c40f','#1abc9c','#3498db','#9b59b6','#e67e22'][i % 5])
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        }
+                    }
+                });
+            } catch (e) {
+                console.warn('Erro ao renderizar gráfico:', e);
+            }
         }
 
         async function generateReport(period) {
@@ -1860,12 +1926,19 @@
                 
                 const agendamentos = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-                if (agendamentos.length === 0) {
-                     reportResults.innerHTML = '<p class="empty-message">Nenhum dado encontrado para o período selecionado.</p>';
-                     return;
+                // Busca também as despesas no período
+                const q2 = query(collection(db, 'despesas'), where('data', '>=', startISO), where('data', '<=', endISO));
+                const snap2 = await getDocs(q2);
+                const despesas = snap2.docs.map(d => d.data());
+                const totalDespesas = despesas.reduce((s, d) => s + (d.valor || 0), 0);
+
+                // Se não houver dados de agendamentos nem despesas, mostra mensagem
+                if ((agendamentos.length === 0) && totalDespesas === 0) {
+                    reportResults.innerHTML = '<p class="empty-message">Nenhum dado encontrado para o período selecionado.</p>';
+                    return;
                 }
 
-                formatReportResults(agendamentos, periodoLabel);
+                formatReportResults(agendamentos, periodoLabel, totalDespesas);
 
             } catch (e) {
                 console.error('Erro ao gerar relatório:', e);
