@@ -565,6 +565,13 @@
             color: white;
             flex: 1;
         }
+
+        /* Estilos para despesas pagas/pendentes */
+        .expense-paid { border-left-color: var(--green) !important; background: #132a18; }
+        .expense-pending { border-left-color: var(--red) !important; }
+        .expense-status-badge { display:inline-block; padding:4px 8px; border-radius:12px; font-size:0.8em; font-weight:bold; }
+        .badge-paid { background: var(--green); color:black; }
+        .badge-pending { background: var(--red); color:white; }
     </style>
     
     <script>
@@ -739,6 +746,19 @@
                     
                     <label for="expenseDate" style="font-size: 0.9em; color: #ccc; margin-top: 10px;">Data da Despesa:</label>
                     <input type="date" id="expenseDate" required>
+
+                    <label for="expenseRecurrence" style="font-size:0.9em;color:#ccc;margin-top:10px;">Recorrência:</label>
+                    <select id="expenseRecurrence" style="width:100%; padding:10px; margin-top:5px;">
+                        <option value="none">Nenhuma</option>
+                        <option value="weekly">Semanal</option>
+                        <option value="monthly">Mensal</option>
+                        <option value="annual">Anual</option>
+                    </select>
+
+                    <div style="display:flex; align-items:center; gap:10px; margin-top:10px;">
+                        <input type="checkbox" id="expensePaid" />
+                        <label for="expensePaid" style="margin:0; color:#ccc;">Marcar como paga</label>
+                    </div>
                     
                     <button id="addExpenseBtn" style="width: 100%; background: var(--red); color: white; border: none; padding: 12px; border-radius: 5px; font-weight: bold; margin-top: 10px;">
                         Lançar Despesa
@@ -761,6 +781,11 @@
                     <div id="expenseTotalDisplay" class="total-taxa" style="margin-top: 15px;">
                         <h3 style="margin: 0 0 5px 0;">🔴 TOTAL DE DESPESAS NO PERÍODO</h3>
                         <div style="font-size: 1.5em; font-weight: bold;">R$ 0,00</div>
+                    </div>
+
+                    <div style="margin-top:15px;">
+                        <canvas id="expensesPaidChart" height="150"></canvas>
+                        <div id="expensePaidSummary" style="margin-top:10px; color:#ccc;"></div>
                     </div>
                 </div>
                 
@@ -807,7 +832,8 @@
         const ALLOWED_ADMIN_EMAILS = [
             'saullinho2008@gmail.com',
             'saullogabriel18@hotmail.com',
-            'saullogabriel182@outlook.com'
+            'saullogabriel182@outlook.com',
+            'teste@gmail.com'
         ];
         
         // EMAIL DO DESENVOLVEDOR (Para ferramentas especiais)
@@ -887,11 +913,15 @@
         const expenseCategorySelect = document.getElementById('expenseCategory');
         const expenseValueInput = document.getElementById('expenseValue');
         const expenseDateInput = document.getElementById('expenseDate');
+        const expenseRecurrenceSelect = document.getElementById('expenseRecurrence');
+        const expensePaidCheckbox = document.getElementById('expensePaid');
         const addExpenseBtn = document.getElementById('addExpenseBtn');
         const expenseList = document.getElementById('expenseList');
         const expenseFilterSelect = document.getElementById('expenseFilter');
         const expenseTotalDisplay = document.getElementById('expenseTotalDisplay');
         const expenseMsg = document.getElementById('expenseMsg');
+        const expensesChartCanvas = document.getElementById('expensesPaidChart');
+        let expensesChart = null;
 
         // Variáveis do Desenvolvedor
         const devTools = document.getElementById('devTools');
@@ -1973,6 +2003,9 @@
                     categoria: category,
                     valor: value,
                     data: date,
+                    recorrente: expenseRecurrenceSelect ? (expenseRecurrenceSelect.value || 'none') : 'none',
+                    pago: expensePaidCheckbox ? !!expensePaidCheckbox.checked : false,
+                    paidAt: (expensePaidCheckbox && expensePaidCheckbox.checked) ? new Date().toISOString() : null,
                     createdAt: new Date().toISOString()
                 });
                 
@@ -1985,6 +2018,8 @@
                 expenseCategorySelect.value = '';
                 expenseValueInput.value = '';
                 expenseDateInput.value = '';
+                if (expenseRecurrenceSelect) expenseRecurrenceSelect.value = 'none';
+                if (expensePaidCheckbox) expensePaidCheckbox.checked = false;
 
                 loadExpenses(expenseFilterSelect.value); // Recarrega a lista
                 
@@ -2051,21 +2086,31 @@
         function renderExpenseList(expenses) {
             let totalPeriodo = 0;
             let htmlContent = '';
-            
+
             if (expenses.length === 0) {
                 htmlContent = '<p class="empty-message">Nenhuma despesa encontrada para o período selecionado.</p>';
             } else {
                 expenses.forEach(expense => {
                     totalPeriodo += expense.valor || 0;
+                    const isPaid = !!expense.pago;
+                    const paidClass = isPaid ? 'expense-paid' : 'expense-pending';
+                    const statusBadge = isPaid ? '<span class="expense-status-badge badge-paid">PAGO</span>' : '<span class="expense-status-badge badge-pending">PENDENTE</span>';
+                    let recorrenciaLabel = '';
+                    if (expense.recorrente && expense.recorrente !== 'none') {
+                        const mapRec = { weekly: 'Semanal', monthly: 'Mensal', annual: 'Anual' };
+                        recorrenciaLabel = `<p>Recorrência: ${mapRec[expense.recorrente] || expense.recorrente}</p>`;
+                    }
+
                     htmlContent += `
-                        <div class="agendamento-item" style="border-left-color: var(--red);">
+                        <div class="agendamento-item ${paidClass}" onclick="toggleExpensePaid('${expense.id}', ${isPaid ? 'false' : 'true'})">
                             <div class="agendamento-info">
-                                <p><strong>${formatarData(expense.data)}</strong> - ${expense.descricao}</p>
+                                <p><strong>${formatarData(expense.data)}</strong> - ${expense.descricao} ${statusBadge}</p>
                                 <p>Categoria: ${expense.categoria}</p>
-                                <p style="color:var(--red);">Valor: <strong>${formatarPreco(expense.valor)}</strong></p>
+                                ${recorrenciaLabel}
+                                <p style="color:${isPaid ? 'var(--green)' : 'var(--red)'};">Valor: <strong>${formatarPreco(expense.valor)}</strong></p>
                             </div>
                             <div class="agendamento-actions">
-                                <button class="cancel-admin-btn" onclick="confirmDeleteExpense('${expense.id}')">
+                                <button class="cancel-admin-btn" onclick="event.stopPropagation(); confirmDeleteExpense('${expense.id}')">
                                     <i class="fa-solid fa-trash-can"></i> Excluir
                                 </button>
                             </div>
@@ -2073,16 +2118,65 @@
                     `;
                 });
             }
-            
+
             expenseList.innerHTML = htmlContent;
-            
+
             // Atualiza o total
             expenseTotalDisplay.querySelector('div').textContent = formatarPreco(totalPeriodo);
+
+            // Atualiza gráfico e resumo
+            try {
+                renderExpensesChart(expenses);
+            } catch (e) {
+                console.error('Erro ao renderizar gráfico de despesas:', e);
+            }
         }
 
         expenseFilterSelect.addEventListener('change', (e) => {
             loadExpenses(e.target.value);
         });
+
+        // Alterna o estado de pago/não pago ao clicar na despesa
+        window.toggleExpensePaid = async function(id, newState) {
+            try {
+                const docRef = doc(db, 'despesas', id);
+                await updateDoc(docRef, {
+                    pago: !!newState,
+                    paidAt: newState ? new Date().toISOString() : null
+                });
+                loadExpenses(expenseFilterSelect.value);
+            } catch (e) {
+                console.error('Erro ao atualizar status de pagamento:', e);
+                alert('Erro ao atualizar status. Veja o console.');
+            }
+        }
+
+        // Renderiza gráfico de despesa paga vs não paga
+        function renderExpensesChart(expenses) {
+            const paidSum = expenses.filter(e => !!e.pago).reduce((s, e) => s + (e.valor || 0), 0);
+            const unpaidSum = expenses.filter(e => !e.pago).reduce((s, e) => s + (e.valor || 0), 0);
+
+            const summaryEl = document.getElementById('expensePaidSummary');
+            if (summaryEl) {
+                summaryEl.innerHTML = `Pagas: <strong>${formatarPreco(paidSum)}</strong> &nbsp; | &nbsp; Não pagas: <strong>${formatarPreco(unpaidSum)}</strong>`;
+            }
+
+            if (!expensesChart || !(expensesChart instanceof Chart)) {
+                const ctx = expensesChartCanvas ? expensesChartCanvas.getContext('2d') : null;
+                if (!ctx) return;
+                expensesChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Pagas', 'Não Pagas'],
+                        datasets: [{ data: [paidSum, unpaidSum], backgroundColor: ['#2ecc71', '#e74c3c'] }]
+                    },
+                    options: { responsive: true }
+                });
+            } else {
+                expensesChart.data.datasets[0].data = [paidSum, unpaidSum];
+                expensesChart.update();
+            }
+        }
 
         window.confirmDeleteExpense = async function(id) {
             if (!confirm('Tem certeza que deseja EXCLUIR esta despesa? Esta ação é irreversível.')) {
