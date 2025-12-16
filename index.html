@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lopes Barbearia | Agendamento Real</title>
+    <title>Nossa Barbearia | Agendamento Real</title>
     <!-- Desabilita aviso de source maps do Firebase -->
     <meta http-equiv="x-ua-compatible" content="IE=edge">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     
     <style>
         :root {
-            --primary: #d4af37;
-            --dark: #1a1a1a;
-            --gray: #333;
-            --light: #f4f4f4;
+            --primary: #1e90ff;
+            --dark: #000000;
+            --gray: #111111;
+            --light: #ffffff;
             --disabled: #555;
             --red: #e74c3c;
-            --blue: #3498db;
+            --blue: #1e90ff;
             --green: #2ecc71;
             --orange: #ff9900;
         }
@@ -249,9 +249,9 @@
         /* Estilos para botões sociais (Google / Anônimo) */
         .social-login { display: flex; gap: 10px; margin-top: 12px; }
         .social-btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 10px 12px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; box-shadow: 0 2px 6px rgba(0,0,0,0.25); }
-        .social-btn .social-icon { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 4px; font-weight: 800; }
-        .google-btn { background: #ffffff; color: #222; border: 1px solid #ddd; }
-        .google-btn .social-icon { background: transparent; color: #DB4437; font-size: 18px; }
+        .social-btn .social-icon { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 4px; font-weight: 800; background: var(--primary); color: var(--light); font-size: 14px; }
+        .google-btn { background: #ffffff; color: var(--primary); border: 1px solid var(--primary); }
+        .google-btn .social-icon { background: var(--primary); color: var(--light); font-size: 14px; }
         .anon-btn { background: linear-gradient(90deg, #4a7ef9, #2c5de0); color: #fff; }
         .social-btn.secondary { background: #2a2a2a; color: var(--light); border: 1px solid #444; }
 
@@ -279,17 +279,17 @@
     <header>
         <img id="barberLogo" 
             src="https://media.istockphoto.com/id/1446474893/pt/vetorial/barbershop-logo-vector-salon-logo.jpg?s=612x612&w=0&k=20&c=Ctt2bw9V05sMx0iOmlhbgXiGQxRgsBxxxZ3k7UWj7YA=" 
-            alt="Logo Lopes Barbearia" 
+            alt="Logo Nossa Barbearia" 
             style="height: 100px; margin-bottom: 10px; border-radius: 50%; border: 3px solid var(--primary);">
         
-        <h1>✂️ LOPES BARBEARIA</h1>
+        <h1>✂️ NOSSA BARBEARIA</h1>
         
         <div class="location-info">
             <p style="margin: 5px 0 5px 0; font-size: 0.95em;">
-                📍 Avenida Central 149 - 29345000 Marataízes, ES, Brazil
+                📍 R. Isaías Mendes, n°07 - Alto Lagoa Funda, Marataízes - ES, 29345-000
             </p>
             <p style="margin: 0 0 5px 0;">
-                <a href="https://www.google.com/maps/search/?api=1&query=Avenida+Central+149+Marata%C3%ADzes+ES" target="_blank">Ver no Google Maps</a>
+                <a href="https://www.google.com/maps/search/?api=1&query=R.+Isa%C3%ADas+Mendes+07+Alto+Lagoa+Funda+Marata%C3%ADzes+ES+29345-000" target="_blank">Ver no Google Maps</a>
             </p>
             <p style="margin: 0; font-weight: bold; color: var(--light);">
                 ⏰ HORÁRIO: Segunda a Sábado, das 09:00h às 19:00h.
@@ -336,7 +336,7 @@
             <ul class="services-list">
                 <li><span>Corte de Cabelo/Barba (40 min)</span> <span class="price">R$ 40,00</span></li>
                 <li><span>Combo (Cabelo e Barba - 80 min)</span> <span class="price">R$ 75,00</span></li>
-                <li><span>Corte Infantil - Autismo (80 min)</span> <span class="price" style="color: var(--orange);">R$ 60,00</span></li> 
+                <li><span>Corte Infantil - Autismo (80 min)</span> <span class="price">R$ 60,00</span></li>
             </ul>
 
             <label>1. Seu Nome:</label>
@@ -396,12 +396,12 @@
         // ✅ SUAS CHAVES DO FIREBASE INTEGRADA
         // ============================================================
         const firebaseConfig = {
-            apiKey: "AIzaSyBLBFTLC7sqM9VUhlsypPugQ-LhcX7-0Rw",
-            authDomain: "barbearia-do-rei.firebaseapp.com",
-            projectId: "barbearia-do-rei",
-            storageBucket: "barbearia-do-rei.firebasestorage.app",
-            messagingSenderId: "546744214164",
-            appId: "1:546744214164:web:5bd367381afbef253d0a81"
+              apiKey: "AIzaSyAi2g57qd4J3ONEjGvTEct69jsdV9F59lg",
+              authDomain: "nossa-barbearia.firebaseapp.com",
+              projectId: "nossa-barbearia",
+              storageBucket: "nossa-barbearia.firebasestorage.app",
+              messagingSenderId: "545785512912",
+              appId: "1:545785512912:web:a917526f553c21945e6fd5",
         };
         // ============================================================
 
@@ -548,7 +548,7 @@
                 
                 // 3. GERA O LINK DO WHATSAPP DE CANCELAMENTO
                 
-                // 🚨 AJUSTE NECESSÁRIO: SUBSTITUA PELO NÚMERO DO BARBEIRO (55 + DDD + NÚMERO)
+                // 🚨 AJUSTE NECESSÁRIO: SUBSTITUA PELO NÚMERO DA BARBEARIA (55 + DDD + NÚMERO)
                 const numeroBarbeiro = '28999082741'; 
                 
                 // O nome e serviço virão da função (se você os passa na chamada HTML)
@@ -571,7 +571,7 @@
                 // 4. ALERTA E ABRE O WHATSAPP
                 alert(`Agendamento das ${hora}h cancelado com sucesso.
                 
-                ✅ POR FAVOR, clique em OK para enviar a notificação de cancelamento para o Barbeiro via WhatsApp.`);
+                ✅ POR FAVOR, clique em OK para enviar a notificação de cancelamento para a Nossa Barbearia via WhatsApp.`);
                 
                 // Abre o link do WhatsApp em uma nova aba
                 window.open(whatsappLink, '_blank');
@@ -667,9 +667,72 @@
 
             } catch (error) {
                 console.error("Erro ao carregar agendamentos do usuário:", error);
-                // ESTE ERRO É O QUE VOCÊ ESTÁ VENDO. SE ESTIVER ACONTECENDO AQUI, 
-                // A REGRA DE SEGURANÇA AINDA ESTÁ ERRADA OU BLOQUEANDO ALGO.
-                myAppointmentsList.innerHTML = '<p class="empty-message" style="color:var(--red);">Erro ao carregar seus agendamentos. (Verifique as permissões de leitura no Firebase!)</p>';
+                // Se o erro indicar que é necessário criar um índice, mostra link direto para o console
+                let message = 'Erro ao carregar seus agendamentos. (Verifique as permissões de leitura no Firebase!)';
+                let indexLink = null;
+                if (error && error.message && error.message.includes('https://')) {
+                    const m = error.message.match(/https:\/\/[^\s)']+/);
+                    if (m && m[0]) indexLink = m[0];
+                }
+                if (indexLink) {
+                    message += ` <br><a href="${indexLink}" target="_blank" style="color:var(--primary); font-weight:bold;">Criar índice necessário no Firebase</a>`;
+                }
+                myAppointmentsList.innerHTML = `<p class="empty-message" style="color:var(--red);">${message}</p>`;
+
+                // Tentativa de fallback: buscar apenas por userId e filtrar/ordenar no cliente (evita necessidade de índice composto)
+                try {
+                    const q2 = query(collection(db, "agendamentos"), where("userId", "==", userId), orderBy("data", "asc"));
+                    const snap2 = await getDocs(q2);
+                    const items = [];
+                    snap2.forEach(d => {
+                        const data = d.data();
+                        if (!data || !data.data) return;
+                        if (data.data >= hojeISO) items.push({ id: d.id, data });
+                    });
+                    // Ordena por data e hora (em caso de empates)
+                    items.sort((a, b) => {
+                        if (a.data.data !== b.data.data) return a.data.data.localeCompare(b.data.data);
+                        return (a.data.hora || '').localeCompare(b.data.hora || '');
+                    });
+
+                    if (items.length === 0) {
+                        myAppointmentsList.innerHTML = '<p class="empty-message">Você não possui agendamentos futuros.</p>';
+                        return;
+                    }
+
+                    // Renderiza resultados do fallback
+                    myAppointmentsList.innerHTML = '';
+                    items.forEach(item => {
+                        const agendamento = item.data;
+                        agendamento.id = item.id;
+
+                        if (agendamento.idBloqueio === "BLOQUEIO_TOTAL") return;
+                        const isSlotExtra = agendamento.duracao && agendamento.duracao.includes("Slot 2/2");
+                        if (isSlotExtra) return;
+
+                        const isComboPrincipal = agendamento.duracao && agendamento.duracao.includes("80 min");
+
+                        const li = document.createElement('div');
+                        li.className = `my-appointment-item`;
+
+                        const duracaoFormatada = agendamento.duracao ? agendamento.duracao.split('(')[0].trim() : '';
+                        const servicoText = `${agendamento.servico || 'Serviço'} (${duracaoFormatada})`;
+                        const obsText = agendamento.observacoes ? ` | Obs: ${agendamento.observacoes}` : '';
+
+                        li.innerHTML = `
+                            <div>
+                                <p style="font-weight: bold;">${formatarData(agendamento.data)} às ${agendamento.hora}h</p>
+                                <p style="color: var(--primary);">✂️ ${servicoText}</p>
+                                <p style="font-size: 0.9em; color: #ccc;">R$ ${agendamento.preco ? agendamento.preco.toFixed(2).replace('.', ',') : '0,00'} ${obsText}</p>
+                            </div>
+                            <button class="cancel-client-btn" onclick="cancelarAgendamentoCliente('${agendamento.id}', '${agendamento.data}', '${agendamento.hora}', ${isComboPrincipal})">Cancelar</button>
+                        `;
+                        myAppointmentsList.appendChild(li);
+                    });
+
+                } catch (fallbackErr) {
+                    console.error('Fallback também falhou:', fallbackErr);
+                }
             }
         }
 
@@ -877,7 +940,7 @@
             });
 
             if (diaFechado) {
-                gridHorarios.innerHTML = `<p style="color:var(--red); font-weight: bold; text-align: center;">🚫 A agenda para o dia ${formatarData(data)} está FECHADA pelo Barbeiro.</p>`;
+                gridHorarios.innerHTML = `<p style="color:var(--red); font-weight: bold; text-align: center;">🚫 A agenda para o dia ${formatarData(data)} está FECHADA pela Nossa Barbearia.</p>`;
                 btnConfirmar.disabled = true;
                 return;
             }
@@ -1113,7 +1176,7 @@ ${observacoes ? `📝 *Obs:* ${observacoes}` : ''}
 
         alert(`Agendamento de ${servicoNome} para ${formatarData(dataSelecionada)} às ${horaSelecionada}h CONFIRMADO!
         
-        ✅ Clique em OK para notificar o Barbeiro via WhatsApp.`);
+        ✅ Clique em OK para notificar a Nossa Barbearia via WhatsApp.`);
 
         window.open(whatsappLink, '_blank');
         
@@ -1158,11 +1221,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Aplica classes sem alterar IDs (a lógica JS existente continua funcionando)
     if (googleBtn) {
         googleBtn.classList.add('social-btn', 'google-btn');
-        // Se o botão não tiver ícone, cria ícone simples/texto
+        // Ícone SVG limpo para o botão do Google (harmonizado com o tema)
+        const googleSvg = '<svg class="google-svg" width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="var(--primary)"/><text x="12" y="16" text-anchor="middle" font-size="12" font-family="Segoe UI, Arial" fill="var(--light)" font-weight="700">G</text></svg>';
+        // Se o botão não tiver ícone, cria ícone com SVG
         if (!googleBtn.innerHTML.trim()) {
-            googleBtn.innerHTML = '<span class="social-icon">G</span><span>Entrar com Google</span>';
+            googleBtn.innerHTML = `<span class="social-icon">${googleSvg}</span><span>Entrar com Google</span>`;
         } else {
-            googleBtn.innerHTML = '<span class="social-icon">G</span>' + googleBtn.innerHTML;
+            googleBtn.innerHTML = `<span class="social-icon">${googleSvg}</span>` + googleBtn.innerHTML;
         }
     }
 
