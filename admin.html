@@ -1452,6 +1452,9 @@
             const gridEl = document.getElementById('adminGridHorarios');
             gridEl.innerHTML = ''; // Limpa o grid
             
+            const selectEl = document.getElementById('adminHorarioSelecionado');
+            let selectOptions = '<option value="">-- Selecionar Horário --</option>';
+
             const horarios = getHorariosDoDia();
             const horariosOcupados = agendamentosDoDia.map(a => a.hora);
 
@@ -1467,6 +1470,11 @@
 
                 const isUnavailable = isOcupado || isBloqueado;
                 const isActionable = isExtra || (!isUnavailable && horariosPadrao.includes(hora)); // Pode ser bloqueado se for padrão e livre
+
+                // Se estiver disponível (livre), adiciona ao select do admin
+                if (!isUnavailable) {
+                    selectOptions += `<option value="${hora}">${hora}h</option>`;
+                }
 
                 let btnHtml = `<button type="button" class="${classes}" data-hora="${hora}" ${isUnavailable ? 'disabled' : ''}>
                                 ${hora}h
@@ -1492,13 +1500,24 @@
 
                 gridEl.innerHTML += `<div class="time-btn-container">${btnHtml}${actions}</div>`;
             });
+
+            // Preenche o select de horários disponíveis e limpa seleção atual
+            selectEl.innerHTML = selectOptions;
+            selectEl.value = '';
             
             // Adicionar listener de clique aos botões de horário (para agendamento admin)
             document.querySelectorAll('#adminGridHorarios button:not(.blocked):not([disabled])').forEach(btn => {
                 btn.addEventListener('click', function() {
                     document.querySelectorAll('#adminGridHorarios .time-btn').forEach(b => b.classList.remove('selected'));
                     this.classList.add('selected');
-                    document.getElementById('adminHorarioSelecionado').value = this.dataset.hora;
+                    // Se o option correspondente não existir (caso raro), adiciona e seleciona
+                    if (!selectEl.querySelector(`option[value="${this.dataset.hora}"]`)) {
+                        const opt = document.createElement('option');
+                        opt.value = this.dataset.hora;
+                        opt.textContent = `${this.dataset.hora}h`;
+                        selectEl.appendChild(opt);
+                    }
+                    selectEl.value = this.dataset.hora;
                 });
             });
         }
