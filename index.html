@@ -3,1269 +3,1895 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nossa Barbearia | Agendamento Real</title>
-    <!-- Desabilita aviso de source maps do Firebase -->
-    <meta http-equiv="x-ua-compatible" content="IE=edge">
+    <title id="page-title">Lopes Barbearia</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
             --primary: #1e90ff;
-            --dark: #000000;
-            --gray: #111111;
-            --light: #ffffff;
-            --disabled: #555;
-            --red: #e74c3c;
-            --blue: #1e90ff;
-            --green: #2ecc71;
-            --orange: #ff9900;
+            --bg-dark: #0a0a0a;
+            --card-bg: #141414;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --border: #222222;
+            --subscription: #8b5cf6;
+            --subscription-light: rgba(139, 92, 246, 0.1);
+            --subscription-border: rgba(139, 92, 246, 0.3);
+            --subscription-hover: rgba(139, 92, 246, 0.2);
         }
 
-        body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--dark); color: var(--light); }
-        header { background: black; padding: 20px; text-align: center; border-bottom: 3px solid var(--primary); }
-        h1 { color: var(--primary); margin: 0; text-transform: uppercase; }
-        
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        
-        /* Inputs */
-        input, select {
-            width: 100%; padding: 12px; margin: 10px 0;
-            background: var(--gray); border: 1px solid #444; color: white;
-            border-radius: 5px; box-sizing: border-box; font-size: 1rem;
-        }
-        
-        /* Estilo para Textarea */
-        textarea {
-            width: 100%; padding: 12px; margin: 10px 0;
-            background: var(--gray); border: 1px solid #444; color: white;
-            border-radius: 5px; box-sizing: border-box; font-size: 1rem;
-            resize: vertical;
+        body { 
+            margin: 0; font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-dark); color: var(--text-main); line-height: 1.6;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* Grid de Horários */
-        .horarios-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr); 
-            gap: 10px;
-            margin-top: 20px;
+        header { 
+            padding: 40px 20px; max-width: 1200px; margin: 0 auto;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .logo-area { display: flex; align-items: center; gap: 15px; }
+        .logo-area img { height: 50px; border-radius: 50%; border: 2px solid var(--primary); }
+        .logo-area h1 { font-size: 1.4rem; letter-spacing: 2px; margin: 0; text-transform: uppercase; }
+
+        .nav-buttons { display: flex; gap: 10px; }
+        .nav-btn { 
+            background: transparent; border: 1px solid var(--border); color: #fff;
+            padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.8rem;
+        }
+        .nav-btn.active { background: var(--primary); border-color: var(--primary); color: #000; }
+
+        .main-layout {
+            display: grid; grid-template-columns: 1fr 380px; gap: 40px;
+            max-width: 1200px; margin: 0 auto; padding: 0 20px 60px 20px;
         }
 
+        .section-title { font-size: 1.4rem; font-weight: 700; margin: 30px 0 20px 0; display: flex; align-items: center; gap: 12px; }
+        .section-num { color: var(--primary); font-style: italic; opacity: 0.6; }
+
+        .services-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .service-card {
+            background: var(--card-bg); border: 1px solid var(--border);
+            padding: 20px; border-radius: 12px; cursor: pointer; transition: 0.3s;
+        }
+        .service-card:hover { border-color: var(--primary); }
+        .service-card.selected { 
+            border-color: var(--primary); 
+            box-shadow: 0 0 15px rgba(30,144,255,0.2);
+            background: var(--card-bg);
+        }
+        .service-card h3 { margin: 0 0 8px 0; font-size: 1rem; }
+        .service-card p { font-size: 0.8rem; color: var(--text-muted); margin: 0 0 15px 0; min-height: 40px; }
+        .service-meta { display: flex; justify-content: space-between; align-items: center; }
+        .service-price { font-weight: 700; color: #fff; }
+
+        .date-picker-wrapper {
+            position: relative;
+            max-width: 320px;
+            margin-bottom: 25px;
+        }
+        
+        .date-picker {
+            appearance: none;
+            -webkit-appearance: none;
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            padding: 15px 15px 15px 45px;
+            border-radius: 12px;
+            color: #ffffff;
+            width: 100%;
+            font-size: 1rem;
+            font-family: inherit;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+        .date-picker:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .date-picker-wrapper::before {
+            content: "";
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%231e90ff'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        ::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .horarios-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 10px; }
         .time-btn {
-            padding: 15px;
-            background-color: var(--gray);
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            cursor: pointer;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-
-        .time-btn.combo-slot { 
-            background-color: #585800; 
-            border-color: #ffff00;
-        }
-
-        .time-btn:hover { background-color: var(--primary); color: black; }
-        
-        /* Estilo para horário bloqueado */
-        .time-btn.blocked {
-            background-color: #2c2c2c;
-            border-color: #444;
-            color: #666;
-            cursor: not-allowed;
-            text-decoration: line-through;
-        }
-
-        /* Estilo para horário selecionado */
-        .time-btn.selected {
-            background-color: var(--primary);
-            color: black;
-            box-shadow: 0 0 10px var(--primary);
-        }
-
-        .action-btn {
-            width: 100%; padding: 15px; background: var(--primary);
-            border: none; color: black; font-weight: bold; font-size: 1.1em;
-            cursor: pointer; margin-top: 20px; border-radius: 5px;
-        }
-        .action-btn:disabled { background: #555; cursor: not-allowed; }
-
-        /* Lista de Serviços (Visual) */
-        .services-list {
-            list-style: none;
-            padding: 0;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        .services-list li {
-            background: #222;
-            padding: 10px 0;
-            border-bottom: 1px solid #444;
-            display: flex;
-            justify-content: space-between;
-        }
-        .services-list .price {
-            color: var(--primary);
-            font-weight: bold;
-        }
-        
-        .location-info a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .location-info a:hover {
-            text-decoration: underline;
-        }
-        
-        /* Login/Auth Section Styles */
-        .auth-section {
-            background: #2a2a2a;
-            padding: 25px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            border: 1px solid #444;
-            text-align: center;
-        }
-        
-        /* Controles de Autenticação */
-        #emailAuthInputs {
-            margin-bottom: 15px;
-            border-bottom: 1px dashed #444;
-            padding-bottom: 15px;
-        }
-
-        .auth-actions {
-            display: flex;
-            gap: 10px;
-        }
-        .auth-actions button {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        #loginBtn, #registerBtn { background-color: var(--primary); color: black; }
-        
-        #googleBtn { 
-            background-color: #dd4b39; 
-            color: white; 
-            width: 100%; 
-            margin-top: 10px;
-        }
-        
-        #anonymousBtn { background-color: var(--blue); color: white; margin-top: 10px;}
-        #logoutBtn { background-color: var(--red); color: white; margin-top: 15px; }
-
-        .auth-welcome {
-            background: #2ecc7133;
-            padding: 15px;
-            border-radius: 5px;
-            border-left: 5px solid #2ecc71;
-            text-align: left;
-            margin-bottom: 20px;
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
+            background: transparent; border: 1px solid var(--border); color: #fff;
+            padding: 12px; border-radius: 6px; cursor: pointer; transition: 0.2s;
             position: relative;
         }
         
-        .password-toggle {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: var(--primary);
-            font-size: 1.2em;
-            user-select: none;
-            background: none;
-            border: none;
-            padding: 0;
-        }
-        
-        .password-toggle:hover {
-            opacity: 0.8;
-        }
-        
-        .form-group input[type="password"],
-        .form-group input[type="text"].password-visible {
-            padding-right: 40px;
+        .time-btn.selected { 
+            background: var(--primary); 
+            color: #000; 
+            font-weight: 800; 
+            border: 2px dashed #ffffff;
+            box-shadow: 0 0 20px rgba(30,144,255,0.6); 
+            transform: scale(1.05);
+            z-index: 2;
         }
 
-        /* Minha Agenda Styles */
-        .my-appointments-section {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #444;
+        .time-btn.blocked { opacity: 0.2; cursor: not-allowed; text-decoration: line-through; pointer-events: none; background: #222; }
+
+        .summary-card {
+            background: var(--card-bg); border: 1px solid var(--border);
+            padding: 30px; border-radius: 15px; position: sticky; top: 20px;
         }
-        .my-appointment-item {
-            background: #2a2a2a;
-            padding: 15px;
+        .summary-row { margin-bottom: 20px; }
+        .summary-label { font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; display: block; }
+        .summary-value { font-size: 1rem; font-weight: 600; display: block; margin-top: 5px; }
+        .total-price { font-size: 2.2rem; font-weight: 700; margin: 20px 0; display: block; }
+        
+        .btn-confirm {
+            width: 100%; padding: 18px; border-radius: 8px; border: 1px solid var(--border);
+            background: #222; color: #555; font-weight: 700; cursor: pointer; transition: 0.3s;
+        }
+        .btn-confirm.ready { background: #fff; color: #000; border-color: #fff; box-shadow: 0 4px 15px rgba(255,255,255,0.1); }
+
+        /* AJUSTE PARA MOBILE NA SEÇÃO DE CONTA */
+        .auth-container {
+            background: var(--card-bg); padding: 30px; border-radius: 12px;
+            max-width: 400px; margin: 40px auto; border: 1px solid var(--border);
+            display: none;
+            box-sizing: border-box; /* Garante que o preenchimento não quebre a largura */
+            width: calc(100% - 40px); /* Garante margens laterais no celular */
+        }
+        .auth-container input {
+            width: 100%; padding: 12px; margin: 10px 0; background: #000;
+            border: 1px solid var(--border); color: #fff; border-radius: 6px; box-sizing: border-box;
+            font-size: 16px; /* Evita zoom automático chato no iPhone */
+        }
+        .toggle-auth { color: var(--primary); cursor: pointer; font-size: 0.85rem; text-align: center; display: block; margin-top: 15px; }
+
+        footer { border-top: 1px solid var(--border); padding: 40px; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
+        .map-link { 
+            color: var(--primary); text-decoration: none; font-weight: 700; 
+            display: inline-block; margin-top: 10px; border: 1px solid var(--primary);
+            padding: 8px 15px; border-radius: 5px; transition: 0.3s;
+        }
+        .map-link:hover { background: var(--primary); color: #000; }
+
+        /* Estilos para Assinaturas */
+        .subscription-card {
+            border: 2px solid var(--border);
+            transition: all 0.3s ease;
+        }
+        .subscription-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(30, 144, 255, 0.15);
+        }
+        .subscription-card.selected {
+            border-color: var(--primary);
+            box-shadow: 0 0 25px rgba(30, 144, 255, 0.4);
+            transform: scale(1.02);
+        }
+        .subscription-card h3 {
+            color: var(--primary);
             margin-bottom: 10px;
-            border-left: 5px solid var(--primary);
-            border-radius: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
         }
-        .my-appointment-item p { margin: 5px 0; }
-        .cancel-client-btn {
-            background-color: var(--red);
-            color: white;
-            padding: 8px 12px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+        .subscription-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .subscription-card li {
+            padding: 3px 0;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .subscription-card li:before {
+            content: "✓ ";
+            color: var(--primary);
             font-weight: bold;
         }
-        
-        .slot-extra {
-            border-left-color: #585800;
-            opacity: 0.8;
-            font-size: 0.9em;
+
+        /* Novos estilos para assinatura */
+        .service-card.subscription-included {
+            border: 2px solid var(--subscription);
+            background: var(--subscription-light);
+            position: relative;
         }
-        
-        .empty-message {
+        .service-card.subscription-included::before {
+            content: "👑 ASSINATURA";
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            background: var(--subscription);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            z-index: 1;
+        }
+        .subscription-badge {
+            background: var(--subscription);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+        .subscription-free {
+            color: var(--subscription);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .subscription-tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .subscription-tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--card-bg);
+            color: var(--text-main);
             text-align: center;
-            padding: 20px;
-            background: #222;
-            border-radius: 5px;
-            color: #888;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            border: 1px solid var(--border);
+            font-size: 0.8rem;
+        }
+        .subscription-tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        .subscription-usage {
+            background: var(--subscription-light);
+            border: 1px solid var(--subscription-border);
+            border-radius: 8px;
+            padding: 12px;
+            margin: 10px 0;
+            font-size: 0.85rem;
+        }
+        .subscription-usage strong {
+            color: var(--subscription);
+        }
+        .subscription-savings {
+            background: linear-gradient(135deg, var(--subscription), var(--primary));
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin: 8px 0;
+            text-align: center;
+        }
+        .subscription-upgrade {
+            background: var(--warn);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            margin: 8px 0;
+            text-align: center;
+            cursor: pointer;
+        }
+        .subscription-confirm {
+            background: var(--subscription);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px 0;
+            width: 100%;
         }
 
-        @media (max-width: 500px) { 
-            .horarios-grid { grid-template-columns: repeat(3, 1fr); } 
-            .auth-actions { flex-direction: column; }
-            .my-appointment-item { flex-direction: column; align-items: flex-start; }
-            .cancel-client-btn { margin-top: 10px; width: 100%; }
-        }
-
-        /* Estilos para botões sociais (Google / Anônimo) */
-        .social-login { display: flex; gap: 10px; margin-top: 12px; }
-        .social-btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 10px 12px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; box-shadow: 0 2px 6px rgba(0,0,0,0.25); }
-        .social-btn .social-icon { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 4px; font-weight: 800; background: var(--primary); color: var(--light); font-size: 14px; }
-        .google-btn { background: #ffffff; color: var(--primary); border: 1px solid var(--primary); }
-        .google-btn .social-icon { background: var(--primary); color: var(--light); font-size: 14px; }
-        .anon-btn { background: linear-gradient(90deg, #4a7ef9, #2c5de0); color: #fff; }
-        .social-btn.secondary { background: #2a2a2a; color: var(--light); border: 1px solid #444; }
-
-        @media (max-width: 500px) {
-            .social-login { flex-direction: column; }
-        }
+@media (max-width: 900px) { .main-layout { grid-template-columns: 1fr; } .summary-card { position: static; } .services-grid { grid-template-columns: 1fr; } header { flex-direction: column; gap: 20px; } .auth-container { margin: 20px auto; } .logo-area h1 { font-size: 1rem; } .nav-buttons { flex-wrap: wrap; justify-content: center; } .nav-btn { padding: 8px 12px; font-size: 0.75rem; } .section-title { font-size: 1.2rem; } .horarios-grid { grid-template-columns: repeat(3, 1fr); } .service-card { padding: 15px; } .service-card h3 { font-size: 0.95rem; } .summary-card { padding: 20px; } .total-price { font-size: 1.8rem; } }
     </style>
-    
-    <script>
-        // Função global para alternar visibilidade da senha
-        function togglePasswordVisibility(inputId, btn) {
-            const input = document.getElementById(inputId);
-            if (input.type === 'password') {
-                input.type = 'text';
-                btn.textContent = '🙈';
-            } else {
-                input.type = 'password';
-                btn.textContent = '👁️';
-            }
-        }
-    </script>
 </head>
 <body>
 
     <header>
-        <img id="barberLogo" 
-            src="https://media.istockphoto.com/id/1446474893/pt/vetorial/barbershop-logo-vector-salon-logo.jpg?s=612x612&w=0&k=20&c=Ctt2bw9V05sMx0iOmlhbgXiGQxRgsBxxxZ3k7UWj7YA=" 
-            alt="Logo Nossa Barbearia" 
-            style="height: 100px; margin-bottom: 10px; border-radius: 50%; border: 3px solid var(--primary);">
-        
-        <h1>✂️ NOSSA BARBEARIA</h1>
-        
-        <div class="location-info">
-            <p style="margin: 5px 0 5px 0; font-size: 0.95em;">
-                📍 R. Isaías Mendes, n°07 - Alto Lagoa Funda, Marataízes - ES, 29345-000
-            </p>
-            <p style="margin: 0 0 5px 0;">
-                <a href="https://www.google.com/maps/search/?api=1&query=R.+Isa%C3%ADas+Mendes+07+Alto+Lagoa+Funda+Marata%C3%ADzes+ES+29345-000" target="_blank">Ver no Google Maps</a>
-            </p>
-            <p style="margin: 0; font-weight: bold; color: var(--light);">
-                ⏰ HORÁRIO: Segunda a Sábado, das 09:00h às 19:00h.
-            </p>
+        <div class="logo-area">
+            <img src="https://media.istockphoto.com/id/1446474893/pt/vetorial/barbershop-logo-vector-salon-logo.jpg?s=612x612&w=0&k=20&c=Ctt2bw9V05sMx0iOmlhbgXiGQxRgsBxxxZ3k7UWj7YA=" alt="Logo">
+            <h1 id="barbearia-nome-header">LOPES BARBEARIA</h1>
         </div>
-        
-        <p>Intervalos de 40 minutos.</p>
+        <div class="nav-buttons">
+            <button class="nav-btn active" id="btn-nav-agendamento" onclick="showSection('agendamento')">Agendar</button>
+            <button class="nav-btn" id="btn-nav-assinaturas" onclick="showSection('assinaturas')">Assinaturas</button>
+            <button class="nav-btn" id="btn-nav-minha-assinatura" onclick="showSection('minha-assinatura')">Minha Assinatura</button>
+            <button class="nav-btn" id="btn-nav-cliente" onclick="showSection('cliente')">Meus Agendamentos</button>
+        </div>
     </header>
-    
-    <div class="container">
-        
-        <div id="authSection" class="auth-section">
-            <h3 id="authTitle" style="color: var(--light); margin-top: 0;">Acesse ou Cadastre-se</h3>
-            
-            <div id="authForm">
-                <div id="emailAuthInputs">
-                    <div class="form-group">
-                        <input type="email" id="authEmail" placeholder="Seu Email" required>
-                    </div>
-                    <div class="form-group">
-                        <input type="password" id="authPassword" placeholder="Sua Senha" required>
-                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility('authPassword', this)">👁️</button>
-                    </div>
-                    
-                    <div class="auth-actions">
-                        <button id="loginBtn">Entrar</button>
-                        <button id="registerBtn">Cadastrar</button>
+
+    <div id="section-agendamento" class="main-layout">
+        <div class="content-side">
+            <div class="section-title"><span class="section-num">1</span> Escolha o Serviço</div>
+            <div class="services-grid" id="services-grid">
+                </div>
+
+            <div id="dateTimeArea" style="opacity: 0.3; pointer-events: none; transition: 0.5s;">
+                <div class="section-title"><span class="section-num">2</span> Data & Horário</div>
+                <div class="date-picker-wrapper">
+                    <input type="date" id="dataAgendamento" class="date-picker">
+                </div>
+                <div id="gridHorarios" class="horarios-grid"></div>
+            </div>
+        </div>
+
+        <div class="summary-side">
+            <div class="summary-card">
+                <div class="summary-row">
+                    <span class="summary-label">Serviço</span>
+                    <span class="summary-value" id="resumoServico">---</span>
+                </div>
+
+                <div id="autismo-area" style="display:none; margin-bottom:12px;">
+                    <span class="summary-label">Atendimento especializado?</span>
+                    <div style="display: flex; gap: 8px; margin-top: 8px;">
+                        <button class="time-btn" style="flex:1" onclick="setAutismo(true)">Sim (Autismo)</button>
+                        <button class="time-btn" style="flex:1" onclick="setAutismo(false)">Não</button>
                     </div>
                 </div>
-                
-                <button id="googleBtn">🔑 Entrar com Google</button>
-                
-                <button id="anonymousBtn">Continuar Anônimo</button>
-            </div>
-            
-            <div id="userInfoDisplay" class="auth-welcome" style="display: none;">
-                <p style="margin: 0; font-weight: bold;">Bem-vindo(a), <span id="userNameDisplay">Cliente</span>!</p>
-                <p style="margin: 5px 0 0 0; font-size: 0.9em;">Seu agendamento será associado à sua conta.</p>
-                <button id="logoutBtn">Sair</button>
-            </div>
-        </div>
-        <div id="agendamentoForm" style="display:none;">
-            <label>Tabela de Serviços:</label>
-            <ul class="services-list">
-                <li><span>Corte de Cabelo/Barba (40 min)</span> <span class="price">R$ 40,00</span></li>
-                <li><span>Combo (Cabelo e Barba - 80 min)</span> <span class="price">R$ 75,00</span></li>
-                <li><span>Corte Infantil - Autismo (80 min)</span> <span class="price">R$ 60,00</span></li>
-            </ul>
 
-            <label>1. Seu Nome:</label>
-            <input type="text" id="nomeCliente" placeholder="Digite seu nome..." required>
-            <label>Telefone (WhatsApp)</label>
-            <input type="tel" id="telefoneCliente" placeholder="(27) 99999-9999" style="margin-bottom:8px;">
-            
-            <label>2. Escolha o Serviço:</label>
-            <select id="servicoSelecionado">
-                <option value="Corte de Cabelo (40 min)">Corte de Cabelo (R$ 40)</option>
-                <option value="Barba (40 min)">Barba (R$ 40)</option>
-                <option value="Combo Cabelo e Barba (80 min)">Combo (Cabelo e Barba) (R$ 75)</option>
-            </select>
-
-            <div style="margin-top: 15px;">
-                <input type="checkbox" id="isInfantil" style="width: auto; margin-right: 10px;">
-                <label for="isInfantil" style="display: inline;">Agendamento Infantil (Apenas para Corte)</label>
-            </div>
-
-            <div id="autismoOption" style="display:none; margin-left: 20px; margin-top: 10px; border-left: 2px solid var(--primary); padding-left: 10px;">
-                <input type="checkbox" id="isAutismo" style="width: auto; margin-right: 10px;">
-                <label for="isAutismo" style="display: inline; color: var(--primary); font-weight: bold;">Cliente no Espectro Autista (80 min / R$ 60)</label>
-            </div>
-
-            <label style="margin-top: 20px;">Observações (Opcional):</label>
-            <textarea id="observacoes" placeholder="Ex: Cabelo liso, cliente com sensibilidade ao barulho, etc." rows="3"></textarea>
-
-
-            <label>3. Escolha o Dia:</label>
-            <input type="date" id="dataAgendamento">
-
-            <div id="areaHorarios" style="display:none; margin-top: 20px;">
-                <label>4. Escolha um Horário Disponível:</label>
-                <div class="horarios-grid" id="gridHorarios">
+                <div id="corte-area" style="display:none; margin-bottom:12px;">
+                    <span class="summary-label">Tipo de corte?</span>
+                    <div style="display: flex; gap: 8px; margin-top: 8px;">
+                        <button class="time-btn" style="flex:1" onclick="setCorteType('tesoura')">Só Tesoura</button>
+                        <button class="time-btn" style="flex:1" onclick="setCorteType('maquina')">Só Máquina</button>
                     </div>
-                <p style="font-size: 0.8em; color: #aaa; text-align: center; margin-top: 10px;">Horários riscados já estão ocupados.</p>
+                </div>
+
+                <div id="combo-area" style="display:none; margin-bottom:12px;">
+                    <span class="summary-label">Qual combo?</span>
+                    <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+                        <button class="time-btn" onclick="setComboType('basico')">Cabelo + Barba (R$ 45)</button>
+                        <button class="time-btn" onclick="setComboType('completo')">Cabelo + Barba + Sobrancelha (R$ 50)</button>
+                    </div>
+                </div>
+
+                <div class="summary-row">
+                    <span class="summary-label">Data e Hora</span>
+                    <span class="summary-value" id="resumoDataHora">---</span>
+                </div>
+                
+                <div id="observations-area" style="display:none; margin-bottom: 12px;">
+                    <span class="summary-label">Observações / Preferências sensoriais</span>
+                    <textarea id="observations" placeholder="Ex: Prefere atenção calma, sem barulho" style="width:100%; height:70px; margin-top:8px; padding:8px; background:#000; color:#fff; border:1px solid var(--border); border-radius:6px; font-family: sans-serif;"></textarea>
+                </div>
+
+                <span class="summary-label">Total a pagar</span>
+                <span class="total-price" id="resumoPreco">
+                    R$ 0 <span id="resumoTempo" style="font-size:0.8rem; color:var(--text-muted); font-weight:500;"></span>
+                </span>
+                
+                <div id="userNameLogged" style="margin-bottom: 15px; font-size: 0.8rem; color: var(--primary); font-weight: 600;"></div>
+                
+                <button id="btnConfirmar" class="btn-confirm" disabled onclick="finalizarAgendamento()">
+                    CONFIRMAR AGENDAMENTO
+                </button>
             </div>
-            <p id="avisoDomingo" style="display: none; color: var(--red); text-align: center;">⛔ Domingo não é um dia de agendamento. Por favor, escolha outra data.</p>
-
-
-            <button id="btnConfirmar" class="action-btn" disabled>CONFIRMAR AGENDAMENTO</button>
         </div>
+    </div>
+
+    <div id="section-assinaturas" style="display: none; max-width: 1200px; margin: 0 auto; padding: 20px;">
+        <div class="section-title" style="text-align: center; margin-bottom: 40px; color: var(--primary); font-size: 2rem;">Escolha seu Plano de Assinatura</div>
+        <p style="text-align: center; color: var(-@med-text-muted); margin-bottom: 50px; font-size: 1.1rem;">Planos flexíveis para manter seu visual sempre impecável</p>
         
-        <div id="myAppointmentsSection" class="my-appointments-section" style="display:none;">
-            <h3 style="color: var(--primary);">🗓️ Meus Próximos Agendamentos</h3>
-            <div id="myAppointmentsList">
-                <p class="empty-message">Carregando seus agendamentos...</p>
+        <div class="services-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px;">
+            <div class="service-card subscription-card" onclick="selectSubscription('sempre-alinhado')" style="border: 2px solid var(--border); transition: all 0.3s ease; position: relative;">
+                <div style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: var(--primary); color: white; padding: 5px 15px; border-radius: 15px; font-size: 0.8rem; font-weight: bold;">POPULAR</div>
+                <h3 style="color: var(--primary); margin-bottom: 10px; text-align: center;">Sempre Alinhado</h3>
+                <p style="font-size: 0.9rem; margin-bottom: 15px;">Foco em manutenção semanal para visual impecável.</p>
+                <ul style="list-style: none; padding: 0; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
+                    <li>• Até 4 "Pezinhos" por mês (1/semana)</li>
+                    <li>• Até 2 Barbas por mês</li>
+                    <li>• 1 Sobrancelha inclusa</li>
+                </ul>
+                <div class="service-meta">
+                    <span class="service-price" style="font-size: 1.2rem; color: var(--primary);">R$ 79,90/mês</span>
+                </div>
+                <button class="btn-confirm" style="width: 100%; margin-top: 15px; background: var(--primary); color: white; border: none;" onclick="subscribePlan('sempre-alinhado')">ASSINAR</button>
+            </div>
+
+            <div class="service-card subscription-card" onclick="selectSubscription('combo-executivo')">
+                <h3>Combo Executivo</h3>
+                <p style="font-size: 0.9rem; margin-bottom: 15px;">Corte + Barba a cada 15 dias com sobrancelhas ilimitadas.</p>
+                <ul style="list-style: none; padding: 0; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
+                    <li>• 2 Cortes na Máquina por mês</li>
+                    <li>• 2 Barbas por mês</li>
+                    <li>• Sobrancelha ilimitada</li>
+                </ul>
+                <div class="service-meta">
+                    <span class="service-price" style="font-size: 1.2rem; color: var(--primary);">R$ 119,90/mês</span>
+                </div>
+                <button class="btn-confirm" style="width: 100%; margin-top: 15px; background: var(--primary); color: white; border: none;" onclick="subscribePlan('combo-executivo')">ASSINAR</button>
+            </div>
+
+            <div class="service-card subscription-card" onclick="selectSubscription('vip-premium')">
+                <h3>VIP Premium</h3>
+                <p style="font-size: 0.9rem; margin-bottom: 15px;">Experiência completa com serviços ilimitados.</p>
+                <ul style="list-style: none; padding: 0; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
+                    <li>• Cortes ilimitados (1/semana min.)</li>
+                    <li>• Barba ilimitada</li>
+                    <li>• Sobrancelha e Pigmentação</li>
+                    <li>• Depilação sempre que necessário</li>
+                </ul>
+                <div class="service-meta">
+                    <span class="service-price" style="font-size: 1.2rem; color: var(--primary);">R$ 159,90/mês</span>
+                </div>
+                <button class="btn-confirm" style="width: 100%; margin-top: 15px; background: var(--primary); color: white; border: none;" onclick="subscribePlan('vip-premium')">ASSINAR</button>
             </div>
         </div>
+
+        <div id="subscription-details" style="display: none; margin-top: 40px; background: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+            <h3 id="selected-plan-title" style="margin-bottom: 20px; color: var(--primary); text-align: center; font-size: 1.5rem;"></h3>
+            <div id="selected-plan-description" style="margin-bottom: 25px; line-height: 1.6;"></div>
+            <div style="text-align: center;">
+                <button class="btn-confirm" style="background: var(--success); color: white; border: none; padding: 15px 30px; font-size: 1.1rem; font-weight: bold;" onclick="confirmSubscription()">CONFIRMAR ASSINATURA</button>
+            </div>
         </div>
+    </div>
+
+    <div id="section-minha-assinatura" style="display: none; max-width: 1200px; margin: 0 auto; padding: 20px;">
+        <div class="section-title" style="text-align: center; margin-bottom: 40px;">Minha Assinatura</div>
+        
+        <div id="subscription-info" style="display: none;">
+            <div class="summary-card" style="margin-bottom: 30px;">
+                <div class="summary-row">
+                    <span class="summary-label">Plano Ativo</span>
+                    <span class="summary-value" id="current-plan-name">---</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Valor Mensal</span>
+                    <span class="summary-value" id="current-plan-price">---</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Próxima Cobrança</span>
+                    <span class="summary-value" id="next-billing-date">---</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Status</span>
+                    <span class="summary-value" id="subscription-status">---</span>
+                </div>
+            </div>
+
+            <!-- Gráfico de uso mensal -->
+            <div class="summary-card" style="margin-bottom: 30px;">
+                <h4 style="margin-bottom: 20px; color: var(--subscription);">📊 Uso Mensal dos Serviços</h4>
+                <div id="subscription-usage-chart" style="height: 200px;">
+                    <canvas id="usageChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Próximos benefícios -->
+            <div class="summary-card" style="margin-bottom: 30px;">
+                <h4 style="margin-bottom: 20px; color: var(--subscription);">🔄 Próximos Benefícios</h4>
+                <div id="upcoming-benefits">
+                    <p style="color: var(--text-muted);">Carregando...</p>
+                </div>
+            </div>
+
+            <!-- Histórico de uso -->
+            <div class="summary-card" style="margin-bottom: 30px;">
+                <h4 style="margin-bottom: 20px; color: var(--subscription);">📋 Histórico de Uso (Este Mês)</h4>
+                <div id="usage-history">
+                    <p style="color: var(--text-muted);">Carregando...</p>
+                </div>
+                <button class="btn-action" style="background: var(--subscription); margin-top: 15px;" onclick="showFullHistory()">VER HISTÓRICO COMPLETO</button>
+            </div>
+
+            <div style="text-align: center;">
+                <button class="btn-confirm" style="background: var(--primary);" onclick="contactBarber()">FALAR COM O BARBEIRO</button>
+            </div>
+        </div>
+
+        <div id="no-subscription" style="text-align: center; padding: 50px;">
+            <h3 style="color: var(--text-muted);">Você não possui uma assinatura ativa</h3>
+            <p style="color: var(--text-muted); margin: 20px 0;">Clique em "Assinaturas" para conhecer nossos planos!</p>
+            <button class="btn-confirm" onclick="showSection('assinaturas')">VER PLANOS</button>
+        </div>
+    </div>
+
+    <div id="section-cliente" class="auth-container">
+        <div id="auth-login">
+            <h2 style="text-align: center;">Acessar</h2>
+            <input type="text" id="login-email" placeholder="E-mail ou telefone">
+            <input type="password" id="login-senha" placeholder="Senha">
+            <button class="nav-btn active" style="width: 100%; margin-top: 10px;" onclick="handleLogin()">Entrar</button>
+            <span class="toggle-auth" onclick="toggleAuthMode('signup')">Ainda não tem conta? Criar conta</span>
+        </div>
+
+        <div id="auth-signup" style="display: none;">
+            <h2 style="text-align: center;">Nova Conta</h2>
+            <input type="text" id="signup-nome" placeholder="Nome Completo *" required>
+            <input type="text" id="signup-phone" placeholder="Telefone (DDD + Número) *" required>
+            <input type="email" id="signup-email" placeholder="E-mail *" required>
+            <input type="password" id="signup-senha" placeholder="Senha (mín. 6 dígitos) *" required>
+            <button class="nav-btn active" style="width: 100%; margin-top: 10px;" onclick="handleSignUp()">Cadastrar</button>
+            <span class="toggle-auth" onclick="toggleAuthMode('login')">Já tem conta? Entrar</span>
+        </div>
+
+        <div id="user-logged-info" style="display: none; text-align: center;">
+            <p>Olá, <span id="clientName" style="color: var(--primary); font-weight: 700;"></span>!</p>
+            <button class="nav-btn" onclick="handleLogout()">Sair da conta</button>
+            <hr border-color="#222" style="margin: 20px 0;">
+            <h3 style="font-size: 0.9rem;">Meus Agendamentos</h3>
+            <div id="listaAgendamentos" style="font-size: 0.8rem; text-align: left;"></div>
+        </div>
+    </div>
+
+    <footer>
+        <p id="barbearia-endereco-footer">📍 Av. Central, 149-21 - Alto Lagoa Funda, Marataízes - ES, 29345-000</p>
+        <a id="barbearia-maps-link" href="https://maps.app.goo.gl/tMqWDAU2Eh14hp9bA" target="_blank" class="map-link">
+            🗺️ VER NO GOOGLE MAPS
+        </a>
+        <p style="margin-top: 20px; opacity: 0.5;">© 2026 <span id="barbearia-nome-footer">BARBER MANAGER</span></p>
+    </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, query, where, getDocs, deleteDoc, doc, orderBy, setDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, signInAnonymously, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, where, getDocs, getDoc, setDoc, doc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-
-        // ============================================================
-        // ✅ SUAS CHAVES DO FIREBASE INTEGRADA
-        // ============================================================
         const firebaseConfig = {
-              apiKey: "AIzaSyAi2g57qd4J3ONEjGvTEct69jsdV9F59lg",
-              authDomain: "nossa-barbearia.firebaseapp.com",
-              projectId: "nossa-barbearia",
-              storageBucket: "nossa-barbearia.firebasestorage.app",
-              messagingSenderId: "545785512912",
-              appId: "1:545785512912:web:a917526f553c21945e6fd5",
+            apiKey: "AIzaSyBLBFTLC7sqM9VUhlsypPugQ-LhcX7-0Rw",
+            authDomain: "barbearia-do-rei.firebaseapp.com",
+            projectId: "barbearia-do-rei",
+            storageBucket: "barbearia-do-rei.firebasestorage.app",
+            messagingSenderId: "546744214164",
+            appId: "1:546744214164:web:5bd367381afbef253d0a81",
         };
-        // ============================================================
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app); 
-        const googleProvider = new GoogleAuthProvider(); 
-
-        // ============================================================
-        // Variáveis Globais e Mapeamento de DOM
-        // ============================================================
-        const horariosPossiveis = [
-            "09:00", "09:40", "10:20", "11:00", "11:40", 
-            "13:00", "13:40", "14:20", "15:00", "15:40", 
-            "16:20", "17:00", "17:40", "18:20" 
+        const serviceOrder = [
+            "Corte na Máquina",
+            "Corte só Tesoura", 
+            "Corte Infantil",
+            "Pezinho",
+            "Combo Corte + Barba",
+            "Combo Completo: Cabelo, Barba e Sobrancelha",
+            "Barba Completa",
+            "Sobrancelha",
+            "Pigmentação",
+            "Depilação Nariz/Orelha"
         ];
 
-        const dataInput = document.getElementById('dataAgendamento');
-        const areaHorarios = document.getElementById('areaHorarios');
-        const gridHorarios = document.getElementById('gridHorarios');
-        const btnConfirmar = document.getElementById('btnConfirmar');
-        const nomeInput = document.getElementById('nomeCliente');
-        const servicoInput = document.getElementById('servicoSelecionado');
-        const avisoDomingo = document.getElementById('avisoDomingo');
-        const agendamentoForm = document.getElementById('agendamentoForm');
-        
-        const isInfantilInput = document.getElementById('isInfantil'); 
-        const autismoOptionDiv = document.getElementById('autismoOption'); 
-        const isAutismoInput = document.getElementById('isAutismo'); 
-        const observacoesInput = document.getElementById('observacoes'); 
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
 
-        // Elementos de Autenticação
-        const authForm = document.getElementById('authForm');
-        const userInfoDisplay = document.getElementById('userInfoDisplay');
-        const userNameDisplay = document.getElementById('userNameDisplay');
-        const authEmail = document.getElementById('authEmail');
-        const authPassword = document.getElementById('authPassword');
-        const loginBtn = document.getElementById('loginBtn');
-        const registerBtn = document.getElementById('registerBtn');
-        const googleBtn = document.getElementById('googleBtn'); 
-        const anonymousBtn = document.getElementById('anonymousBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
+        const inputData = document.getElementById('dataAgendamento');
         
-        // Elementos de Meus Agendamentos
-        const myAppointmentsSection = document.getElementById('myAppointmentsSection');
-        const myAppointmentsList = document.getElementById('myAppointmentsList');
+        // Função para obter data atual no formato YYYY-MM-DD
+        const getTodayStr = () => {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+
+        // Configurar data mínima para o date picker
+        const hojeISO = getTodayStr();
+        inputData.setAttribute('min', hojeISO);
+
+        // Estado da aplicação
+        let state = { 
+            servico: null, 
+            data: null, 
+            hora: null, 
+            user: null, 
+            autismo: false,
+            monthlyBookings: {}
+        };
         
-        let horarioSelecionado = null;
-        let horariosOcupadosGlobal = [];
-        let currentUser = null; 
+        // Variáveis para horários
+        let horariosBase = []; // Será carregada do Firestore
+        let horariosConfig = null; // Para armazenar configurações de horários
         
-        // ============================================================
-        // FUNÇÕES DE UTILIDADE
-        // ============================================================
+        // Outras variáveis globais
+        let servicesData = [];
+        let usageChart = null;
+        let userSubscription = null;
+
+        // ========== FUNÇÕES DE CARREGAMENTO DE CONFIGURAÇÕES ==========
         
-        // A rotina automática de remoção de agendamentos antigos foi removida.
-        // Para fins de auditoria ou limpeza, execute ações manuais no console do Firebase.
+        // Função para carregar configurações de horários
+        async function loadHorariosConfig() {
+            try {
+                console.log('Carregando configurações de horários...');
+                const docRef = doc(db, "configuracoes_gerais", "horarios");
+                const docSnap = await getDoc(docRef);
+                
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    console.log('Configurações de horários carregadas do admin:', data);
+                    horariosConfig = data;
+                    // Gerar array de horários a partir da configuração do admin
+                    horariosBase = generateTimeSlots(data);
+                    console.log('Horários gerados:', horariosBase);
+                } else {
+                    console.log('Nenhuma configuração de horários encontrada, usando padrões');
+                    horariosConfig = null;
+                    horariosBase = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30"];
+                }
+            } catch (error) {
+                console.error('Erro ao carregar configurações de horários:', error);
+                horariosConfig = null;
+                horariosBase = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30"];
+            }
+        }
         
-        function formatarData(dataISO) {
-             if (dataISO instanceof Date) {
-                 return dataISO.toLocaleDateString('pt-BR');
-             }
-             if (typeof dataISO === 'string' && dataISO.includes('-')) {
-                 return dataISO.split('-').reverse().join('/');
-             }
-             if (dataISO && dataISO.seconds) {
-                 const date = new Date(dataISO.seconds * 1000);
-                 return date.toLocaleDateString('pt-BR');
-             }
-             return String(dataISO); 
+        // Função para gerar array de horários a partir da configuração do admin
+        function generateTimeSlots(horariosConfig) {
+            if (!horariosConfig) return ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30"];
+            
+            // Usar configuração de segunda-feira como padrão ou primeira dia aberto
+            const dias = ['segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado', 'domingo'];
+            let diaConfig = null;
+            
+            for (let dia of dias) {
+                if (horariosConfig[dia] && horariosConfig[dia].abre !== false) {
+                    diaConfig = horariosConfig[dia];
+                    break;
+                }
+            }
+            
+            if (!diaConfig) {
+                diaConfig = { abertura: '09:00', fechamento: '18:00', almocoInicio: '12:00', almocoFim: '13:00' };
+            }
+            
+            const slots = [];
+            const [startH, startM] = diaConfig.abertura.split(':').map(Number);
+            const [endH, endM] = diaConfig.fechamento.split(':').map(Number);
+            const [lunchStartH, lunchStartM] = diaConfig.almocoInicio.split(':').map(Number);
+            const [lunchEndH, lunchEndM] = diaConfig.almocoFim.split(':').map(Number);
+            
+            let currentH = startH;
+            let currentM = startM;
+            
+            while (currentH < endH || (currentH === endH && currentM < endM)) {
+                const lunchStart = lunchStartH * 60 + lunchStartM;
+                const lunchEnd = lunchEndH * 60 + lunchEndM;
+                const current = currentH * 60 + currentM;
+                
+                if (current < lunchStart || current >= lunchEnd) {
+                    slots.push(`${String(currentH).padStart(2, '0')}:${String(currentM).padStart(2, '0')}`);
+                }
+                
+                currentM += 30;
+                if (currentM >= 60) {
+                    currentM = 0;
+                    currentH += 1;
+                }
+            }
+            
+            return slots.length > 0 ? slots : ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30"];
         }
 
-        function getProximoHorario(horaAtual) {
-            const indexAtual = horariosPossiveis.indexOf(horaAtual);
-            return indexAtual !== -1 && indexAtual + 1 < horariosPossiveis.length 
-                ? horariosPossiveis[indexAtual + 1] 
-                : null;
-        }
-
-        // ============================================================
-        // FUNÇÃO PARA CALCULAR HORÁRIO FIM
-        // ============================================================
-        function calcularHorarioFim(horaInicio, duracao) {
-            const [horas, minutos] = horaInicio.split(':').map(Number);
-            const totalMinutos = horas * 60 + minutos + duracao;
-            const novasHoras = Math.floor(totalMinutos / 60);
-            const novosMinutos = totalMinutos % 60;
-            return `${String(novasHoras).padStart(2, '0')}:${String(novosMinutos).padStart(2, '0')}`;
-        }
-
-        // ============================================================
-        // FUNÇÃO PARA VERIFICAR DISPONIBILIDADE DE SLOT
-        // ============================================================
-        async function isSlotAvailable(data, hora) {
-            const q = query(
-                collection(db, "agendamentos"),
-                where("data", "==", data),
-                where("hora", "==", hora)
-            );
-            const snapshot = await getDocs(q);
-            return snapshot.empty; // Retorna true se não há agendamentos
-        }
-
-        // ============================================================
-        // FUNÇÃO PARA RECARREGAR A AGENDA (RECARREGA HORÁRIOS)
-        // ============================================================
-        function loadAgenda(data) {
-            if (data) {
-                carregarHorarios(data);
+        // Carregar serviços do Firestore
+        async function loadServices() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "services"));
+                if (!querySnapshot.empty) {
+                    servicesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    console.log('Serviços carregados do Firestore:', servicesData);
+                } else {
+                    console.log('Nenhum serviço encontrado no Firestore, usando fallback');
+                    servicesData = [
+                        { name: "Corte na Máquina", duration: 20, price: 20, slots: 1 },
+                        { name: "Corte só Tesoura", duration: 45, price: 30, slots: 2 },
+                        { name: "Corte Infantil", duration: 30, price: 35, slots: 1 },
+                        { name: "Pezinho", duration: 30, price: 10, slots: 1 },
+                        { name: "Combo Corte + Barba", duration: 60, price: 45, slots: 2 },
+                        { name: "Combo Completo: Cabelo, Barba e Sobrancelha", duration: 75, price: 50, slots: 3 },
+                        { name: "Barba Completa", duration: 30, price: 25, slots: 1 },
+                        { name: "Sobrancelha", duration: 15, price: 15, slots: 1 },
+                        { name: "Pigmentação", duration: 20, price: 25, slots: 1 },
+                        { name: "Depilação Nariz/Orelha", duration: 10, price: 10, slots: 1 }
+                    ];
+                }
+                renderServices();
+            } catch (error) {
+                console.error("Erro ao carregar serviços:", error);
+                servicesData = [
+                    { name: "Corte na Máquina", duration: 20, price: 20, slots: 1 },
+                    { name: "Corte só Tesoura", duration: 45, price: 30, slots: 2 },
+                    { name: "Corte Infantil", duration: 30, price: 35, slots: 1 },
+                    { name: "Pezinho", duration: 30, price: 10, slots: 1 },
+                    { name: "Combo Corte + Barba", duration: 60, price: 45, slots: 2 },
+                    { name: "Combo Completo: Cabelo, Barba e Sobrancelha", duration: 75, price: 50, slots: 3 },
+                    { name: "Barba Completa", duration: 30, price: 25, slots: 1 },
+                    { name: "Sobrancelha", duration: 15, price: 15, slots: 1 },
+                    { name: "Pigmentação", duration: 20, price: 25, slots: 1 },
+                    { name: "Depilação Nariz/Orelha", duration: 10, price: 10, slots: 1 }
+                ];
+                renderServices();
             }
         }
 
+        // Carregar configurações da barbearia
+        async function loadBarbeariaConfig() {
+            try {
+                console.log('Carregando configurações da barbearia...');
+                const docRef = doc(db, "configuracoes_gerais", "barbearia");
+                const docSnap = await getDoc(docRef);
+                
+                if (docSnap.exists()) {
+                    const config = docSnap.data();
+                    console.log('Configurações da barbearia carregadas:', config);
+                    
+                    // Atualizar nome da barbearia
+                    const barberName = config.barberName || 'Lopes Barbearia';
+                    document.getElementById('barbearia-nome-header').textContent = barberName;
+                    document.getElementById('page-title').textContent = barberName;
+                    document.getElementById('barbearia-nome-footer').textContent = barberName;
+                    
+                    // Atualizar telefone (usar nas mensagens WhatsApp)
+                    if (config.barberPhone) {
+                        window.barberPhone = config.barberPhone.replace(/\D/g, '');
+                    }
+                    
+                    // Atualizar endereço e link do maps
+                    if (config.barberAddress) {
+                        document.getElementById('barbearia-endereco-footer').textContent = `📍 ${config.barberAddress}`;
+                    }
+                    
+                    if (config.barberMapsLink) {
+                        const mapsLink = document.getElementById('barbearia-maps-link');
+                        mapsLink.href = config.barberMapsLink;
+                    }
+                    
+                    console.log('Configurações da barbearia aplicadas com sucesso');
+                } else {
+                    console.log('Nenhuma configuração da barbearia encontrada, usando padrões');
+                }
+            } catch (error) {
+                console.error('Erro ao carregar configurações da barbearia:', error);
+            }
+        }
         
-       // ============================================================
-        // LÓGICA DE CANCELAMENTO DO CLIENTE (DELETA DIRETO DO FIREBASE E GERA WHATSAPP)
-        // SEM CLOUD FUNCTION
-        // ============================================================
-        window.cancelarAgendamentoCliente = async function(idAgendamento, data, hora, isComboPrincipal, nomeCliente, servico) {
-            const confirmacao = confirm(`Tem certeza que deseja cancelar o agendamento das ${hora}h do dia ${formatarData(data)}?`);
-            if (!confirmacao) return;
+        // Carregar duração de agendamentos
+        async function loadDuracaoAgendamento() {
+            try {
+                console.log('Carregando duração de agendamentos...');
+                const docRef = doc(db, "configuracoes_gerais", "agendamentos");
+                const docSnap = await getDoc(docRef);
+                
+                if (docSnap.exists()) {
+                    const dados = docSnap.data();
+                    window.duracaoAgendamento = dados.duracao || 30;
+                    console.log('Duração de agendamento carregada:', window.duracaoAgendamento);
+                } else {
+                    window.duracaoAgendamento = 30; // Padrão
+                    console.log('Nenhuma duração configurada, usando padrão: 30 minutos');
+                }
+            } catch (error) {
+                console.error('Erro ao carregar duração de agendamento:', error);
+                window.duracaoAgendamento = 30; // Padrão em caso de erro
+            }
+        }
 
-            if (!currentUser) {
-                alert("Você precisa estar logado para cancelar agendamentos.");
+        // Função para carregar todas as configurações
+        async function loadAllConfigurations() {
+            console.log('Carregando todas as configurações...');
+            await loadBarbeariaConfig();
+            await loadDuracaoAgendamento();
+            await loadHorariosConfig();
+            await loadServices();
+            setupHorariosListener();
+        }
+
+        // Listener em tempo real para horários
+        function setupHorariosListener() {
+            try {
+                const docRef = doc(db, "configuracoes_gerais", "horarios");
+                onSnapshot(docRef, (snapshot) => {
+                    if (snapshot.exists()) {
+                        const newHorariosConfig = snapshot.data();
+                        console.log('✅ Horários atualizados em tempo real:', newHorariosConfig);
+                        horariosConfig = newHorariosConfig;
+                        horariosBase = generateTimeSlots(newHorariosConfig);
+                        
+                        // Se estiver na página de agendamento, re-renderizar os horários
+                        if (state.data) {
+                            console.log('Renderizando horários atualizados...');
+                            renderHorarios();
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Erro ao configurar listener de horários:', error);
+            }
+        }
+
+        // ========== FUNÇÕES PRINCIPAIS ==========
+
+        // Carregar assinatura do usuário
+        async function loadUserSubscriptionForBooking() {
+            if (!state.user) return;
+            try {
+                const q = query(collection(db, "assinaturas"), where("clientId", "==", state.user.uid), where("status", "==", "active"));
+                const querySnapshot = await getDocs(q);
+                if (!querySnapshot.empty) {
+                    userSubscription = querySnapshot.docs[0].data();
+                } else {
+                    userSubscription = null;
+                }
+            } catch (e) {
+                console.error("Erro ao carregar assinatura:", e);
+                userSubscription = null;
+            }
+        }
+
+        // Calcular agendamentos do mês
+        async function getMonthlyBookings() {
+            if (!state.user) return {};
+            const now = new Date();
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            
+            try {
+                const q = query(collection(db, "agendamentos"), 
+                    where("userId", "==", state.user.uid),
+                    where("data", ">=", startOfMonth.toISOString().split('T')[0]),
+                    where("data", "<=", endOfMonth.toISOString().split('T')[0])
+                );
+                const querySnapshot = await getDocs(q);
+                const bookings = {};
+                querySnapshot.forEach(doc => {
+                    const data = doc.data();
+                    const serviceName = data.servico.replace(' (Assinatura)', '').split(' (')[0];
+                    if (!bookings[serviceName]) bookings[serviceName] = 0;
+                    bookings[serviceName]++;
+                });
+                return bookings;
+            } catch (e) {
+                console.error("Erro ao carregar agendamentos:", e);
+                return {};
+            }
+        }
+
+        // Calcular disponibilidade por serviço baseado na assinatura
+        function getServiceAvailability(serviceName, monthlyBookings) {
+            if (!userSubscription) return null;
+            
+            const plan = userSubscription.plan;
+            const bookings = monthlyBookings[serviceName] || 0;
+            
+            let limit = null;
+            
+            if (plan === 'sempre-alinhado') {
+                if (serviceName === 'Pezinho') limit = 4;
+                else if (serviceName === 'Barba Completa') limit = 2;
+                else if (serviceName === 'Sobrancelha') limit = 1;
+            } else if (plan === 'combo-executivo') {
+                if (serviceName === 'Corte na Máquina') limit = 2;
+                else if (serviceName === 'Barba Completa') limit = 2;
+                else if (serviceName === 'Sobrancelha') limit = Infinity;
+            } else if (plan === 'vip-premium') {
+                limit = Infinity;
+            }
+            
+            if (limit === null) return null;
+            
+            const available = limit - bookings;
+            return { used: bookings, limit: limit, available: Math.max(0, available) };
+        }
+        
+        // Renderizar serviços
+        function renderServices() {
+            const grid = document.getElementById('services-grid');
+            if (!grid) {
+                console.error('services-grid não encontrado');
+                return;
+            }
+            
+            if (!servicesData || servicesData.length === 0) {
+                console.warn('servicesData vazio, usando padrão');
+                servicesData = [
+                    { name: "Corte na Máquina", duration: 20, price: 20 },
+                    { name: "Corte só Tesoura", duration: 45, price: 30 },
+                    { name: "Corte Infantil", duration: 30, price: 35 },
+                    { name: "Pezinho", duration: 30, price: 10 },
+                    { name: "Combo Corte + Barba", duration: 60, price: 45 },
+                    { name: "Combo Completo: Cabelo, Barba e Sobrancelha", duration: 75, price: 50 },
+                    { name: "Barba Completa", duration: 30, price: 25 },
+                    { name: "Sobrancelha", duration: 15, price: 15 },
+                    { name: "Pigmentação", duration: 20, price: 25 },
+                    { name: "Depilação Nariz/Orelha", duration: 10, price: 10 }
+                ];
+            }
+            
+            // Ordenar os serviços
+            const sortedServices = [...servicesData].sort((a, b) => {
+                const indexA = serviceOrder.indexOf(a.name);
+                const indexB = serviceOrder.indexOf(b.name);
+                
+                if (indexA === -1 && indexB === -1) return 0;
+                if (indexA === -1) return 1;
+                if (indexB === -1) return -1;
+                
+                return indexA - indexB;
+            });
+            
+            const serviceDescriptions = {
+                "Corte na Máquina": "Corte rápido e prático com máquina.",
+                "Corte só Tesoura": "Corte exclusivo com tesoura para acabamento perfeito.",
+                "Corte Infantil": "Atendimento humanizado e paciente para crianças.",
+                "Pezinho": "Limpeza e acabamento dos pés.",
+                "Combo Corte + Barba": "Cabelo + Barba com desconto especial.",
+                "Combo Completo: Cabelo, Barba e Sobrancelha": "Pacote completo para o cavalheiro moderno.",
+                "Barba Completa": "Design de barba e acabamento.",
+                "Sobrancelha": "Design e limpeza das sobrancelhas.",
+                "Pigmentação": "Tingimento e pigmentação capilar.",
+                "Depilação Nariz/Orelha": "Limpeza e depilação de pelos indesejados.",
+                "Combos": "Pacotes completos para o cavalheiro moderno.",
+                "Corte Infantil (Autismo)": "Atendimento especializado para crianças com autismo."
+            };
+
+            grid.innerHTML = sortedServices.map(service => {
+                const displayName = service.name;
+                const availability = getServiceAvailability(service.name, state.monthlyBookings || {});
+                
+                let availabilityText = '';
+                let priceDisplay = `R$ ${service.price}`;
+                let cardClass = 'service-card';
+                let badgeHtml = '';
+                let tooltipHtml = '';
+                
+                if (availability) {
+                    if (availability.available > 0) {
+                        cardClass += ' subscription-included';
+                        badgeHtml = '<span class="subscription-badge">👑 INCLUSO</span>';
+                        priceDisplay = `<span class="subscription-free">GRÁTIS</span>`;
+                        availabilityText = `<div class="subscription-usage">Você já usou <strong>${availability.used}</strong> de <strong>${availability.limit === Infinity ? '∞' : availability.limit}</strong> este mês</div>`;
+                        tooltipHtml = `<div class="subscription-tooltip">💡<span class="tooltip-text">Este serviço está incluso na sua assinatura ativa. Você economiza R$ ${service.price}!</span></div>`;
+                    } else {
+                        availabilityText = `<div class="subscription-usage" style="background: rgba(239, 68, 68, 0.1); border-color: var(--danger);">Limite atingido este mês (${availability.used}/${availability.limit === Infinity ? '∞' : availability.limit})</div>`;
+                        tooltipHtml = `<div class="subscription-tooltip">⚠️<span class="tooltip-text">Você atingiu o limite mensal deste serviço na sua assinatura.</span></div>`;
+                    }
+                } else if (userSubscription) {
+                    tooltipHtml = `<div class="subscription-tooltip">💳<span class="tooltip-text">Este serviço não está incluso na sua assinatura. Custa R$ ${service.price} avulso.</span></div>`;
+                }
+                
+                return `
+                    <div class="${cardClass}" onclick="selectService(this, '${service.name}', ${service.duration}, ${service.price})">
+                        <h3>${displayName}${badgeHtml}${tooltipHtml}</h3>
+                        <p>${serviceDescriptions[service.name] || service.name}</p>
+                        ${availabilityText}
+                        <div class="service-meta">
+                            <span class="service-time">⏱ ${service.duration} MIN</span>
+                            <span class="service-price">${priceDisplay}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Tornar renderServices global
+        window.renderServices = renderServices;
+
+        // ========== FUNÇÕES DE INTERFACE ==========
+
+        window.showSection = (name) => {
+            document.getElementById('section-agendamento').style.display = name === 'agendamento' ? 'grid' : 'none';
+            document.getElementById('section-assinaturas').style.display = name === 'assinaturas' ? 'block' : 'none';
+            document.getElementById('section-minha-assinatura').style.display = name === 'minha-assinatura' ? 'block' : 'none';
+            document.getElementById('section-cliente').style.display = name === 'cliente' ? 'block' : 'none';
+            document.getElementById('btn-nav-agendamento').classList.toggle('active', name === 'agendamento');
+            document.getElementById('btn-nav-assinaturas').classList.toggle('active', name === 'assinaturas');
+            document.getElementById('btn-nav-minha-assinatura').classList.toggle('active', name === 'minha-assinatura');
+            document.getElementById('btn-nav-cliente').classList.toggle('active', name === 'cliente');
+            window.scrollTo(0, 0);
+            
+            if (name === 'minha-assinatura') {
+                loadUserSubscription();
+            }
+        };
+
+        window.toggleAuthMode = (mode) => {
+            document.getElementById('auth-login').style.display = mode === 'login' ? 'block' : 'none';
+            document.getElementById('auth-signup').style.display = mode === 'signup' ? 'block' : 'none';
+        };
+
+        window.selectService = (el, nome, duracao, preco) => {
+            document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+            const slots = Math.max(1, Math.ceil(duracao / 30));
+            state.servico = { nome, duracao, preco, slots, original: { duracao, preco, slots } };
+            state.autismo = false;
+            state.hora = null;
+
+            const availability = getServiceAvailability(nome, state.monthlyBookings || {});
+            state.isSubscription = availability && availability.available > 0;
+            const finalPreco = state.isSubscription ? 0 : preco;
+
+            if (state.isSubscription) {
+                const savingsMsg = document.createElement('div');
+                savingsMsg.className = 'subscription-savings';
+                savingsMsg.innerHTML = `💰 Você economiza R$ ${preco} usando sua assinatura!`;
+                el.appendChild(savingsMsg);
+                setTimeout(() => savingsMsg.remove(), 3000);
+            }
+
+            document.getElementById('resumoServico').innerHTML = `${nome}${slots > 1 ? ' (' + slots + ' slots)' : ''}${state.isSubscription ? ' <span style="color: var(--subscription); font-weight: bold;">(Assinatura)</span>' : ''}`;
+            document.getElementById('resumoPreco').innerHTML = `R$ ${finalPreco} <span id="resumoTempo" style="font-size:0.8rem; color:var(--text-muted); font-weight:500;"> • ⏱ ${duracao} min </span>`;
+            
+            document.getElementById('dateTimeArea').style.opacity = "1";
+            document.getElementById('dateTimeArea').style.pointerEvents = "all";
+
+            if(nome === 'Corte Infantil') {
+                document.getElementById('autismo-area').style.display = 'block';
+                document.getElementById('corte-area').style.display = 'none';
+                document.getElementById('combo-area').style.display = 'none';
+                document.getElementById('observations-area').style.display = 'none';
+            } else if(nome === 'Corte na Máquina' || nome === 'Corte só Tesoura') {
+                document.getElementById('autismo-area').style.display = 'none';
+                document.getElementById('corte-area').style.display = 'none';
+                document.getElementById('combo-area').style.display = 'none';
+                document.getElementById('observations-area').style.display = 'block';
+            } else if(nome === 'Combo Corte + Barba' || nome === 'Combo Completo: Cabelo, Barba e Sobrancelha') {
+                document.getElementById('autismo-area').style.display = 'none';
+                document.getElementById('corte-area').style.display = 'none';
+                document.getElementById('combo-area').style.display = 'none';
+                document.getElementById('observations-area').style.display = 'block';
+            } else {
+                document.getElementById('autismo-area').style.display = 'none';
+                document.getElementById('corte-area').style.display = 'none';
+                document.getElementById('combo-area').style.display = 'none';
+                document.getElementById('observations-area').style.display = 'block';
+            }
+            
+            if (state.data) renderHorarios();
+            updateUI();
+        };
+
+        window.setAutismo = (val) => {
+            state.autismo = val;
+            if (!state.servico) return;
+
+            if (val) {
+                state.servico.slots = 2;
+                state.servico.duracao = 45;
+                if (state.servico.nome && state.servico.nome.includes('Infantil')) {
+                    state.servico.nome = 'Corte Infantil (Autismo)';
+                    state.servico.preco = 40;
+                }
+            } else {
+                if (state.servico.original) {
+                    state.servico.duracao = state.servico.original.duracao;
+                    state.servico.preco = state.servico.original.preco;
+                    state.servico.slots = state.servico.original.slots;
+                } else {
+                    state.servico.duracao = 30; state.servico.preco = 35; state.servico.slots = 1;
+                }
+                if (state.servico.nome && state.servico.nome.includes('Infantil')) {
+                    state.servico.nome = 'Corte Infantil';
+                }
+            }
+
+            document.getElementById('resumoPreco').innerHTML = `R$ ${state.servico.preco} <span id="resumoTempo" style="font-size:0.8rem; color:var(--text-muted); font-weight:500;"> • ⏱ ${state.servico.duracao} min </span>`;
+
+            document.querySelectorAll('#autismo-area .time-btn').forEach(b => b.classList.remove('selected'));
+            event.target.classList.add('selected');
+            document.getElementById('observations-area').style.display = 'block';
+
+            if (state.data) renderHorarios();
+            updateUI();
+        };
+
+        window.setCorteType = (type) => {
+            if (!state.servico) return;
+
+            if (state.servico.nome === 'Corte só Tesoura' || state.servico.nome === 'Corte na Máquina') {
+                if (type === 'tesoura') {
+                    state.servico.nome = 'Corte só Tesoura';
+                    state.servico.preco = 30;
+                    state.servico.duracao = 45;
+                } else if (type === 'maquina') {
+                    state.servico.nome = 'Corte na Máquina';
+                    state.servico.preco = 20;
+                    state.servico.duracao = 20;
+                }
+            }
+
+            document.getElementById('resumoPreco').innerHTML = `R$ ${state.servico.preco} <span id="resumoTempo" style="font-size:0.8rem; color:var(--text-muted); font-weight:500;"> • ⏱ ${state.servico.duracao} min </span>`;
+
+            document.querySelectorAll('#corte-area .time-btn').forEach(b => b.classList.remove('selected'));
+            event.target.classList.add('selected');
+            document.getElementById('observations-area').style.display = 'block';
+
+            if (state.data) renderHorarios();
+            updateUI();
+        };
+
+        window.setComboType = (type) => {
+            if (!state.servico || state.servico.nome !== 'Combos') return;
+
+            if (type === 'basico') {
+                state.servico.preco = 45;
+                state.servico.nome = 'Combo Corte + Barba';
+            } else if (type === 'completo') {
+                state.servico.preco = 50;
+                state.servico.nome = 'Combo Completo: Cabelo, Barba e Sombrancelha';
+            }
+
+            document.getElementById('resumoServico').innerText = `${state.servico.nome} (2 slots)`;
+            document.getElementById('resumoPreco').innerHTML = `R$ ${state.servico.preco} <span id="resumoTempo" style="font-size:0.8rem; color:var(--text-muted); font-weight:500;"> • ⏱ ${state.servico.duracao} min </span>`;
+
+            document.querySelectorAll('#combo-area .time-btn').forEach(b => b.classList.remove('selected'));
+            event.target.classList.add('selected');
+            document.getElementById('observations-area').style.display = 'block';
+
+            if (state.data) renderHorarios();
+            updateUI();
+        };
+
+        inputData.addEventListener('change', (e) => {
+            const selectedDate = e.target.value;
+            const today = getTodayStr();
+
+            if (selectedDate && selectedDate < today) {
+                alert("Não é possível agendar em datas passadas.");
+                e.target.value = "";
+                state.data = null;
+                state.hora = null;
+                document.getElementById('resumoDataHora').innerText = "---";
+                document.getElementById('gridHorarios').innerHTML = "";
+                updateUI();
                 return;
             }
 
-            try {
-                // 1. DELETA O AGENDAMENTO PRINCIPAL
-                await deleteDoc(doc(db, "agendamentos", idAgendamento));
+            state.data = selectedDate;
+            state.hora = null;
+            document.getElementById('resumoDataHora').innerText = "---";
+            renderHorarios();
+            updateUI();
+        });
 
-                // 2. Se for um serviço de 80 min, deleta o slot extra
-                if (isComboPrincipal) {
-                    const q = query(
-                        collection(db, "agendamentos"),
-                        where("data", "==", data),
-                        where("referencia", "==", hora) 
-                    );
-                    const snapshot = await getDocs(q);
+        async function renderHorarios() {
+            const grid = document.getElementById('gridHorarios');
+            if(!state.data) return;
+            
+            const dataSelecionada = new Date(state.data + 'T00:00:00');
+            const dayOfWeek = dataSelecionada.getDay();
+            const dayNames = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
+            const dayName = dayNames[dayOfWeek];
+
+            // Verificar se o dia está aberto conforme configuração do admin
+            let isDayOpen = true;
+            let horariosDoDia = [...horariosBase];
+            
+            if (horariosConfig && horariosConfig[dayName]) {
+                const dayConfig = horariosConfig[dayName];
+                isDayOpen = dayConfig.abre !== false;
+                
+                if (isDayOpen) {
+                    // Gerar horários específicos do dia
+                    horariosDoDia = [];
+                    const [startH, startM] = dayConfig.abertura.split(':').map(Number);
+                    const [endH, endM] = dayConfig.fechamento.split(':').map(Number);
+                    const [lunchStartH, lunchStartM] = dayConfig.almocoInicio.split(':').map(Number);
+                    const [lunchEndH, lunchEndM] = dayConfig.almocoFim.split(':').map(Number);
                     
-                    snapshot.forEach(async (docSnapshot) => {
-                        await deleteDoc(doc(db, "agendamentos", docSnapshot.id));
-                    });
+                    let currentH = startH;
+                    let currentM = startM;
+                    
+                    while (currentH < endH || (currentH === endH && currentM < endM)) {
+                        const lunchStart = lunchStartH * 60 + lunchStartM;
+                        const lunchEnd = lunchEndH * 60 + lunchEndM;
+                        const current = currentH * 60 + currentM;
+                        
+                        if (current < lunchStart || current >= lunchEnd) {
+                            horariosDoDia.push(`${String(currentH).padStart(2, '0')}:${String(currentM).padStart(2, '0')}`);
+                        }
+                        
+                        currentM += 30;
+                        if (currentM >= 60) {
+                            currentM = 0;
+                            currentH += 1;
+                        }
+                    }
                 }
-                
-                // 3. GERA O LINK DO WHATSAPP DE CANCELAMENTO
-                
-                // 🚨 AJUSTE NECESSÁRIO: SUBSTITUA PELO NÚMERO DA BARBEARIA (55 + DDD + NÚMERO)
-                const numeroBarbeiro = '28999082741'; 
-                
-                // O nome e serviço virão da função (se você os passa na chamada HTML)
-                const nome = nomeCliente || 'Cliente (Nome não salvo)';
-                const servicoAgendado = servico || 'Serviço não especificado';
+            }
 
-                // Monta a mensagem
-                const mensagemCancelamento = `🚨 *CANCELAMENTO DE AGENDAMENTO* 🚨
+            // Verificar configurações customizadas do dia específico
+            const configRef = doc(db, "config_dias", state.data);
+            const configSnap = await getDoc(configRef);
 
-👤 *Cliente:* ${nome}
-📅 *Data:* ${formatarData(data)}
-⏰ *Horário:* ${hora}h
-✂️ *Serviço:* ${servicoAgendado}
+            // Se o dia está fechado nas configurações do admin, mostrar mensagem
+            if (!isDayOpen || (configSnap.exists() && configSnap.data().status === 'closed')) {
+                grid.innerHTML = "<p style='color: #ff4d4d; grid-column: 1/-1;'>Dia fechado para agendamentos.</p>";
+                return;
+            }
 
-✅ *Vaga liberada para novo agendamento!*`;
-                
-                const urlEncodedMessage = encodeURIComponent(mensagemCancelamento);
-                const whatsappLink = `https://api.whatsapp.com/send?phone=${numeroBarbeiro}&text=${urlEncodedMessage}`;
+            // Carregar horários se necessário
+            if (horariosBase.length === 0) {
+                await loadHorariosConfig();
+            }
 
-                // 4. ALERTA E ABRE O WHATSAPP
-                alert(`Agendamento das ${hora}h cancelado com sucesso.
-                
-                ✅ POR FAVOR, clique em OK para enviar a notificação de cancelamento para a Nossa Barbearia via WhatsApp.`);
-                
-                // Abre o link do WhatsApp em uma nova aba
-                window.open(whatsappLink, '_blank');
-                
-                // 5. RECARREGA A LISTA
-                loadMyHistoricalAppointments(currentUser.uid); 
+            grid.innerHTML = "Carregando...";
+            try {
+                const q = query(collection(db, "agendamentos"), where("data", "==", state.data));
+                const snap = await getDocs(q);
+                const occupiedSet = new Set();
+                snap.docs.forEach(d => {
+                    const data = d.data();
+                    const idx = horariosDoDia.indexOf(data.hora);
+                    if (idx !== -1) {
+                        for (let s = 0; s < (data.slots || 1); s++) {
+                            if (horariosDoDia[idx + s]) occupiedSet.add(horariosDoDia[idx + s]);
+                        }
+                    }
+                });
 
-            } catch (e) {
-                console.error("Erro ao cancelar:", e);
-                alert("Erro ao cancelar agendamento. Verifique se as regras de DELETE do Firebase estão ativas.");
+                grid.innerHTML = "";
+                const agora = new Date();
+                const dataHojeStr = getTodayStr();
+
+                const availability = getServiceAvailability(state.servico?.nome, state.monthlyBookings || {});
+                const subscriptionLimitReached = availability && availability.available <= 0;
+
+                horariosDoDia.forEach((h, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'time-btn';
+                    btn.innerText = h;
+                    
+                    const [hH, hM] = h.split(':').map(Number);
+                    
+                    let isPast = false;
+                    if (state.data === dataHojeStr) {
+                        const horaLimite = new Date();
+                        horaLimite.setHours(hH, hM, 0, 0);
+                        if (agora > horaLimite) isPast = true;
+                    }
+
+                    let canFit = true;
+                    for(let i = 0; i < (state.servico?.slots || 1); i++) {
+                        const targetTime = horariosDoDia[index + i];
+                        if (!targetTime || occupiedSet.has(targetTime)) { 
+                            canFit = false; 
+                            break; 
+                        }
+                    }
+
+                    if (isPast || !canFit) {
+                        btn.classList.add('blocked');
+                        btn.disabled = true;
+                    } else if (subscriptionLimitReached) {
+                        btn.classList.add('blocked');
+                        btn.disabled = true;
+                        btn.innerText = h + ' (Limite assinatura atingido)';
+                        btn.style.background = 'rgba(239, 68, 68, 0.2)';
+                        btn.style.borderColor = 'var(--danger)';
+                    } else {
+                        if (state.hora === h) btn.classList.add('selected');
+
+                        btn.onclick = () => {
+                            if (state.isSubscription) {
+                                const confirmMsg = `Usar 1 dos seus ${availability.available} serviços restantes de ${availability.limit === Infinity ? '∞' : availability.limit} este mês?`;
+                                if (!confirm(confirmMsg)) return;
+                            }
+
+                            document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('selected'));
+                            btn.classList.add('selected');
+                            state.hora = h;
+                            document.getElementById('resumoDataHora').innerText = `${state.data.split('-').reverse().join('/')} às ${h}h`;
+                            updateUI();
+                        };
+                    }
+                    grid.appendChild(btn);
+                });
+            } catch (e) { 
+                console.error("Erro ao renderizar horários:", e);
+                grid.innerHTML = "Erro ao carregar horários."; 
             }
         }
 
-        // ============================================================
-        // LÓGICA DE CARREGAMENTO DE AGENDAMENTOS DO CLIENTE
-        // ============================================================
+        window.handleSignUp = async () => {
+            const nome = document.getElementById('signup-nome').value.trim();
+            const phoneRaw = document.getElementById('signup-phone').value;
+            const emailInput = document.getElementById('signup-email').value.trim();
+            const senha = document.getElementById('signup-senha').value;
+            const phoneClean = phoneRaw.replace(/\D/g, '');
 
-       // ... (código anterior) ...
+            if (!nome || phoneClean.length < 10 || !emailInput.includes('@') || senha.length < 6) {
+                alert("Verifique os campos obrigatórios."); return;
+            }
 
-        // ============================================================
-        // LÓGICA DE CARREGAMENTO DE AGENDAMENTOS DO CLIENTE (CORRIGIDA)
-        // ============================================================
+            try {
+                const res = await createUserWithEmailAndPassword(auth, emailInput, senha);
+                await updateProfile(res.user, { displayName: nome });
+                await setDoc(doc(db, 'users', res.user.uid), {
+                    nome: nome, email: emailInput, phone: phoneClean, createdAt: new Date()
+                });
+                alert("Conta criada!");
+            } catch (e) { alert("Erro: " + e.message); }
+        };
 
-        async function loadMyHistoricalAppointments(userId) {
-            myAppointmentsList.innerHTML = '<p class="empty-message" style="color:var(--primary);">Buscando seus agendamentos...</p>';
-            
-            // Usamos a data de HOJE no formato ISO (YYYY-MM-DD) para filtrar.
-            // Isso evita problemas de fuso horário na query do Firestore.
-            const hojeISO = new Date().toISOString().split('T')[0];
+        window.handleLogin = async () => {
+            const iden = document.getElementById('login-email').value;
+            const senha = document.getElementById('login-senha').value;
+            try {
+                if (iden.includes('@')) {
+                    await signInWithEmailAndPassword(auth, iden, senha);
+                } else {
+                    const clean = iden.replace(/\D/g,'');
+                    const q = query(collection(db, 'users'), where('phone', '==', clean));
+                    const snap = await getDocs(q);
+                    if (snap.empty) throw new Error('Usuário não encontrado');
+                    await signInWithEmailAndPassword(auth, snap.docs[0].data().email, senha);
+                }
+            } catch (e) { alert("Erro: " + e.message); }
+        };
+
+        window.handleLogout = () => signOut(auth);
+
+        onAuthStateChanged(auth, async (user) => {
+            state.user = user;
+            if (user) {
+                let nomeExibicao = user.displayName || user.email;
+                let userPhone = '';
+                try {
+                    const userDoc = await getDoc(doc(db, 'users', user.uid));
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        if (userData.nome) nomeExibicao = userData.nome;
+                        if (userData.phone) userPhone = userData.phone;
+                    }
+                } catch (e) {}
+
+                state.user.phone = userPhone;
+
+                document.getElementById('user-logged-info').style.display = "block";
+                document.getElementById('auth-login').style.display = "none";
+                document.getElementById('auth-signup').style.display = "none";
+                document.getElementById('clientName').innerText = nomeExibicao;
+                document.getElementById('userNameLogged').innerText = `Agendando para: ${nomeExibicao}`;
+                
+                await loadUserSubscriptionForBooking();
+                state.monthlyBookings = await getMonthlyBookings();
+                window.renderServices();
+                loadUserAppointments(user.uid);
+            } else {
+                document.getElementById('user-logged-info').style.display = "none";
+                document.getElementById('auth-login').style.display = "block";
+                document.getElementById('userNameLogged').innerText = "";
+                userSubscription = null;
+                state.monthlyBookings = {};
+                window.renderServices();
+            }
+            updateUI();
+        });
+
+        window.finalizarAgendamento = async () => {
+            if (!state.user) { showSection('cliente'); return; }
+
+            const hoje = getTodayStr();
+            const agora = new Date();
+            const [selH, selM] = state.hora.split(':').map(Number);
+            const dataHoraSelecionada = new Date(state.data + 'T00:00:00');
+            dataHoraSelecionada.setHours(selH, selM, 0, 0);
+
+            if (state.data < hoje || (state.data === hoje && agora > dataHoraSelecionada)) {
+                alert("O horário selecionado já passou. Por favor, escolha outro horário.");
+                renderHorarios();
+                return;
+            }
+
+            const confRef = doc(db, "config_dias", state.data);
+            const confSnap = await getDoc(confRef);
+            const dataSelecionadaConf = new Date(state.data + 'T00:00:00');
+            const isSundayConf = dataSelecionadaConf.getDay() === 0;
+            if ((confSnap.exists() && confSnap.data().status === 'closed') || (isSundayConf && (!confSnap.exists() || confSnap.data().status !== 'open'))) {
+                alert("Não é possível agendar para esta data: dia fechado pelo administrador.");
+                renderHorarios();
+                return;
+            }
+
+            const btn = document.getElementById('btnConfirmar');
+            btn.innerText = "SALVANDO..."; btn.disabled = true;
             
             try {
-                // Filtra agendamentos do usuário e ordena pela data e hora
-                const q = query(
-                    collection(db, "agendamentos"), 
-                    where("userId", "==", userId),
-                    where("data", ">=", hojeISO), // Busca apenas agendamentos a partir de hoje
-                    orderBy("data", "asc"),
-                    orderBy("hora", "asc")
-                );
+                const uDoc = await getDoc(doc(db, 'users', state.user.uid));
+                const userData = uDoc.data();
+                const nomeCliente = userData?.nome || state.user.displayName || "Cliente";
 
-                const snapshot = await getDocs(q);
+                const slotsNeeded = state.autismo ? 2 : state.servico.slots;
+                let precoFinal = Number(state.servico.preco) || 0;
+                let servicoFinal = state.servico.nome;
+                let subscriptionUseNumber = null;
+                let subscriptionPlan = null;
+
+                if (state.isSubscription) {
+                    precoFinal = 0;
+                    servicoFinal += ' (Assinatura)';
+                    
+                    const availability = getServiceAvailability(state.servico.nome, state.monthlyBookings || {});
+                    subscriptionUseNumber = availability.used + 1;
+                    subscriptionPlan = userSubscription.plan;
+                }
+
+                if (state.autismo) {
+                    servicoFinal += ' (Autismo)';
+                    if (state.servico.nome && state.servico.nome.includes('Infantil')) precoFinal = 60;
+                }
+
+                if (slotsNeeded > 1) {
+                    const index = horariosBase.indexOf(state.hora);
+                    const nextTime = horariosBase[index + 1];
+                    if (!nextTime) { alert("Não há horário seguinte disponível."); btn.innerText = "CONFIRMAR AGENDAMENTO"; btn.disabled = false; return; }
+
+                    const q = query(collection(db, "agendamentos"), where("data", "==", state.data));
+                    const snap = await getDocs(q);
+                    const occupied = [];
+                    snap.forEach(d => {
+                        const data = d.data();
+                        const idx = horariosBase.indexOf(data.hora);
+                        for (let s = 0; s < (data.slots || 1); s++) {
+                            if (horariosBase[idx + s]) occupied.push(horariosBase[idx + s]);
+                        }
+                    });
+                    if (occupied.includes(nextTime)) { alert("O próximo horário está ocupado."); btn.innerText = "CONFIRMAR AGENDAMENTO"; btn.disabled = false; return; }
+                }
+
+                await addDoc(collection(db, "agendamentos"), {
+                    userId: state.user.uid,
+                    nome: nomeCliente,
+                    cliente: nomeCliente,
+                    telefone: userData?.phone || '',
+                    servico: servicoFinal,
+                    data: state.data,
+                    hora: state.hora,
+                    slots: slotsNeeded,
+                    preco: precoFinal,
+                    autismo: state.autismo,
+                    isSubscription: state.isSubscription || false,
+                    subscriptionPlan: subscriptionPlan,
+                    subscriptionUseNumber: subscriptionUseNumber,
+                    observacoes: document.getElementById('observations').value,
+                    status: 'confirmed',
+                    timestamp: new Date()
+                });
+
+                const barberName = document.getElementById('barbearia-nome-header').textContent || 'Lopes Barbearia';
+                const phone = window.barberPhone || "5528999082741";
+                const msg = encodeURIComponent(`💈 *${barberName}*\n\n👤 Cliente: ${nomeCliente}\n✂️ Serviço: ${servicoFinal}\n📅 Data: ${state.data.split('-').reverse().join('/')}\n⏰ Hora: ${state.hora}h`);
+                window.open(`https://api.whatsapp.com/send?phone=${phone}&text=${msg}`);
+                location.reload();
+            } catch (e) { 
+                alert(e.message); btn.innerText = "CONFIRMAR AGENDAMENTO"; btn.disabled = false; 
+            }
+        };
+
+        function updateUI() {
+            const btn = document.getElementById('btnConfirmar');
+            let ready = !!(state.servico && state.data && state.hora);
+            
+            if (state.servico?.nome === 'Corte Infantil') {
+                const autismoBtnSelected = document.querySelector('#autismo-area .time-btn.selected');
+                if (!autismoBtnSelected) ready = false;
+            }
+            
+            btn.disabled = !ready;
+            btn.classList.toggle('ready', !btn.disabled);
+        }
+
+        async function loadUserAppointments(uid) {
+            const q = query(collection(db, "agendamentos"), where("userId", "==", uid));
+            const snap = await getDocs(q);
+            const lista = document.getElementById('listaAgendamentos');
+            lista.innerHTML = snap.empty ? "Nenhum agendamento ativo." : "";
+            snap.forEach(d => {
+                const dt = d.data();
+                const dadosAgendamento = JSON.stringify({
+                    servico: dt.servico,
+                    data: dt.data,
+                    hora: dt.hora,
+                    cliente: dt.cliente
+                }).replace(/"/g, '"');
+
+                lista.innerHTML += `<div style="border-bottom: 1px solid #222; padding: 10px 0;">
+                    <b>${dt.servico}</b><br>${dt.data.split('-').reverse().join('/')} às ${dt.hora}h
+                    <br><button style="background:#e53e3e; color:#fff; border:none; padding:4px 8px; border-radius:4px; margin-top:5px; cursor:pointer;" onclick="cancelMyBooking('${d.id}', '${dadosAgendamento}')">CANCELAR</button>
+                </div>`;
+            });
+        }
+
+        window.cancelMyBooking = async (id, dadosRaw) => {
+            const dados = JSON.parse(dadosRaw);
+            
+            const agora = new Date();
+            const [horaS, minS] = dados.hora.split(':').map(Number);
+            const dataAgendamento = new Date(dados.data + 'T00:00:00');
+            dataAgendamento.setHours(horaS, minS, 0, 0);
+
+            const diferencaMs = dataAgendamento - agora;
+            const diferencaHoras = diferencaMs / (1000 * 60 * 60);
+
+            if (diferencaHoras < 2) {
+                alert("Não é possível cancelar com menos de 2 horas de antecedência. Entre em contato direto com a barbearia.");
+                return;
+            }
+
+            if (!confirm('Deseja realmente cancelar este agendamento?')) return;
+            
+            try {
+                await deleteDoc(doc(db, 'agendamentos', id));
                 
-                if (snapshot.empty) {
-                    myAppointmentsList.innerHTML = '<p class="empty-message">Você não possui agendamentos futuros.</p>';
+                const barberName = document.getElementById('barbearia-nome-header').textContent || 'Lopes Barbearia';
+                const phone = window.barberPhone || "5528999082741";
+                const msgCancelamento = encodeURIComponent(
+                    `🚫 *CANCELAMENTO DE AGENDAMENTO - ${barberName}*\n\n` +
+                    `👤 Cliente: ${dados.cliente}\n` +
+                    `✂️ Serviço: ${dados.servico}\n` +
+                    `📅 Data: ${dados.data.split('-').reverse().join('/')}\n` +
+                    `⏰ Hora: ${dados.hora}h\n\n`
+                );
+                
+                alert("Agendamento removido. Informando o barbeiro...");
+                window.open(`https://api.whatsapp.com/send?phone=${phone}&text=${msgCancelamento}`);
+                loadUserAppointments(state.user.uid);
+            } catch (e) {
+                alert("Erro: " + e.message);
+            }
+        };
+
+        // ========== FUNÇÕES DE ASSINATURAS ==========
+
+        const subscriptionPlans = {
+            'sempre-alinhado': {
+                name: 'Sempre Alinhado',
+                price: 79.90,
+                description: 'Foco em manutenção semanal para visual impecável. Até 4 "Pezinhos" por mês (1/semana), até 2 Barbas por mês, 1 Sobrancelha inclusa.',
+                benefits: ['Até 4 Pezinhos/mês', 'Até 2 Barbas/mês', '1 Sobrancelha inclusa']
+            },
+            'combo-executivo': {
+                name: 'Combo Executivo',
+                price: 119.90,
+                description: 'Corte + Barba a cada 15 dias com sobrancelhas ilimitadas. 2 Cortes na Máquina por mês, 2 Barbas por mês, Sobrancelha ilimitada.',
+                benefits: ['2 Cortes na Máquina/mês', '2 Barbas/mês', 'Sobrancelha ilimitada']
+            },
+            'vip-premium': {
+                name: 'VIP Premium',
+                price: 159.90,
+                description: 'Experiência completa com serviços ilimitados. Cortes ilimitados (1/semana min.), Barba ilimitada, Sobrancelha e Pigmentação, Depilação sempre que necessário.',
+                benefits: ['Cortes ilimitados', 'Barba ilimitada', 'Sobrancelha + Pigmentação', 'Depilação incluída']
+            }
+        };
+
+        let selectedPlan = null;
+
+        window.selectSubscription = (planId) => {
+            document.querySelectorAll('.subscription-card').forEach(c => c.classList.remove('selected'));
+            const clickedCard = document.querySelector(`[onclick="selectSubscription('${planId}')"]`);
+            if (clickedCard) clickedCard.classList.add('selected');
+            selectedPlan = planId;
+            
+            const plan = subscriptionPlans[planId];
+            document.getElementById('selected-plan-title').innerText = plan.name;
+            document.getElementById('selected-plan-description').innerHTML = `
+                <strong>Preço: R$ ${plan.price.toFixed(2)}/mês</strong><br><br>
+                ${plan.description}<br><br>
+                <strong>Benefícios:</strong><br>
+                <ul>${plan.benefits.map(b => `<li>${b}</li>`).join('')}</ul>
+            `;
+            document.getElementById('subscription-details').style.display = 'block';
+            document.getElementById('subscription-details').scrollIntoView({ behavior: 'smooth' });
+        };
+
+        window.subscribePlan = (planId) => {
+            if (!state.user) {
+                alert('Você precisa estar logado para assinar um plano.');
+                showSection('cliente');
+                return;
+            }
+            selectSubscription(planId);
+            document.getElementById('subscription-details').scrollIntoView({ behavior: 'smooth' });
+        };
+
+        window.confirmSubscription = async () => {
+            if (!selectedPlan || !state.user) {
+                alert('Erro: Plano não selecionado ou usuário não logado.');
+                return;
+            }
+
+            const confirmButton = document.querySelector('#subscription-details button');
+            const originalText = confirmButton.innerText;
+            confirmButton.innerText = 'PROCESSANDO...';
+            confirmButton.disabled = true;
+
+            try {
+                const now = new Date();
+                const currentMonth = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+                
+                const q = query(
+                    collection(db, "assinaturas"), 
+                    where("clientId", "==", state.user.uid),
+                    where("status", "==", "active")
+                );
+                const existingSubs = await getDocs(q);
+                
+                const hasActiveThisMonth = existingSubs.docs.some(doc => {
+                    const data = doc.data();
+                    const startMonth = data.startDate.substring(0, 7);
+                    return startMonth === currentMonth;
+                });
+                
+                if (hasActiveThisMonth) {
+                    alert('Você já possui uma assinatura ativa este mês. Aguarde o próximo mês para assinar novamente.');
                     return;
                 }
 
-                myAppointmentsList.innerHTML = '';
-                let hasFutureAppointments = false;
-                
-                snapshot.forEach(docSnapshot => {
-                    const agendamento = docSnapshot.data();
-                    agendamento.id = docSnapshot.id;
-                    
-                    // Não mostra slots de bloqueio total ou slots extras (continuação)
-                    if (agendamento.idBloqueio === "BLOQUEIO_TOTAL") {
-                        return;
-                    }
-                    
-                    const isSlotExtra = agendamento.duracao && agendamento.duracao.includes("Slot 2/2");
-                    if (isSlotExtra) {
-                        return; // Esconde o slot de continuação do cliente
-                    }
-                    
-                    hasFutureAppointments = true;
-                    
-                    const isComboPrincipal = agendamento.duracao && agendamento.duracao.includes("80 min");
+                const plan = subscriptionPlans[selectedPlan];
+                const startDate = new Date().toISOString().split('T')[0];
+                const nextBilling = new Date();
+                nextBilling.setMonth(nextBilling.getMonth() + 1);
 
-                    const li = document.createElement('div');
-                    li.className = `my-appointment-item`; // Classe ajustada
-                    
-                    // Adiciona a duração para exibição (ex: Combo Cabelo e Barba (80 min))
-                    // Isso corrige o problema de exibição (que pode ter sido a última pendência)
-                    const duracaoFormatada = agendamento.duracao.split('(')[0].trim();
-                    const servicoText = `${agendamento.servico} (${duracaoFormatada})`; 
-
-                    const obsText = agendamento.observacoes ? ` | Obs: ${agendamento.observacoes}` : '';
-                    
-                    li.innerHTML = `
-                        <div>
-                            <p style="font-weight: bold;">${formatarData(agendamento.data)} às ${agendamento.hora}h</p>
-                            <p style="color: var(--primary);">✂️ ${servicoText}</p> 
-                            ${agendamento.telefone ? `<p style="font-size:0.95em;color:var(--light);">📱 ${agendamento.telefone} <a href="https://api.whatsapp.com/send?phone=${agendamento.telefone.replace(/\D/g,'').startsWith('55')?agendamento.telefone.replace(/\D/g,''): '55'+agendamento.telefone.replace(/\D/g,'')}" target="_blank" style="color:var(--primary); margin-left:8px; text-decoration:none;">Enviar WhatsApp</a></p>` : ''}
-                            <p style="font-size: 0.9em; color: #ccc;">R$ ${agendamento.preco.toFixed(2).replace('.', ',')} ${obsText}</p>
-                        </div>
-                        <button class="cancel-client-btn" onclick="cancelarAgendamentoCliente('${agendamento.id}', '${agendamento.data}', '${agendamento.hora}', ${isComboPrincipal})">Cancelar</button>
-                    `;
-                    myAppointmentsList.appendChild(li);
+                await addDoc(collection(db, "assinaturas"), {
+                    client: state.user.displayName || state.user.email,
+                    clientPhone: state.user.phone || '',
+                    clientId: state.user.uid,
+                    plan: selectedPlan,
+                    planName: plan.name,
+                    value: plan.price,
+                    startDate,
+                    nextBilling: nextBilling.toISOString().split('T')[0],
+                    status: 'active',
+                    createdAt: new Date()
                 });
 
-                if (!hasFutureAppointments) {
-                     myAppointmentsList.innerHTML = '<p class="empty-message">Você não possui agendamentos futuros.</p>';
-                }
-
-            } catch (error) {
-                console.error("Erro ao carregar agendamentos do usuário:", error);
-                // Se o erro indicar que é necessário criar um índice, mostra link direto para o console
-                let message = 'Erro ao carregar seus agendamentos. (Verifique as permissões de leitura no Firebase!)';
-                let indexLink = null;
-                if (error && error.message && error.message.includes('https://')) {
-                    const m = error.message.match(/https:\/\/[^\s)']+/);
-                    if (m && m[0]) indexLink = m[0];
-                }
-                if (indexLink) {
-                    message += ` <br><a href="${indexLink}" target="_blank" style="color:var(--primary); font-weight:bold;">Criar índice necessário no Firebase</a>`;
-                }
-                myAppointmentsList.innerHTML = `<p class="empty-message" style="color:var(--red);">${message}</p>`;
-
-                // Tentativa de fallback: buscar apenas por userId e filtrar/ordenar no cliente (evita necessidade de índice composto)
-                try {
-                    const q2 = query(collection(db, "agendamentos"), where("userId", "==", userId), orderBy("data", "asc"));
-                    const snap2 = await getDocs(q2);
-                    const items = [];
-                    snap2.forEach(d => {
-                        const data = d.data();
-                        if (!data || !data.data) return;
-                        if (data.data >= hojeISO) items.push({ id: d.id, data });
-                    });
-                    // Ordena por data e hora (em caso de empates)
-                    items.sort((a, b) => {
-                        if (a.data.data !== b.data.data) return a.data.data.localeCompare(b.data.data);
-                        return (a.data.hora || '').localeCompare(b.data.hora || '');
-                    });
-
-                    if (items.length === 0) {
-                        myAppointmentsList.innerHTML = '<p class="empty-message">Você não possui agendamentos futuros.</p>';
-                        return;
-                    }
-
-                    // Renderiza resultados do fallback
-                    myAppointmentsList.innerHTML = '';
-                    items.forEach(item => {
-                        const agendamento = item.data;
-                        agendamento.id = item.id;
-
-                        if (agendamento.idBloqueio === "BLOQUEIO_TOTAL") return;
-                        const isSlotExtra = agendamento.duracao && agendamento.duracao.includes("Slot 2/2");
-                        if (isSlotExtra) return;
-
-                        const isComboPrincipal = agendamento.duracao && agendamento.duracao.includes("80 min");
-
-                        const li = document.createElement('div');
-                        li.className = `my-appointment-item`;
-
-                        const duracaoFormatada = agendamento.duracao ? agendamento.duracao.split('(')[0].trim() : '';
-                        const servicoText = `${agendamento.servico || 'Serviço'} (${duracaoFormatada})`;
-                        const obsText = agendamento.observacoes ? ` | Obs: ${agendamento.observacoes}` : '';
-
-                        li.innerHTML = `
-                            <div>
-                                <p style="font-weight: bold;">${formatarData(agendamento.data)} às ${agendamento.hora}h</p>
-                                <p style="color: var(--primary);">✂️ ${servicoText}</p>
-                                <p style="font-size: 0.9em; color: #ccc;">R$ ${agendamento.preco ? agendamento.preco.toFixed(2).replace('.', ',') : '0,00'} ${obsText}</p>
-                            </div>
-                            <button class="cancel-client-btn" onclick="cancelarAgendamentoCliente('${agendamento.id}', '${agendamento.data}', '${agendamento.hora}', ${isComboPrincipal})">Cancelar</button>
-                        `;
-                        myAppointmentsList.appendChild(li);
-                    });
-
-                } catch (fallbackErr) {
-                    console.error('Fallback também falhou:', fallbackErr);
-                }
-            }
-        }
-
-        // ============================================================
-        // LÓGICA DE AUTENTICAÇÃO
-        // ============================================================
-
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            if (user) {
-                authForm.style.display = 'none';
-                userInfoDisplay.style.display = 'block';
-                agendamentoForm.style.display = 'block';
-                myAppointmentsSection.style.display = 'block'; 
-
-                let suggestedName = '';
-
-                if (user.isAnonymous) {
-                    userNameDisplay.textContent = 'Cliente Anônimo';
-                    suggestedName = ''; 
-                } else if (user.displayName) {
-                    userNameDisplay.textContent = user.displayName;
-                    suggestedName = user.displayName;
-                } else {
-                    userNameDisplay.textContent = user.email;
-                    suggestedName = user.email.split('@')[0]; 
-                }
-
-                if (!nomeInput.value.trim()) {
-                    nomeInput.value = suggestedName;
-                }
+                alert(`✅ Assinatura do plano "${plan.name}" confirmada com sucesso!\n\nVocê será cobrado R$ ${plan.price.toFixed(2)} mensalmente.\nPróxima cobrança: ${nextBilling.toLocaleDateString('pt-BR')}`);
+                selectedPlan = null;
+                document.getElementById('subscription-details').style.display = 'none';
+                document.querySelectorAll('.subscription-card').forEach(c => c.classList.remove('selected'));
                 
-                nomeInput.placeholder = 'Digite seu nome (Obrigatório)';
-                nomeInput.disabled = false;
-
-                // A rotina automática de remoção de agendamentos antigos foi desativada.
-
-                loadMyHistoricalAppointments(user.uid);
-                checkInputs(); 
-                
-            } else {
-                authForm.style.display = 'block';
-                userInfoDisplay.style.display = 'none';
-                agendamentoForm.style.display = 'none';
-                myAppointmentsSection.style.display = 'none'; 
-                
-                currentUser = null;
-                nomeInput.value = '';
-                nomeInput.disabled = false;
+                showSection('minha-assinatura');
+            } catch (e) {
+                alert("❌ Erro ao confirmar assinatura: " + e.message);
+            } finally {
+                confirmButton.innerText = originalText;
+                confirmButton.disabled = false;
             }
-        });
-
-        loginBtn.addEventListener('click', async () => {
-            const email = authEmail.value;
-            const password = authPassword.value;
-            if (!email || !password) return alert("Preencha email e senha para entrar.");
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-            } catch (error) {
-                alert("Erro ao fazer login: " + error.message);
-            }
-        });
-
-        registerBtn.addEventListener('click', async () => {
-            const email = authEmail.value;
-            const password = authPassword.value;
-            if (!email || !password || password.length < 6) return alert("O email e a senha (mínimo 6 caracteres) são obrigatórios para o cadastro.");
-            try {
-                await createUserWithEmailAndPassword(auth, email, password);
-            } catch (error) {
-                alert("Erro ao cadastrar: " + error.message);
-            }
-        });
-        
-        googleBtn.addEventListener('click', async () => {
-            try {
-                // Ao usar o Google, você verá o erro "auth/unauthorized-domain" 
-                // se o seu domínio (o link do Netlify) não estiver na lista de domínios 
-                // autorizados do Firebase Console.
-                await signInWithPopup(auth, googleProvider);
-            } catch (error) {
-                alert("Erro ao fazer login com Google: " + error.message);
-            }
-        });
-
-
-        anonymousBtn.addEventListener('click', async () => {
-            try {
-                await signInAnonymously(auth);
-            } catch (error) {
-                alert("Erro ao continuar anônimo: " + error.message);
-            }
-        });
-
-        logoutBtn.addEventListener('click', async () => {
-            try {
-                await signOut(auth);
-                alert("Você saiu da conta.");
-            } catch (error) {
-                alert("Erro ao sair: " + error.message);
-            }
-        });
-
-
-        // ============================================================
-        // LÓGICA DE AGENDAMENTO 
-        // ============================================================
-
-        function controlarCamposInfantis(servico) {
-            const isCorte = servico.includes("Corte");
-            const isBarbaOuCombo = servico.includes("Barba") || servico.includes("Combo");
-            
-            if (isCorte && !isBarbaOuCombo) {
-                isInfantilInput.disabled = false;
-            } else {
-                isInfantilInput.checked = false;
-                isAutismoInput.checked = false;
-                isInfantilInput.disabled = true;
-            }
-            autismoOptionDiv.style.display = isInfantilInput.checked ? 'block' : 'none';
-        }
-        
-        servicoInput.addEventListener('change', () => {
-             const servico = servicoInput.value;
-             controlarCamposInfantis(servico);
-             if (dataInput.value) {
-                carregarHorarios(dataInput.value); // Recarrega horários para garantir a nova duração
-                checkInputs();
-            }
-        });
-
-        isInfantilInput.addEventListener('change', () => {
-            autismoOptionDiv.style.display = isInfantilInput.checked ? 'block' : 'none';
-            if (!isInfantilInput.checked) {
-                isAutismoInput.checked = false;
-            }
-            if (dataInput.value) {
-                carregarHorarios(dataInput.value); // Recarrega horários
-                checkInputs();
-            }
-        });
-
-        isAutismoInput.addEventListener('change', () => {
-            if (dataInput.value) {
-                carregarHorarios(dataInput.value); // Recarrega horários
-                checkInputs();
-            }
-        });
-        
-        dataInput.addEventListener('change', async function() {
-            const dataEscolhida = this.value;
-            if(!dataEscolhida) return;
-
-            controlarCamposInfantis(servicoInput.value);
-
-            // Verifica se a data já passou
-            const dataSelecionada = new Date(dataEscolhida + 'T00:00:00');
-            const dataHoje = new Date();
-            dataHoje.setHours(0, 0, 0, 0);
-
-            if (dataSelecionada < dataHoje) {
-                areaHorarios.style.display = 'none';
-                avisoDomingo.style.display = 'block';
-                avisoDomingo.textContent = '⛔ Não é possível agendar em datas que já passaram. Por favor, escolha uma data futura.';
-                avisoDomingo.style.display = 'block';
-                btnConfirmar.disabled = true;
-                return;
-            }
-
-            const diaDaSemana = new Date(dataEscolhida + 'T00:00:00').getDay();
-            
-            // 0 = Domingo (Bloqueia)
-            if (diaDaSemana === 0) { 
-                areaHorarios.style.display = 'none';
-                avisoDomingo.style.display = 'block';
-                avisoDomingo.textContent = '⛔ Domingo não é um dia de agendamento. Por favor, escolha outra data.';
-                btnConfirmar.disabled = true;
-                return;
-            }
-            
-            avisoDomingo.style.display = 'none';
-            areaHorarios.style.display = 'block';
-            horarioSelecionado = null;
-            btnConfirmar.disabled = true;
-            btnConfirmar.innerText = "CONFIRMAR AGENDAMENTO";
-            
-            carregarHorarios(dataEscolhida);
-        });
-        
-        async function carregarHorarios(data) {
-            gridHorarios.innerHTML = '<p style="color:var(--primary);">Carregando horários...</p>';
-            
-            const q = query(collection(db, "agendamentos"), where("data", "==", data));
-            const querySnapshot = await getDocs(q);
-            
-            horariosOcupadosGlobal = [];
-            let diaFechado = false; 
-
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                if (data.idBloqueio === "BLOQUEIO_TOTAL") {
-                    diaFechado = true;
-                }
-                horariosOcupadosGlobal.push(data.hora);
-            });
-
-            if (diaFechado) {
-                gridHorarios.innerHTML = `<p style="color:var(--red); font-weight: bold; text-align: center;">🚫 A agenda para o dia ${formatarData(data)} está FECHADA pela Nossa Barbearia.</p>`;
-                btnConfirmar.disabled = true;
-                return;
-            }
-
-            renderizarBotoes(horariosOcupadosGlobal);
-        }
-
-        function getSlotsNecessarios() {
-            const servicoAtual = servicoInput.value;
-            const isAutismo = isAutismoInput.checked;
-
-            if (isAutismo) {
-                return 2;
-            }
-            
-            if (servicoAtual.includes("Combo")) {
-                return 2;
-            }
-            
-            return 1;
-        }
-
-
-        function renderizarBotoes(ocupados) {
-            gridHorarios.innerHTML = ''; 
-            const slotsNecessarios = getSlotsNecessarios();
-            const isDoisSlots = slotsNecessarios === 2;
-
-            // Verifica se é hoje para validar horários que já passaram
-            const dataSelecionada = dataInput.value;
-            const dataHoje = new Date();
-            const dataHojeFormatada = dataHoje.toISOString().split('T')[0];
-            const ehHoje = dataSelecionada === dataHojeFormatada;
-            const horaAgora = new Date();
-
-            horariosPossiveis.forEach(hora => {
-                const btn = document.createElement('button');
-                btn.className = 'time-btn';
-                btn.innerText = hora;
-
-                const isOcupado = ocupados.includes(hora);
-                let deveBloquear = isOcupado;
-                
-                // Verifica se é um horário que já passou
-                let eHorarioPassado = false;
-                if (ehHoje) {
-                    const [horario, minuto] = hora.split(':').map(Number);
-                    const horarioSlot = new Date();
-                    horarioSlot.setHours(horario, minuto, 0, 0);
-                    
-                    if (horarioSlot < horaAgora) {
-                        eHorarioPassado = true;
-                        deveBloquear = true;
-                        btn.title = 'Horário já passou';
-                    }
-                }
-                
-                if (!isOcupado && isDoisSlots) {
-                    const proximoHorario = getProximoHorario(hora);
-                    
-                    if (!proximoHorario || ocupados.includes(proximoHorario)) {
-                        deveBloquear = true;
-                        btn.title = proximoHorario ? `O próximo slot (${proximoHorario}) está OCUPADO ou não existe.` : `Serviço de 80 min não cabe neste horário.`;
-                    } else {
-                        btn.classList.add('combo-slot'); 
-                    }
-                }
-                
-                if (deveBloquear) {
-                    btn.classList.add('blocked');
-                    btn.disabled = true;
-                } else {
-                    btn.onclick = () => selecionarHorario(btn, hora);
-                }
-
-                gridHorarios.appendChild(btn);
-            });
-        }
-        
-        function selecionarHorario(btn, hora) {
-            document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('selected'));
-            
-            btn.classList.add('selected');
-            horarioSelecionado = hora;
-            
-            checkInputs();
-        }
-        
-        function checkInputs() {
-             if(horarioSelecionado && nomeInput.value.trim() !== "" && dataInput.value.trim() !== "" && currentUser) {
-                btnConfirmar.disabled = false;
-            } else {
-                btnConfirmar.disabled = true;
-            }
-        }
-        
-        nomeInput.addEventListener('input', checkInputs);
-        dataInput.addEventListener('change', checkInputs);
-
-
-/// ... (Seu código até a linha 968, que termina a lógica de controle de inputs)
-
-// ============================================================
-// LÓGICA DE AGENDAMENTO (COMPLETA E CORRIGIDA)
-// ============================================================
-
-// Assumindo que você já definiu: dataInput, horarioSelecionado, servicoInput, 
-// nomeInput, observacoesInput, isAutismoInput, isInfantilInput
-// e as funções: calcularHorarioFim, isSlotAvailable, formatarData, loadAgenda, loadMyHistoricalAppointments
-// e o objeto: currentUser
-
-async function agendar() {
-    // 1. CHECAGEM DE REQUISITOS
-    if (!currentUser) {
-        alert("Você precisa estar logado (mesmo que anonimamente) para agendar.");
-        return;
-    }
-
-    const dataSelecionada = dataInput.value;
-    const horaSelecionada = horarioSelecionado; // Usa a variável global
-    const servicoSelecionado = servicoInput.options[servicoInput.selectedIndex];
-    
-    // O nome do serviço no select está formatado de forma diferente agora, 
-    // então precisamos calcular a duração e preço de forma diferente:
-    let preco = 0;
-    let duracaoTotal = 40; // Default
-    let servicoNome = servicoInput.value.split('(')[0].trim(); // Pega o nome base
-
-    // Lógica para determinar preço e duração
-    const isAutismo = isAutismoInput.checked;
-    const isCombo = servicoNome.includes("Combo");
-    const isInfantil = isInfantilInput.checked;
-
-    if (isAutismo) {
-        servicoNome = `Corte Infantil - Autismo`;
-        duracaoTotal = 80;
-        preco = 60.00;
-    } else if (isCombo) {
-        servicoNome = `Combo Cabelo e Barba`;
-        duracaoTotal = 80;
-        preco = 75.00;
-    } else {
-        // Serviços de 40 min (Corte ou Barba)
-        duracaoTotal = 40;
-        preco = 40.00;
-        if (isInfantil) {
-            servicoNome = `${servicoNome} (Infantil)`;
-        }
-    }
-
-    const observacoes = observacoesInput.value.trim();
-    const nomeCliente = nomeInput.value.trim();
-    const telefoneCliente = document.getElementById('telefoneCliente') ? document.getElementById('telefoneCliente').value.trim() : '';
-    const emailCliente = currentUser && !currentUser.isAnonymous ? currentUser.email : null; 
-
-    if (!dataSelecionada || !horaSelecionada || !servicoNome || !nomeCliente) {
-        alert("Por favor, preencha a data, o horário e seu nome.");
-        return;
-    }
-    
-    const isDoisSlots = duracaoTotal === 80;
-    
-    // Assumindo que calcularHorarioFim está definido
-    const horarioFim = calcularHorarioFim(horaSelecionada, duracaoTotal); 
-
-    btnConfirmar.innerText = "Agendando...";
-    btnConfirmar.disabled = true;
-
-    try {
-        // 2. VERIFICAR DISPONIBILIDADE
-        // Assumindo que isSlotAvailable existe
-        if (!await isSlotAvailable(dataSelecionada, horaSelecionada)) {
-            throw new Error("Este horário não está mais disponível.");
-        }
-
-        if (isDoisSlots) {
-            const horaExtra = calcularHorarioFim(horaSelecionada, 40);
-            if (!await isSlotAvailable(dataSelecionada, horaExtra)) {
-                throw new Error("O slot de 80 minutos não pode ser reservado, pois o horário seguinte está ocupado.");
-            }
-        }
-        
-        // 3. SALVAR AGENDAMENTOS
-        const baseData = {
-            nome: nomeCliente,
-            email: emailCliente,
-            telefone: telefoneCliente,
-            observacoes: observacoes,
-            userId: currentUser.uid, 
-            servico: servicoNome,
-            preco: preco,
-            criadoEm: new Date(),
         };
 
-        // Slot Principal
-        const novoAgendamentoRef = doc(collection(db, "agendamentos"));
-        await setDoc(novoAgendamentoRef, {
-            ...baseData,
-            data: dataSelecionada,
-            hora: horaSelecionada,
-            duracao: duracaoTotal + ' min',
+        // Funções para Minha Assinatura
+        async function loadUserSubscription() {
+            if (!state.user) {
+                showSection('cliente');
+                return;
+            }
+
+            try {
+                const q = query(collection(db, "assinaturas"), where("clientId", "==", state.user.uid), where("status", "==", "active"));
+                const querySnapshot = await getDocs(q);
+                
+                if (!querySnapshot.empty) {
+                    const sub = querySnapshot.docs[0].data();
+                    document.getElementById('current-plan-name').innerText = sub.planName;
+                    document.getElementById('current-plan-price').innerText = `R$ ${sub.value.toFixed(2)}`;
+                    document.getElementById('next-billing-date').innerText = new Date(sub.nextBilling).toLocaleDateString('pt-BR');
+                    document.getElementById('subscription-status').innerText = 'Ativa';
+                    
+                    document.getElementById('subscription-info').style.display = 'block';
+                    document.getElementById('no-subscription').style.display = 'none';
+
+                    await loadSubscriptionUsageChart(sub);
+                    await loadUpcomingBenefits(sub);
+                    await loadUsageHistory(sub);
+                } else {
+                    document.getElementById('subscription-info').style.display = 'none';
+                    document.getElementById('no-subscription').style.display = 'block';
+                }
+            } catch (e) {
+                console.error("Erro ao carregar assinatura:", e);
+                document.getElementById('subscription-info').style.display = 'none';
+                document.getElementById('no-subscription').style.display = 'block';
+            }
+        }
+
+        async function loadSubscriptionUsageChart(subscription) {
+            const now = new Date();
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            
+            try {
+                const q = query(collection(db, "agendamentos"), 
+                    where("userId", "==", state.user.uid),
+                    where("isSubscription", "==", true),
+                    where("data", ">=", startOfMonth.toISOString().split('T')[0]),
+                    where("data", "<=", endOfMonth.toISOString().split('T')[0])
+                );
+                const snap = await getDocs(q);
+                
+                const usageByService = {};
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    const serviceName = data.servico.replace(' (Assinatura)', '');
+                    usageByService[serviceName] = (usageByService[serviceName] || 0) + 1;
+                });
+
+                const planLimits = getPlanLimits(subscription.plan);
+                const labels = Object.keys(planLimits);
+                const used = labels.map(service => usageByService[service] || 0);
+                const limits = labels.map(service => planLimits[service]);
+
+                const ctx = document.getElementById('usageChart').getContext('2d');
+                
+                if (usageChart) {
+                    usageChart.destroy();
+                }
+                
+                usageChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Usado',
+                            data: used,
+                            backgroundColor: 'var(--subscription)',
+                            borderColor: 'var(--subscription)',
+                            borderWidth: 1
+                        }, {
+                            label: 'Limite',
+                            data: limits,
+                            backgroundColor: 'rgba(139, 92, 246, 0.3)',
+                            borderColor: 'var(--subscription)',
+                            borderWidth: 1,
+                            type: 'line'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { color: '#aaa' },
+                                grid: { color: '#333' }
+                            },
+                            x: { ticks: { color: '#aaa' }, grid: { display: false } }
+                        },
+                        plugins: { legend: { labels: { color: '#aaa' } } }
+                    }
+                });
+            } catch (e) {
+                console.error("Erro ao carregar gráfico:", e);
+            }
+        }
+
+        function getPlanLimits(plan) {
+            const limits = {};
+            if (plan === 'sempre-alinhado') {
+                limits['Pezinho'] = 4;
+                limits['Barba Completa'] = 2;
+                limits['Sobrancelha'] = 1;
+            } else if (plan === 'combo-executivo') {
+                limits['Corte na Máquina'] = 2;
+                limits['Barba Completa'] = 2;
+                limits['Sobrancelha'] = Infinity;
+            } else if (plan === 'vip-premium') {
+                limits['Corte na Máquina'] = Infinity;
+                limits['Corte só Tesoura'] = Infinity;
+                limits['Barba Completa'] = Infinity;
+                limits['Sobrancelha'] = Infinity;
+                limits['Pigmentação'] = Infinity;
+                limits['Depilação Nariz/Orelha'] = Infinity;
+            }
+            return limits;
+        }
+
+        async function loadUpcomingBenefits(subscription) {
+            const container = document.getElementById('upcoming-benefits');
+            const nextBilling = new Date(subscription.nextBilling);
+            const daysUntilRenewal = Math.ceil((nextBilling - new Date()) / (1000 * 60 * 60 * 24));
+            
+            container.innerHTML = `
+                <div style="background: var(--subscription-light); padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                    <strong style="color: var(--subscription);">🔄 Renovação Automática</strong><br>
+                    <span style="color: var(--text-muted); font-size: 0.9rem;">Em ${daysUntilRenewal} dias - ${nextBilling.toLocaleDateString('pt-BR')}</span>
+                </div>
+                <div style="background: var(--subscription-light); padding: 15px; border-radius: 8px;">
+                    <strong style="color: var(--subscription);">💳 Próximo Pagamento</strong><br>
+                    <span style="color: var(--text-muted); font-size: 0.9rem;">R$ ${subscription.value.toFixed(2)} - ${nextBilling.toLocaleDateString('pt-BR')}</span>
+                </div>
+            `;
+        }
+
+        async function loadUsageHistory(subscription) {
+            const container = document.getElementById('usage-history');
+            const now = new Date();
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            
+            try {
+                const q = query(collection(db, "agendamentos"), 
+                    where("userId", "==", state.user.uid),
+                    where("isSubscription", "==", true),
+                    where("data", ">=", startOfMonth.toISOString().split('T')[0])
+                );
+                const snap = await getDocs(q);
+                
+                if (snap.empty) {
+                    container.innerHTML = '<p style="color: var(--text-muted);">Nenhum uso registrado este mês.</p>';
+                    return;
+                }
+
+                const historyItems = snap.docs
+                    .map(doc => doc.data())
+                    .sort((a, b) => new Date(b.data) - new Date(a.data))
+                    .slice(0, 5);
+
+                container.innerHTML = historyItems.map(item => `
+                    <div style="display: flex; justify-content: space-between; padding: 10px; background: var(--subscription-light); border-radius: 6px; margin-bottom: 8px;">
+                        <div>
+                            <strong style="color: var(--subscription);">${item.servico}</strong><br>
+                            <span style="color: var(--text-muted); font-size: 0.8rem;">${item.data.split('-').reverse().join('/')} às ${item.hora}h</span>
+                        </div>
+                        <div style="text-align: right;">
+                            <span style="color: var(--subscription); font-weight: bold;">Uso #${item.subscriptionUseNumber}</span>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error("Erro ao carregar histórico:", e);
+                container.innerHTML = '<p style="color: var(--text-muted);">Erro ao carregar histórico.</p>';
+            }
+        }
+
+        window.showFullHistory = async () => {
+            alert('Funcionalidade completa em desenvolvimento. Entre em contato com o barbeiro para ver seu histórico completo.');
+        };
+
+        window.contactBarber = () => {
+            const phone = window.barberPhone || "5528999082741";
+            const message = encodeURIComponent("Olá! Gostaria de falar sobre minha assinatura.");
+            window.open(`https://api.whatsapp.com/send?phone=${phone}&text=${message}`);
+        };
+
+        // ========== INICIALIZAÇÃO ==========
+
+        console.log('=== index.html script iniciado ===');
+
+        // Inicializar quando o DOM estiver carregado
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('DOMContentLoaded - Carregando configurações...');
+            try {
+                await loadAllConfigurations();
+                console.log('Todas as configurações carregadas com sucesso');
+            } catch (error) {
+                console.error('Erro ao carregar configurações:', error);
+            }
         });
 
-        // Slot Extra (80 min)
-        if (isDoisSlots) {
-            const horaExtra = calcularHorarioFim(horaSelecionada, 40);
-            const agendamentoExtraRef = doc(collection(db, "agendamentos"));
-            
-            await setDoc(agendamentoExtraRef, {
-                ...baseData,
-                data: dataSelecionada,
-                hora: horaExtra,
-                duracao: "40 min (Slot 2/2)", 
-                preco: 0, // Preço zero, cobrado no primeiro slot
-                referencia: horaSelecionada, 
-            });
+        // Se o DOM já estiver carregado, executar imediatamente
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            console.log('DOM já carregado - Carregando configurações imediatamente...');
+            loadAllConfigurations();
         }
-        
-        // 4. NOTIFICAÇÃO VIA WHATSAPP (com número de contato)
-        const numeroBarbeiro = '5528999082741'; 
-        const precoFormatado = preco.toFixed(2).replace('.', ',');
-
-        const mensagem = `💈 *NOVO AGENDAMENTO CONFIRMADO!* 💈
-
-👤 *Cliente:* ${nomeCliente}
-� *Telefone:* ${telefoneCliente || '-'}
-📅 *Data:* ${formatarData(dataSelecionada)}
-⏰ *Horário:* ${horaSelecionada}h - ${horarioFim}h
-✂️ *Serviço:* ${servicoNome} (${duracaoTotal} min)
-💰 *Valor:* R$ ${precoFormatado}
-${observacoes ? `📝 *Obs:* ${observacoes}` : ''}
-`;
-        
-        const urlEncodedMessage = encodeURIComponent(mensagem);
-        const whatsappLink = `https://api.whatsapp.com/send?phone=${numeroBarbeiro}&text=${urlEncodedMessage}`; // notifica a barbearia
-
-        // SALVA o telefone no documento principal
-
-
-        alert(`Agendamento de ${servicoNome} para ${formatarData(dataSelecionada)} às ${horaSelecionada}h CONFIRMADO!
-        
-        ✅ Clique em OK para notificar a Nossa Barbearia via WhatsApp.`);
-
-        window.open(whatsappLink, '_blank');
-        
-        // 5. LIMPEZA E RECARREGAMENTO
-        loadAgenda(dataSelecionada); // Assumindo que esta função existe
-        loadMyHistoricalAppointments(currentUser.uid); // Assumindo que esta função existe
-        
-        // Limpar inputs
-        servicoInput.value = servicoInput.options[0].value;
-        observacoesInput.value = '';
-        horarioSelecionado = null;
-        gridHorarios.innerHTML = ''; // Limpa a grade de horários
-        isAutismoInput.checked = false;
-        isInfantilInput.checked = false;
-        
-        checkInputs(); // Re-checa para desabilitar o botão
-
-    } catch (e) {
-        console.error("Erro ao agendar: ", e);
-        alert("Erro ao salvar agendamento: " + e.message);
-        btnConfirmar.disabled = false;
-        btnConfirmar.innerText = "CONFIRMAR AGENDAMENTO";
-    }
-}
-
-// ----------------------------------------------------
-// ✅ LISTENER CORRETO PARA O BOTÃO
-// ----------------------------------------------------
-btnConfirmar.addEventListener('click', agendar);
-
-
-
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const googleBtn = document.getElementById('googleBtn');
-    const anonymousBtn = document.getElementById('anonymousBtn');
-    const authForm = document.getElementById('authForm');
-    if (!authForm) return;
-
-    // Aplica classes sem alterar IDs (a lógica JS existente continua funcionando)
-    if (googleBtn) {
-        googleBtn.classList.add('social-btn', 'google-btn');
-        // Ícone SVG limpo para o botão do Google (harmonizado com o tema)
-        const googleSvg = '<svg class="google-svg" width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="var(--primary)"/><text x="12" y="16" text-anchor="middle" font-size="12" font-family="Segoe UI, Arial" fill="var(--light)" font-weight="700">G</text></svg>';
-        // Se o botão não tiver ícone, cria ícone com SVG
-        if (!googleBtn.innerHTML.trim()) {
-            googleBtn.innerHTML = `<span class="social-icon">${googleSvg}</span><span>Entrar com Google</span>`;
-        } else {
-            googleBtn.innerHTML = `<span class="social-icon">${googleSvg}</span>` + googleBtn.innerHTML;
-        }
-    }
-
-    if (anonymousBtn) {
-        anonymousBtn.classList.add('social-btn', 'anon-btn');
-        if (!anonymousBtn.innerHTML.trim()) {
-            anonymousBtn.innerHTML = '<span class="social-icon">👤</span><span>Continuar como visitante</span>';
-        } else {
-            anonymousBtn.innerHTML = '<span class="social-icon">👤</span>' + anonymousBtn.innerHTML;
-        }
-    }
-
-    // Agrupa os botões em um container visual abaixo dos inputs de e-mail
-    const container = document.createElement('div');
-    container.className = 'social-login';
-
-    if (googleBtn) container.appendChild(googleBtn);
-    if (anonymousBtn) container.appendChild(anonymousBtn);
-
-    // Insere após a seção de email auth (se existir) ou no final do form
-    const emailAuth = document.getElementById('emailAuthInputs');
-    if (emailAuth && emailAuth.parentNode) {
-        emailAuth.parentNode.insertBefore(container, emailAuth.nextSibling);
-    } else {
-        authForm.appendChild(container);
-    }
-});
-</script>
-
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    </script>
 </body>
 </html>
