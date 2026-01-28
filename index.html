@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="page-title">Lopes Barbearia</title>
+    <title id="page-title">FLOW BARBER</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -348,14 +348,6 @@
                     <span class="summary-value" id="resumoServico">---</span>
                 </div>
 
-                <div id="autismo-area" style="display:none; margin-bottom:12px;">
-                    <span class="summary-label">Atendimento especializado?</span>
-                    <div style="display: flex; gap: 8px; margin-top: 8px;">
-                        <button class="time-btn" style="flex:1" onclick="setAutismo(true)">Sim (Autismo)</button>
-                        <button class="time-btn" style="flex:1" onclick="setAutismo(false)">Não</button>
-                    </div>
-                </div>
-
                 <div id="corte-area" style="display:none; margin-bottom:12px;">
                     <span class="summary-label">Tipo de corte?</span>
                     <div style="display: flex; gap: 8px; margin-top: 8px;">
@@ -400,50 +392,8 @@
         <div class="section-title" style="text-align: center; margin-bottom: 40px; color: var(--primary); font-size: 2rem;">Escolha seu Plano de Assinatura</div>
         <p style="text-align: center; color: var(-@med-text-muted); margin-bottom: 50px; font-size: 1.1rem;">Planos flexíveis para manter seu visual sempre impecável</p>
         
-        <div class="services-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px;">
-            <div class="service-card subscription-card" onclick="selectSubscription('sempre-alinhado')" style="border: 2px solid var(--border); transition: all 0.3s ease; position: relative;">
-                <div style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: var(--primary); color: white; padding: 5px 15px; border-radius: 15px; font-size: 0.8rem; font-weight: bold;">POPULAR</div>
-                <h3 style="color: var(--primary); margin-bottom: 10px; text-align: center;">Sempre Alinhado</h3>
-                <p style="font-size: 0.9rem; margin-bottom: 15px;">Foco em manutenção semanal para visual impecável.</p>
-                <ul style="list-style: none; padding: 0; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
-                    <li>• Até 4 "Pezinhos" por mês (1/semana)</li>
-                    <li>• Até 2 Barbas por mês</li>
-                    <li>• 1 Sobrancelha inclusa</li>
-                </ul>
-                <div class="service-meta">
-                    <span class="service-price" style="font-size: 1.2rem; color: var(--primary);">R$ 79,90/mês</span>
-                </div>
-                <button class="btn-confirm" style="width: 100%; margin-top: 15px; background: var(--primary); color: white; border: none;" onclick="subscribePlan('sempre-alinhado')">ASSINAR</button>
-            </div>
-
-            <div class="service-card subscription-card" onclick="selectSubscription('combo-executivo')">
-                <h3>Combo Executivo</h3>
-                <p style="font-size: 0.9rem; margin-bottom: 15px;">Corte + Barba a cada 15 dias com sobrancelhas ilimitadas.</p>
-                <ul style="list-style: none; padding: 0; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
-                    <li>• 2 Cortes na Máquina por mês</li>
-                    <li>• 2 Barbas por mês</li>
-                    <li>• Sobrancelha ilimitada</li>
-                </ul>
-                <div class="service-meta">
-                    <span class="service-price" style="font-size: 1.2rem; color: var(--primary);">R$ 119,90/mês</span>
-                </div>
-                <button class="btn-confirm" style="width: 100%; margin-top: 15px; background: var(--primary); color: white; border: none;" onclick="subscribePlan('combo-executivo')">ASSINAR</button>
-            </div>
-
-            <div class="service-card subscription-card" onclick="selectSubscription('vip-premium')">
-                <h3>VIP Premium</h3>
-                <p style="font-size: 0.9rem; margin-bottom: 15px;">Experiência completa com serviços ilimitados.</p>
-                <ul style="list-style: none; padding: 0; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
-                    <li>• Cortes ilimitados (1/semana min.)</li>
-                    <li>• Barba ilimitada</li>
-                    <li>• Sobrancelha e Pigmentação</li>
-                    <li>• Depilação sempre que necessário</li>
-                </ul>
-                <div class="service-meta">
-                    <span class="service-price" style="font-size: 1.2rem; color: var(--primary);">R$ 159,90/mês</span>
-                </div>
-                <button class="btn-confirm" style="width: 100%; margin-top: 15px; background: var(--primary); color: white; border: none;" onclick="subscribePlan('vip-premium')">ASSINAR</button>
-            </div>
+        <div class="services-grid" id="subscription-plans-container" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px;">
+            <!-- Planos serão carregados dinamicamente aqui -->
         </div>
 
         <div id="subscription-details" style="display: none; margin-top: 40px; background: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
@@ -544,11 +494,12 @@
     </div>
 
     <footer>
+        <p id="barbearia-nome-footer" style="font-weight: bold; margin-bottom: 15px;">LOPES BARBEARIA</p>
         <p id="barbearia-endereco-footer">📍 Av. Central, 149-21 - Alto Lagoa Funda, Marataízes - ES, 29345-000</p>
         <a id="barbearia-maps-link" href="https://maps.app.goo.gl/tMqWDAU2Eh14hp9bA" target="_blank" class="map-link">
             🗺️ VER NO GOOGLE MAPS
         </a>
-        <p style="margin-top: 20px; opacity: 0.5;">© 2026 <span id="barbearia-nome-footer">BARBER MANAGER</span></p>
+        <p style="margin-top: 20px; opacity: 0.5;">© 2026 FONSECA CREATIVE STUDIO </p>
     </footer>
 
     <script type="module">
@@ -604,7 +555,6 @@
             data: null, 
             hora: null, 
             user: null, 
-            autismo: false,
             monthlyBookings: {}
         };
         
@@ -746,9 +696,13 @@
                     
                     // Atualizar nome da barbearia
                     const barberName = config.barberName || 'Lopes Barbearia';
-                    document.getElementById('barbearia-nome-header').textContent = barberName;
-                    document.getElementById('page-title').textContent = barberName;
-                    document.getElementById('barbearia-nome-footer').textContent = barberName;
+                    const headerElement = document.getElementById('barbearia-nome-header');
+                    const titleElement = document.getElementById('page-title');
+                    const footerNameElement = document.getElementById('barbearia-nome-footer');
+                    
+                    if (headerElement) headerElement.textContent = barberName;
+                    if (titleElement) titleElement.textContent = barberName;
+                    if (footerNameElement) footerNameElement.textContent = barberName;
                     
                     // Atualizar telefone (usar nas mensagens WhatsApp)
                     if (config.barberPhone) {
@@ -757,12 +711,17 @@
                     
                     // Atualizar endereço e link do maps
                     if (config.barberAddress) {
-                        document.getElementById('barbearia-endereco-footer').textContent = `📍 ${config.barberAddress}`;
+                        const addressElement = document.getElementById('barbearia-endereco-footer');
+                        if (addressElement) {
+                            addressElement.textContent = `📍 ${config.barberAddress}`;
+                        }
                     }
                     
                     if (config.barberMapsLink) {
                         const mapsLink = document.getElementById('barbearia-maps-link');
-                        mapsLink.href = config.barberMapsLink;
+                        if (mapsLink) {
+                            mapsLink.href = config.barberMapsLink;
+                        }
                     }
                     
                     console.log('Configurações da barbearia aplicadas com sucesso');
@@ -803,6 +762,7 @@
             await loadHorariosConfig();
             await loadServices();
             setupHorariosListener();
+            setupSubscriptionPlansListener();
         }
 
         // Listener em tempo real para horários
@@ -884,16 +844,28 @@
             
             let limit = null;
             
-            if (plan === 'sempre-alinhado') {
-                if (serviceName === 'Pezinho') limit = 4;
-                else if (serviceName === 'Barba Completa') limit = 2;
-                else if (serviceName === 'Sobrancelha') limit = 1;
-            } else if (plan === 'combo-executivo') {
-                if (serviceName === 'Corte na Máquina') limit = 2;
-                else if (serviceName === 'Barba Completa') limit = 2;
-                else if (serviceName === 'Sobrancelha') limit = Infinity;
-            } else if (plan === 'vip-premium') {
-                limit = Infinity;
+            // Tentar buscar no plano do Firebase
+            const planData = subscriptionPlans[plan];
+            if (planData && planData.servicesIncluded && Array.isArray(planData.servicesIncluded)) {
+                const serviceIncluded = planData.servicesIncluded.find(s => s.name === serviceName);
+                if (serviceIncluded) {
+                    limit = serviceIncluded.maxPerMonth === Infinity ? Infinity : serviceIncluded.maxPerMonth;
+                } else {
+                    return null;
+                }
+            } else {
+                // Fallback para lógica anterior (para compatibilidade com planos antigos)
+                if (plan === 'sempre-alinhado') {
+                    if (serviceName === 'Pezinho') limit = 4;
+                    else if (serviceName === 'Barba Completa') limit = 2;
+                    else if (serviceName === 'Sobrancelha') limit = 1;
+                } else if (plan === 'combo-executivo') {
+                    if (serviceName === 'Corte na Máquina') limit = 2;
+                    else if (serviceName === 'Barba Completa') limit = 2;
+                    else if (serviceName === 'Sobrancelha') limit = Infinity;
+                } else if (plan === 'vip-premium') {
+                    limit = Infinity;
+                }
             }
             
             if (limit === null) return null;
@@ -949,13 +921,15 @@
                 "Sobrancelha": "Design e limpeza das sobrancelhas.",
                 "Pigmentação": "Tingimento e pigmentação capilar.",
                 "Depilação Nariz/Orelha": "Limpeza e depilação de pelos indesejados.",
-                "Combos": "Pacotes completos para o cavalheiro moderno.",
-                "Corte Infantil (Autismo)": "Atendimento especializado para crianças com autismo."
+                "Combos": "Pacotes completos para o cavalheiro moderno."
             };
 
             grid.innerHTML = sortedServices.map(service => {
                 const displayName = service.name;
                 const availability = getServiceAvailability(service.name, state.monthlyBookings || {});
+                
+                // Usar descrição do banco de dados se disponível, caso contrário usar a padrão
+                let description = service.description || serviceDescriptions[service.name] || service.name;
                 
                 let availabilityText = '';
                 let priceDisplay = `R$ ${service.price}`;
@@ -981,7 +955,7 @@
                 return `
                     <div class="${cardClass}" onclick="selectService(this, '${service.name}', ${service.duration}, ${service.price})">
                         <h3>${displayName}${badgeHtml}${tooltipHtml}</h3>
-                        <p>${serviceDescriptions[service.name] || service.name}</p>
+                        <p>${description}</p>
                         ${availabilityText}
                         <div class="service-meta">
                             <span class="service-time">⏱ ${service.duration} MIN</span>
@@ -1023,7 +997,6 @@
             el.classList.add('selected');
             const slots = Math.max(1, Math.ceil(duracao / 30));
             state.servico = { nome, duracao, preco, slots, original: { duracao, preco, slots } };
-            state.autismo = false;
             state.hora = null;
 
             const availability = getServiceAvailability(nome, state.monthlyBookings || {});
@@ -1045,61 +1018,23 @@
             document.getElementById('dateTimeArea').style.pointerEvents = "all";
 
             if(nome === 'Corte Infantil') {
-                document.getElementById('autismo-area').style.display = 'block';
                 document.getElementById('corte-area').style.display = 'none';
                 document.getElementById('combo-area').style.display = 'none';
-                document.getElementById('observations-area').style.display = 'none';
+                document.getElementById('observations-area').style.display = 'block';
             } else if(nome === 'Corte na Máquina' || nome === 'Corte só Tesoura') {
-                document.getElementById('autismo-area').style.display = 'none';
                 document.getElementById('corte-area').style.display = 'none';
                 document.getElementById('combo-area').style.display = 'none';
                 document.getElementById('observations-area').style.display = 'block';
             } else if(nome === 'Combo Corte + Barba' || nome === 'Combo Completo: Cabelo, Barba e Sobrancelha') {
-                document.getElementById('autismo-area').style.display = 'none';
                 document.getElementById('corte-area').style.display = 'none';
                 document.getElementById('combo-area').style.display = 'none';
                 document.getElementById('observations-area').style.display = 'block';
             } else {
-                document.getElementById('autismo-area').style.display = 'none';
                 document.getElementById('corte-area').style.display = 'none';
                 document.getElementById('combo-area').style.display = 'none';
                 document.getElementById('observations-area').style.display = 'block';
             }
             
-            if (state.data) renderHorarios();
-            updateUI();
-        };
-
-        window.setAutismo = (val) => {
-            state.autismo = val;
-            if (!state.servico) return;
-
-            if (val) {
-                state.servico.slots = 2;
-                state.servico.duracao = 45;
-                if (state.servico.nome && state.servico.nome.includes('Infantil')) {
-                    state.servico.nome = 'Corte Infantil (Autismo)';
-                    state.servico.preco = 40;
-                }
-            } else {
-                if (state.servico.original) {
-                    state.servico.duracao = state.servico.original.duracao;
-                    state.servico.preco = state.servico.original.preco;
-                    state.servico.slots = state.servico.original.slots;
-                } else {
-                    state.servico.duracao = 30; state.servico.preco = 35; state.servico.slots = 1;
-                }
-                if (state.servico.nome && state.servico.nome.includes('Infantil')) {
-                    state.servico.nome = 'Corte Infantil';
-                }
-            }
-
-            document.getElementById('resumoPreco').innerHTML = `R$ ${state.servico.preco} <span id="resumoTempo" style="font-size:0.8rem; color:var(--text-muted); font-weight:500;"> • ⏱ ${state.servico.duracao} min </span>`;
-
-            document.querySelectorAll('#autismo-area .time-btn').forEach(b => b.classList.remove('selected'));
-            event.target.classList.add('selected');
-            document.getElementById('observations-area').style.display = 'block';
-
             if (state.data) renderHorarios();
             updateUI();
         };
@@ -1421,7 +1356,7 @@
                 const userData = uDoc.data();
                 const nomeCliente = userData?.nome || state.user.displayName || "Cliente";
 
-                const slotsNeeded = state.autismo ? 2 : state.servico.slots;
+                const slotsNeeded = state.servico.slots;
                 let precoFinal = Number(state.servico.preco) || 0;
                 let servicoFinal = state.servico.nome;
                 let subscriptionUseNumber = null;
@@ -1429,16 +1364,11 @@
 
                 if (state.isSubscription) {
                     precoFinal = 0;
-                    servicoFinal += ' (Assinatura)';
-                    
+                    // NÃO alterar o nome do serviço no banco — gravar o nome canônico e usar a flag isSubscription
+                    // para indicar que este agendamento é por assinatura.
                     const availability = getServiceAvailability(state.servico.nome, state.monthlyBookings || {});
                     subscriptionUseNumber = availability.used + 1;
                     subscriptionPlan = userSubscription.plan;
-                }
-
-                if (state.autismo) {
-                    servicoFinal += ' (Autismo)';
-                    if (state.servico.nome && state.servico.nome.includes('Infantil')) precoFinal = 60;
                 }
 
                 if (slotsNeeded > 1) {
@@ -1469,7 +1399,6 @@
                     hora: state.hora,
                     slots: slotsNeeded,
                     preco: precoFinal,
-                    autismo: state.autismo,
                     isSubscription: state.isSubscription || false,
                     subscriptionPlan: subscriptionPlan,
                     subscriptionUseNumber: subscriptionUseNumber,
@@ -1480,7 +1409,9 @@
 
                 const barberName = document.getElementById('barbearia-nome-header').textContent || 'Lopes Barbearia';
                 const phone = window.barberPhone || "5528999082741";
-                const msg = encodeURIComponent(`💈 *${barberName}*\n\n👤 Cliente: ${nomeCliente}\n✂️ Serviço: ${servicoFinal}\n📅 Data: ${state.data.split('-').reverse().join('/')}\n⏰ Hora: ${state.hora}h`);
+                // Mostrar '(Assinatura)' apenas na mensagem, sem gravar no banco
+                const displayService = state.servico.nome + (state.isSubscription ? ' (Assinatura)' : '');
+                const msg = encodeURIComponent(`💈 *${barberName}*\n\n👤 Cliente: ${nomeCliente}\n✂️ Serviço: ${displayService}\n📅 Data: ${state.data.split('-').reverse().join('/')}\n⏰ Hora: ${state.hora}h`);
                 window.open(`https://api.whatsapp.com/send?phone=${phone}&text=${msg}`);
                 location.reload();
             } catch (e) { 
@@ -1491,11 +1422,6 @@
         function updateUI() {
             const btn = document.getElementById('btnConfirmar');
             let ready = !!(state.servico && state.data && state.hora);
-            
-            if (state.servico?.nome === 'Corte Infantil') {
-                const autismoBtnSelected = document.querySelector('#autismo-area .time-btn.selected');
-                if (!autismoBtnSelected) ready = false;
-            }
             
             btn.disabled = !ready;
             btn.classList.toggle('ready', !btn.disabled);
@@ -1508,16 +1434,16 @@
             lista.innerHTML = snap.empty ? "Nenhum agendamento ativo." : "";
             snap.forEach(d => {
                 const dt = d.data();
-                const dadosAgendamento = JSON.stringify({
+                const dadosJson = JSON.stringify({
                     servico: dt.servico,
                     data: dt.data,
                     hora: dt.hora,
                     cliente: dt.cliente
-                }).replace(/"/g, '"');
+                });
 
                 lista.innerHTML += `<div style="border-bottom: 1px solid #222; padding: 10px 0;">
                     <b>${dt.servico}</b><br>${dt.data.split('-').reverse().join('/')} às ${dt.hora}h
-                    <br><button style="background:#e53e3e; color:#fff; border:none; padding:4px 8px; border-radius:4px; margin-top:5px; cursor:pointer;" onclick="cancelMyBooking('${d.id}', '${dadosAgendamento}')">CANCELAR</button>
+                    <br><button style="background:#e53e3e; color:#fff; border:none; padding:4px 8px; border-radius:4px; margin-top:5px; cursor:pointer;" onclick="cancelMyBooking('${d.id}', '${dadosJson.replace(/'/g, "&#39;").replace(/"/g, "&quot;")}')">CANCELAR</button>
                 </div>`;
             });
         }
@@ -1534,7 +1460,19 @@
             const diferencaHoras = diferencaMs / (1000 * 60 * 60);
 
             if (diferencaHoras < 2) {
-                alert("Não é possível cancelar com menos de 2 horas de antecedência. Entre em contato direto com a barbearia.");
+                Toastify({
+                    text: "❌ Não é possível cancelar com menos de 2 horas de antecedência. Entre em contato direto com a barbearia.",
+                    duration: 5000,
+                    gravity: "top",
+                    position: "center",
+                    style: {
+                        background: "#e53e3e",
+                        color: "#fff",
+                        fontSize: "1rem",
+                        borderRadius: "8px",
+                        fontWeight: "600"
+                    }
+                }).showToast();
                 return;
             }
 
@@ -1563,26 +1501,128 @@
 
         // ========== FUNÇÕES DE ASSINATURAS ==========
 
-        const subscriptionPlans = {
+        // Planos padrão (fallback caso o Firebase não tenha dados)
+        const defaultSubscriptionPlans = {
             'sempre-alinhado': {
+                id: 'sempre-alinhado',
                 name: 'Sempre Alinhado',
                 price: 79.90,
                 description: 'Foco em manutenção semanal para visual impecável. Até 4 "Pezinhos" por mês (1/semana), até 2 Barbas por mês, 1 Sobrancelha inclusa.',
-                benefits: ['Até 4 Pezinhos/mês', 'Até 2 Barbas/mês', '1 Sobrancelha inclusa']
+                benefits: ['Até 4 Pezinhos/mês', 'Até 2 Barbas/mês', '1 Sobrancelha inclusa'],
+                servicesIncluded: []
             },
             'combo-executivo': {
+                id: 'combo-executivo',
                 name: 'Combo Executivo',
                 price: 119.90,
                 description: 'Corte + Barba a cada 15 dias com sobrancelhas ilimitadas. 2 Cortes na Máquina por mês, 2 Barbas por mês, Sobrancelha ilimitada.',
-                benefits: ['2 Cortes na Máquina/mês', '2 Barbas/mês', 'Sobrancelha ilimitada']
+                benefits: ['2 Cortes na Máquina/mês', '2 Barbas/mês', 'Sobrancelha ilimitada'],
+                servicesIncluded: []
             },
             'vip-premium': {
+                id: 'vip-premium',
                 name: 'VIP Premium',
                 price: 159.90,
                 description: 'Experiência completa com serviços ilimitados. Cortes ilimitados (1/semana min.), Barba ilimitada, Sobrancelha e Pigmentação, Depilação sempre que necessário.',
-                benefits: ['Cortes ilimitados', 'Barba ilimitada', 'Sobrancelha + Pigmentação', 'Depilação incluída']
+                benefits: ['Cortes ilimitados', 'Barba ilimitada', 'Sobrancelha + Pigmentação', 'Depilação incluída'],
+                servicesIncluded: []
             }
         };
+
+        let subscriptionPlans = { ...defaultSubscriptionPlans };
+        let subscriptionPlansData = [];
+
+        // Variável global para status de assinaturas
+        let subscriptionsEnabled = true;
+
+        // Carregar status de assinaturas
+        async function loadSubscriptionsStatus() {
+            try {
+                const docRef = doc(db, "configuracoes_gerais", "assinaturas");
+                const docSnap = await getDoc(docRef);
+                
+                if (docSnap.exists()) {
+                    const dados = docSnap.data();
+                    subscriptionsEnabled = dados.enabled !== false;
+                } else {
+                    subscriptionsEnabled = true;
+                }
+                
+                updateSubscriptionsVisibility();
+            } catch (error) {
+                console.error("Erro ao carregar status de assinaturas:", error);
+                subscriptionsEnabled = true;
+            }
+        }
+
+        // Atualizar visibilidade das abas de assinatura
+        function updateSubscriptionsVisibility() {
+            const sectionAssinaturas = document.getElementById('section-assinaturas');
+            const sectionMinhaAssinatura = document.getElementById('section-minha-assinatura');
+            const btnNavAssinaturas = document.getElementById('btn-nav-assinaturas');
+            const btnNavMinhaAssinatura = document.getElementById('btn-nav-minha-assinatura');
+            
+            if (subscriptionsEnabled) {
+                if (sectionAssinaturas) sectionAssinaturas.style.display = 'none'; // Oculto por padrão, mostrar via showSection
+                if (sectionMinhaAssinatura) sectionMinhaAssinatura.style.display = 'none'; // Oculto por padrão
+                if (btnNavAssinaturas) btnNavAssinaturas.style.display = 'inline-block';
+                if (btnNavMinhaAssinatura) btnNavMinhaAssinatura.style.display = 'inline-block';
+            } else {
+                if (sectionAssinaturas) sectionAssinaturas.style.display = 'none';
+                if (sectionMinhaAssinatura) sectionMinhaAssinatura.style.display = 'none';
+                if (btnNavAssinaturas) btnNavAssinaturas.style.display = 'none';
+                if (btnNavMinhaAssinatura) btnNavMinhaAssinatura.style.display = 'none';
+            }
+        }
+
+        // Carregar planos do Firebase
+        function setupSubscriptionPlansListener() {
+            onSnapshot(collection(db, "subscription_plans"), snap => {
+                subscriptionPlansData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                console.log('Planos de assinatura carregados:', subscriptionPlansData);
+                
+                // Reconstruir objeto de planos por ID para manter compatibilidade
+                subscriptionPlans = {};
+                subscriptionPlansData.forEach(plan => {
+                    subscriptionPlans[plan.id] = plan;
+                });
+
+                // Renderizar os planos na página
+                renderSubscriptionPlansUI();
+            });
+        }
+
+        // Renderizar planos na interface
+        function renderSubscriptionPlansUI() {
+            const container = document.getElementById('subscription-plans-container');
+            if (!container) return;
+
+            // Se não houver planos no Firebase, usar os padrões
+            const plansToRender = subscriptionPlansData.length > 0 ? subscriptionPlansData : Object.values(defaultSubscriptionPlans);
+
+            container.innerHTML = plansToRender.map(plan => {
+                let servicesHtml = '';
+                if (plan.servicesIncluded && Array.isArray(plan.servicesIncluded) && plan.servicesIncluded.length > 0) {
+                    servicesHtml = plan.servicesIncluded.map(s => `<li>• ${s.name} (até ${s.maxPerMonth}x/mês)</li>`).join('');
+                } else if (plan.benefits && Array.isArray(plan.benefits)) {
+                    servicesHtml = plan.benefits.map(b => `<li>• ${b}</li>`).join('');
+                }
+
+                return `
+                    <div class="service-card subscription-card" onclick="selectSubscription('${plan.id}')" style="border: 2px solid var(--border); transition: all 0.3s ease; position: relative;">
+                        <h3 style="color: var(--primary); margin-bottom: 10px; text-align: center;">${plan.name}</h3>
+                        <p style="font-size: 0.9rem; margin-bottom: 15px;">${plan.description || 'Confira os detalhes abaixo'}</p>
+                        <ul style="list-style: none; padding: 0; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
+                            ${servicesHtml}
+                        </ul>
+                        <div class="service-meta">
+                            <span class="service-price" style="font-size: 1.2rem; color: var(--primary);">R$ ${parseFloat(plan.price).toFixed(2)}/mês</span>
+                        </div>
+                        <button class="btn-confirm" style="width: 100%; margin-top: 15px; background: var(--primary); color: white; border: none;" onclick="subscribePlan('${plan.id}')">ASSINAR</button>
+                    </div>
+                `;
+            }).join('');
+        }
 
         let selectedPlan = null;
 
@@ -1593,12 +1633,26 @@
             selectedPlan = planId;
             
             const plan = subscriptionPlans[planId];
+            if (!plan) {
+                console.error('Plano não encontrado:', planId);
+                return;
+            }
+
             document.getElementById('selected-plan-title').innerText = plan.name;
+            
+            // Gerar benefícios da lista de serviços inclusos
+            let benefitsHtml = '';
+            if (plan.servicesIncluded && Array.isArray(plan.servicesIncluded) && plan.servicesIncluded.length > 0) {
+                benefitsHtml = plan.servicesIncluded.map(s => `<li>${s.name} (até ${s.maxPerMonth}x/mês)</li>`).join('');
+            } else if (plan.benefits && Array.isArray(plan.benefits)) {
+                benefitsHtml = plan.benefits.map(b => `<li>${b}</li>`).join('');
+            }
+
             document.getElementById('selected-plan-description').innerHTML = `
                 <strong>Preço: R$ ${plan.price.toFixed(2)}/mês</strong><br><br>
-                ${plan.description}<br><br>
-                <strong>Benefícios:</strong><br>
-                <ul>${plan.benefits.map(b => `<li>${b}</li>`).join('')}</ul>
+                ${plan.description || 'Confira os serviços inclusos abaixo.'}<br><br>
+                <strong>Serviços Inclusos:</strong><br>
+                <ul>${benefitsHtml || '<li>Consulte o plano para mais detalhes</li>'}</ul>
             `;
             document.getElementById('subscription-details').style.display = 'block';
             document.getElementById('subscription-details').scrollIntoView({ behavior: 'smooth' });
@@ -1881,6 +1935,7 @@
             console.log('DOMContentLoaded - Carregando configurações...');
             try {
                 await loadAllConfigurations();
+                await loadSubscriptionsStatus();
                 console.log('Todas as configurações carregadas com sucesso');
             } catch (error) {
                 console.error('Erro ao carregar configurações:', error);

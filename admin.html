@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Admin | Lopes Barbearia</title>
-    
+    <title>Admin | FLOW BARBER</title>
+    <link rel="manifest" href="/manifest.json">
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 
@@ -28,7 +29,8 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; }
-        body { background-color: var(--bg-dark); color: var(--text-main); line-height: 1.5; overflow-x: hidden; font-size: 14px; }
+        body { background-color: var(--bg-dark); color: var(--text-main); line-height: 1.5; font-size: 14px; }
+        html, body { height: 100%; overflow-y: auto; overflow-x: hidden; }
 
         /* Login - Mobile First */
         #login-screen { 
@@ -38,6 +40,12 @@
             min-height: 100vh; 
             background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
             padding: 1rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 9999;
         }
         
         .login-card { 
@@ -54,6 +62,7 @@
             display: none; 
             min-height: 100vh;
             position: relative;
+            overflow-y: auto;
         }
         
         /* Header com menu hambúrguer */
@@ -92,6 +101,18 @@
             font-size: 1.2rem;
             font-weight: 600;
             color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Indicador da aba atual (baixo do logo) */
+        .header-title #current-tab {
+            margin-top: 5px;
+            color: var(--primary);
+            font-size: 0.9rem;
+            font-weight: 700;
+            display: block;
+            opacity: 0.95;
         }
         
         .logo {
@@ -198,45 +219,90 @@
         }
 
         .simple-stat-card {
-            background: var(--bg-card);
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(255, 255, 255, 0.05) 100%);
             border-radius: 1rem;
-            border: 1px solid var(--border);
+            border: 2px solid var(--border);
             padding: 1.5rem;
             display: flex;
             align-items: center;
             gap: 1rem;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .simple-stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s ease;
         }
 
         .simple-stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border-color: var(--primary);
+        }
+
+        .simple-stat-card:hover::before {
+            left: 100%;
         }
 
         .simple-stat-card.primary {
             border-left: 4px solid var(--primary);
+            box-shadow: -4px 0 20px rgba(30, 144, 255, 0.2);
+        }
+
+        .simple-stat-card.primary:hover {
+            box-shadow: -4px 0 30px rgba(30, 144, 255, 0.4), 0 20px 60px rgba(0, 0, 0, 0.5);
         }
 
         .simple-stat-card.success {
             border-left: 4px solid var(--success);
+            box-shadow: -4px 0 20px rgba(16, 185, 129, 0.2);
+        }
+
+        .simple-stat-card.success:hover {
+            box-shadow: -4px 0 30px rgba(16, 185, 129, 0.4), 0 20px 60px rgba(0, 0, 0, 0.5);
         }
 
         .simple-stat-card.accent {
             border-left: 4px solid var(--accent);
+            box-shadow: -4px 0 20px rgba(59, 130, 246, 0.2);
+        }
+
+        .simple-stat-card.accent:hover {
+            box-shadow: -4px 0 30px rgba(59, 130, 246, 0.4), 0 20px 60px rgba(0, 0, 0, 0.5);
         }
 
         .simple-stat-card.subscription {
             border-left: 4px solid var(--subscription);
+            box-shadow: -4px 0 20px rgba(139, 92, 246, 0.2);
+        }
+
+        .simple-stat-card.subscription:hover {
+            box-shadow: -4px 0 30px rgba(139, 92, 246, 0.4), 0 20px 60px rgba(0, 0, 0, 0.5);
         }
 
         .simple-stat-icon {
-            background: rgba(255, 255, 255, 0.1);
+            background: linear-gradient(135deg, rgba(30, 144, 255, 0.2), rgba(139, 92, 246, 0.1));
             width: 60px;
             height: 60px;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .simple-stat-card:hover .simple-stat-icon {
+            background: linear-gradient(135deg, rgba(30, 144, 255, 0.3), rgba(139, 92, 246, 0.2));
+            transform: scale(1.1) rotate(5deg);
         }
 
         .simple-stat-icon i {
@@ -269,10 +335,17 @@
 
         .simple-upcoming-clients {
             grid-column: span 2;
-            background: var(--bg-card);
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(30, 144, 255, 0.05) 100%);
             border-radius: 1rem;
-            border: 1px solid var(--border);
+            border: 2px solid var(--border);
             padding: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .simple-upcoming-clients:hover {
+            border-color: var(--primary);
+            box-shadow: 0 8px 30px rgba(30, 144, 255, 0.15);
         }
 
         .simple-upcoming-header {
@@ -281,18 +354,25 @@
             gap: 0.75rem;
             margin-bottom: 1.5rem;
             padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 2px solid var(--primary);
         }
 
         .simple-upcoming-header h4 {
             font-size: 1.1rem;
-            color: var(--text-main);
+            color: var(--primary);
+            font-weight: 700;
         }
 
         .simple-upcoming-header i {
             color: var(--primary);
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
         }
 
         .simple-upcoming-list {
@@ -306,14 +386,17 @@
             align-items: center;
             justify-content: space-between;
             padding: 1rem;
-            background: rgba(255, 255, 255, 0.05);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(30, 144, 255, 0.05));
             border-radius: 10px;
-            border: 1px solid var(--border);
-            transition: background 0.2s;
+            border: 1px solid rgba(30, 144, 255, 0.2);
+            transition: all 0.3s ease;
         }
 
         .upcoming-client-item:hover {
-            background: rgba(255, 255, 255, 0.08);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(30, 144, 255, 0.1));
+            border-color: var(--primary);
+            box-shadow: 0 4px 15px rgba(30, 144, 255, 0.2);
+            transform: translateX(4px);
         }
 
         .client-info {
@@ -345,21 +428,25 @@
             font-size: 0.75rem;
             font-weight: 600;
             text-transform: uppercase;
+            transition: all 0.3s ease;
         }
 
         .client-status.confirmed {
-            background: rgba(16, 185, 129, 0.2);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(16, 185, 129, 0.1));
             color: var(--success);
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
         }
 
         .client-status.subscriber {
-            background: rgba(139, 92, 246, 0.2);
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(139, 92, 246, 0.1));
             color: #8b5cf6;
+            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.2);
         }
 
         .client-status.completed {
-            background: rgba(107, 114, 128, 0.2);
+            background: linear-gradient(135deg, rgba(107, 114, 128, 0.3), rgba(107, 114, 128, 0.1));
             color: var(--text-muted);
+            box-shadow: 0 2px 8px rgba(107, 114, 128, 0.2);
         }
 
         .no-upcoming {
@@ -399,10 +486,18 @@
         }
         
         .stat-card { 
-            background: var(--bg-card); 
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(30, 144, 255, 0.05) 100%);
             padding: 1.5rem; 
             border-radius: 1rem; 
-            border: 1px solid var(--border); 
+            border: 2px solid var(--border);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .stat-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 8px 25px rgba(30, 144, 255, 0.15);
+            transform: translateY(-4px);
         }
         
         .stat-value { 
@@ -421,11 +516,18 @@
         }
         
         .calendar-card { 
-            background: var(--bg-card); 
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(30, 144, 255, 0.05) 100%);
             border-radius: 1rem; 
-            border: 1px solid var(--border); 
+            border: 2px solid var(--border);
             overflow: hidden; 
             width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .calendar-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 8px 25px rgba(30, 144, 255, 0.15);
         }
         
         .calendar-header { 
@@ -459,14 +561,21 @@
         .day-number { font-weight: bold; font-size: 0.9rem; margin-bottom: 2px; }
         
         .slots-container { 
-            background: var(--bg-card); 
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(30, 144, 255, 0.05) 100%);
             border-radius: 1rem; 
-            border: 1px solid var(--border); 
+            border: 2px solid var(--border);
             padding: 1.5rem; 
             width: 100%;
             height: fit-content;
             position: sticky;
             top: 90px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .slots-container:hover {
+            border-color: var(--primary);
+            box-shadow: 0 8px 25px rgba(30, 144, 255, 0.15);
         }
         
         .slots-grid { 
@@ -501,11 +610,18 @@
 
         /* Form Estilizado */
         .admin-section { 
-            background: var(--bg-card); 
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(30, 144, 255, 0.05) 100%);
             padding: 1.5rem; 
             border-radius: 1rem; 
-            border: 1px solid var(--border); 
-            margin-bottom: 1.5rem; 
+            border: 2px solid var(--border);
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .admin-section:hover {
+            border-color: var(--primary);
+            box-shadow: 0 8px 25px rgba(30, 144, 255, 0.15);
         }
         
         .form-row { 
@@ -516,17 +632,22 @@
         }
         
         input, select, textarea { 
-            background: #111111; 
-            border: 1px solid var(--border); 
+            background: linear-gradient(135deg, #111111, rgba(30, 144, 255, 0.05));
+            border: 2px solid var(--border); 
             padding: 0.75rem; 
             color: white; 
             border-radius: 0.5rem; 
             width: 100%; 
             outline: none; 
             font-size: 0.9rem;
+            transition: all 0.3s ease;
         }
         
-        input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+        input:focus, select:focus, textarea:focus { 
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(30, 144, 255, 0.2);
+            background: linear-gradient(135deg, #0a0a0a, rgba(30, 144, 255, 0.08));
+        }
         
         label { 
             font-size: 0.8rem; 
@@ -536,22 +657,28 @@
         }
         
         .btn-action { 
-            background: var(--primary); 
+            background: linear-gradient(135deg, var(--primary), rgba(30, 144, 255, 0.8));
             color: white; 
-            border: none; 
+            border: 2px solid rgba(255, 255, 255, 0.2);
             padding: 0.75rem 1.5rem; 
             border-radius: 0.5rem; 
             font-weight: 600; 
             cursor: pointer; 
-            transition: 0.2s; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: inline-flex; 
             align-items: center; 
             justify-content: center; 
             gap: 6px; 
             font-size: 0.9rem;
+            box-shadow: 0 4px 12px rgba(30, 144, 255, 0.3);
         }
         
-        .btn-action:hover { background: var(--primary-hover); }
+        .btn-action:hover { 
+            background: linear-gradient(135deg, var(--primary-hover), rgba(28, 134, 238, 0.9));
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(30, 144, 255, 0.4);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
 
         .btn-whatsapp { 
             background: var(--whatsapp); 
@@ -572,10 +699,17 @@
         .table-wrapper { 
             width: 100%; 
             overflow-x: auto; 
-            background: var(--bg-card); 
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(30, 144, 255, 0.05) 100%);
             border-radius: 1rem; 
-            border: 1px solid var(--border);
+            border: 2px solid var(--border);
             -webkit-overflow-scrolling: touch;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .table-wrapper:hover {
+            border-color: var(--primary);
+            box-shadow: 0 8px 25px rgba(30, 144, 255, 0.15);
         }
         
         table { 
@@ -620,9 +754,20 @@
             position: relative;
             height: 300px;
             width: 100%;
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(30, 144, 255, 0.05) 100%);
+            border-radius: 1rem;
+            border: 2px solid var(--border);
+            padding: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .chart-box:hover {
+            border-color: var(--primary);
+            box-shadow: 0 8px 25px rgba(30, 144, 255, 0.15);
         }
 
-        /* Toggle Autismo e Cortesia */
+        /* Toggle de Serviços */
         .autismo-toggle { 
             display: flex; 
             gap: 8px; 
@@ -767,7 +912,7 @@
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary), rgba(30, 144, 255, 0.8));
             color: white;
             width: 50px;
             height: 50px;
@@ -776,15 +921,19 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            opacity: 0.8;
-            transition: opacity 0.3s;
-            z-index: 999;
-            border: none;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            opacity: 0.7;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10000; /* Mais alto para garantir que fique visível */
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 25px rgba(30, 144, 255, 0.3);
+            font-size: 1.2rem;
         }
         
         .back-to-top:hover {
             opacity: 1;
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 12px 35px rgba(30, 144, 255, 0.5);
+            border-color: rgba(255, 255, 255, 0.5);
         }
         
         /* Scroll suave */
@@ -933,7 +1082,7 @@
 
     <div id="login-screen">
         <div class="login-card">
-            <h2 style="color: var(--primary); text-align: center; margin-bottom: 1.5rem; font-size: 1.5rem;">LOPES ADMIN</h2>
+            <h2 style="color: var(--primary); text-align: center; margin-bottom: 1.5rem; font-size: 1.5rem;">FLOW BARBER</h2>
             <div style="margin-bottom: 1rem;"><label>Email</label><input type="email" id="login-email" autocomplete="email"></div>
             <div style="margin-bottom: 1.5rem;"><label>Senha</label><input type="password" id="login-password" autocomplete="current-password"></div>
             <button class="btn-action" id="btn-login" style="width: 100%;">ENTRAR</button>
@@ -948,8 +1097,10 @@
                 <i data-lucide="menu"></i>
             </button>
             <div class="header-title">
-                <span class="logo">LOPES BARBEARIA</span>
-                <span id="current-tab" style="margin-left: 10px; color: var(--text-muted); font-size: 0.9rem;">Dashboard</span>
+                <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                    <span class="logo" onclick="switchTab('dashboard')" style="cursor: pointer;">FLOW BARBER</span>
+                </div>
+                <span id="current-tab">Dashboard</span>
             </div>
             <button class="btn-action" onclick="logout()" style="background: var(--danger); padding: 8px 16px; font-size: 0.85rem;">
                 <i data-lucide="log-out"></i> SAIR
@@ -959,22 +1110,22 @@
         <div class="nav-modal-overlay" onclick="toggleNavModal()"></div>
         <div class="nav-modal" id="nav-modal">
             <div class="nav-modal-content">
-                <div class="nav-modal-item active" onclick="switchTab('dashboard'); toggleNavModal();">
+                <div class="nav-modal-item active" onclick="switchTab('dashboard');">
                     <i data-lucide="layout-dashboard"></i> Dashboard
                 </div>
-                <div class="nav-modal-item" onclick="switchTab('agendamentos'); toggleNavModal();">
+                <div class="nav-modal-item" onclick="switchTab('agendamentos');">
                     <i data-lucide="calendar"></i> Agenda
                 </div>
-                <div class="nav-modal-item" onclick="switchTab('clientes'); toggleNavModal();">
+                <div class="nav-modal-item" onclick="switchTab('clientes');">
                     <i data-lucide="users"></i> Clientes
                 </div>
-                <div class="nav-modal-item" onclick="switchTab('assinaturas'); toggleNavModal();">
+                <div class="nav-modal-item" id="assinaturas-menu-item" onclick="switchTab('assinaturas');">
                     <i data-lucide="credit-card"></i> Assinaturas
                 </div>
-                <div class="nav-modal-item" onclick="switchTab('finanças'); toggleNavModal();">
+                <div class="nav-modal-item" onclick="switchTab('finanças');">
                     <i data-lucide="wallet"></i> Finanças
                 </div>
-                <div class="nav-modal-item" onclick="switchTab('configurações'); toggleNavModal();">
+                <div class="nav-modal-item" id="configuracoes-menu-item" onclick="switchTab('configurações');">
                     <i data-lucide="settings"></i> Configurações
                 </div>
             </div>
@@ -1129,13 +1280,6 @@
     <option value="" disabled selected>Carregando serviços...</option>
 </select>
                                 </div>
-                                <div id="autismo-container" style="display: none;">
-                                    <label>Autismo?</label>
-                                    <div class="autismo-toggle">
-                                        <button id="autismo-yes" class="toggle-btn" onclick="setAutismo(true)">✅</button>
-                                        <button id="autismo-no" class="toggle-btn" onclick="setAutismo(false)">⛔</button>
-                                    </div>
-                                </div>
                                 <div id="cortesia-slots-container" style="display: none;">
                                     <label>Quantos horários para a Cortesia?</label>
                                     <div class="autismo-toggle">
@@ -1151,9 +1295,9 @@
                                     </div>
                                 </div>
                                 <div id="subscription-details" style="display: none;"></div>
-                                <div>
-                                    <label>Observações (Atendimento especializado)</label>
-                                    <textarea id="edit-observations" placeholder="Preferências sensoriais, notas" style="width:100%; height:80px; margin-top:8px; padding:12px; background:#111111; color:#fff; border:1px solid var(--border); border-radius:8px; font-size: 0.9rem;"></textarea>
+                                <div id="observations-container" style="display: block;">
+                                    <label>Observações e Preferências</label>
+                                    <textarea id="edit-observations" placeholder="Preferências, notas especiais, necessidades do cliente..." style="width:100%; height:80px; margin-top:8px; padding:12px; background:#111111; color:#fff; border:1px solid var(--border); border-radius:8px; font-size: 0.9rem;"></textarea>
                                 </div>
                                 <div id="warning-double" style="display:none; color: var(--danger); font-size: 0.8rem; font-weight: bold;">
                                     ⚠️ Este serviço requer 2 horários seguidos.
@@ -1498,6 +1642,94 @@
                     </div>
                 </div>
 
+                <!-- Configuração de Assinaturas (ON/OFF) -->
+                <div class="admin-section">
+                    <h4 style="margin-bottom: 1.5rem;">Sistema de Assinaturas</h4>
+
+                    <div class="form-row">
+                        <div>
+                            <label>Status do Sistema de Assinaturas</label>
+                            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                <button id="btn-enable-subscriptions" class="btn-action" onclick="toggleSubscriptionsEnabled(true)" style="background: var(--success); flex: 1;">✅ ATIVAR</button>
+                                <button id="btn-disable-subscriptions" class="btn-action" onclick="toggleSubscriptionsEnabled(false)" style="background: var(--danger); flex: 1;">❌ DESATIVAR</button>
+                            </div>
+                            <p id="subscriptions-status" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">Carregando status...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Configuração de Relatório Fiscal -->
+                <div class="admin-section">
+                    <h4 style="margin-bottom: 1.5rem;">Relatório Fiscal</h4>
+
+                    <div class="form-row">
+                        <div>
+                            <label>Habilitar Funcionalidade de Relatório Fiscal</label>
+                            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                <button id="btn-enable-fiscal-report" class="btn-action" onclick="toggleFiscalReport(true)" style="background: var(--success); flex: 1;">✅ ATIVAR</button>
+                                <button id="btn-disable-fiscal-report" class="btn-action" onclick="toggleFiscalReport(false)" style="background: var(--danger); flex: 1;">❌ DESATIVAR</button>
+                            </div>
+                            <p id="fiscal-report-status" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">Carregando status...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Configuração de Serviços de Assinatura -->
+                <div class="admin-section">
+                    <h4 style="margin-bottom: 1.5rem;">Configuração de Serviços de Assinatura</h4>
+
+                    <div class="form-row">
+                        <div>
+                            <label>Nome do Plano</label>
+                            <input type="text" id="assinatura-nome" placeholder="Ex: Sempre Alinhado">
+                        </div>
+                        <div>
+                            <label>Valor Mensal (R$)</label>
+                            <input type="number" id="assinatura-valor" step="0.01" placeholder="79.90">
+                        </div>
+                        <div>
+                            <label>Frequência</label>
+                            <select id="assinatura-frequencia">
+                                <option value="monthly">Mensal</option>
+                                <option value="quarterly">Trimestral</option>
+                                <option value="semiannual">Semestral</option>
+                                <option value="annual">Anual</option>
+                            </select>
+                        </div>
+                        <div style="grid-column: span 2;">
+                            <label>Descrição (opcional)</label>
+                            <textarea id="assinatura-descricao" placeholder="Descrição do plano para os clientes" style="width:100%; height:60px; padding:12px; background:#111111; color:#fff; border:1px solid var(--border); border-radius:8px; font-size: 0.9rem;"></textarea>
+                        </div>
+                        <div style="grid-column: span 2;">
+                            <label>Serviços Inclusos no Plano</label>
+                            <div id="assinatura-servicos-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 10px; max-height: 300px; overflow-y: auto; padding: 10px; background: #0a0a0a; border-radius: 8px; border: 1px solid var(--border);">
+                                <p style="color: var(--text-muted); grid-column: span -1;">Carregando serviços...</p>
+                            </div>
+                        </div>
+                        <div>
+                            <button class="btn-action" onclick="salvarServicoAssinatura()" style="background: var(--success);">SALVAR PLANO</button>
+                            <button class="btn-action" onclick="cancelarEdicaoServicoAssinatura()" style="background: var(--danger); display: none;" id="btn-cancelar-edicao-assinatura">CANCELAR</button>
+                        </div>
+                    </div>
+                    <input type="hidden" id="assinatura-id-editando" value="">
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Valor</th>
+                                <th>Frequência</th>
+                                <th>Descrição</th>
+                                <th>Serviços Inclusos</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="list-services-assinatura"></tbody>
+                    </table>
+                </div>
+
                 <!-- Configuração de Serviços -->
                 <div class="admin-section">
                     <h4 style="margin-bottom: 1.5rem;">Configuração de Serviços</h4>
@@ -1519,6 +1751,10 @@
                             <label>Slots (cada slot = 30min)</label>
                             <input type="number" id="servico-slots" placeholder="1" min="1" value="1">
                         </div>
+                        <div style="grid-column: span 2;">
+                            <label>Descrição Detalhada (opcional)</label>
+                            <textarea id="servico-descricao" placeholder="Descrição detalhada do serviço para os clientes" style="width:100%; height:60px; padding:12px; background:#111111; color:#fff; border:1px solid var(--border); border-radius:8px; font-size: 0.9rem;"></textarea>
+                        </div>
                         <div>
                             <button class="btn-action" onclick="salvarServico()" style="background: var(--success);">SALVAR SERVIÇO</button>
                             <button class="btn-action" onclick="cancelarEdicaoServico()" style="background: var(--danger); display: none;" id="btn-cancelar-edicao">CANCELAR</button>
@@ -1535,17 +1771,52 @@
                                 <th>Preço (R$)</th>
                                 <th>Duração (min)</th>
                                 <th>Slots</th>
+                                <th>Descrição</th>
                                 <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody id="list-services"></tbody>
                     </table>
                 </div>
+
+                <!-- Gerenciamento de Emails Autorizados -->
+                <div class="admin-section">
+                    <h4 style="margin-bottom: 1.5rem;">Emails Autorizados para Acesso ao Admin</h4>
+                    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+                        Adicione emails que possam acessar o painel admin. O email <strong>saullinho2008@gmail.com</strong> tem acesso completo incluindo configurações. Os outros emails só terão acesso ao painel (sem acesso às configurações).
+                    </p>
+
+                    <div class="form-row">
+                        <div style="grid-column: span 2;">
+                            <label>Novo Email</label>
+                            <input type="email" id="novo-email-autorizado" placeholder="exemplo@email.com">
+                        </div>
+                        <div>
+                            <button class="btn-action" onclick="adicionarEmailAutorizado()" style="background: var(--success); margin-top: 1.7rem;">ADICIONAR EMAIL</button>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 2rem;">
+                        <h5 style="margin-bottom: 1rem; font-size: 1rem;">Emails Autorizados:</h5>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Email</th>
+                                        <th>Permissão</th>
+                                        <th>Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="list-emails-autorizados"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
         
-        <button class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
-            <i data-lucide="chevron-up"></i>
+        <button id="back-to-top-btn" class="back-to-top" onclick="backToTop()" aria-label="Voltar ao topo">
+            <i data-lucide="chevron-up" id="back-to-top-icon"></i>
         </button>
         
         <div class="toast" id="toast"></div>
@@ -1554,7 +1825,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc, updateDoc, addDoc, getDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc, updateDoc, addDoc, serverTimestamp, getDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+        import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-messaging.js";
 
         const firebaseConfig = {
   apiKey: "AIzaSyAi2g57qd4J3ONEjGvTEct69jsdV9F59lg",
@@ -1577,7 +1849,6 @@
             "Combo Corte + Barba": "#3cff00",
             "Combo Completo: Cabelo, Barba e Sombrancelha": "#ff6b00",
             "Corte Infantil": "#10b981",
-            "Corte Infantil (Autismo)": "#10b981",
             "Cortesia": "#a0a0a0",
             "Bloqueio": "#ef4444",
             "Outros": "#3b82f6",
@@ -1598,7 +1869,6 @@
         let currentCalendarDate = new Date();
         let selectedDateISO = new Date().toISOString().split('T')[0];
         let selectedSlot = null;
-        let isAutismo = false;
         let cortesiaSlots = 1;
         let mainChart = null;
         let pieChart = null;
@@ -1607,6 +1877,10 @@
         let subscriptionsData = [];
         let servicesData = [];
         let isAssinatura = false;
+        let currentUserEmail = null;
+        let subscriptionPlansData = []; // Nova variável para armazenar planos de assinatura
+        let emailsAutorizados = ['saullinho2008@gmail.com']; // Lista de emails autorizados
+        let isFirstLoadComplete = false; // Flag para rastrear primeiro carregamento completo
 
         const baseSlots = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30"];
 
@@ -1615,8 +1889,15 @@
             const modal = document.getElementById('nav-modal');
             const overlay = document.querySelector('.nav-modal-overlay');
             
-            modal.classList.toggle('active');
-            overlay.classList.toggle('active');
+            const isActive = modal.classList.contains('active');
+            
+            if (isActive) {
+                modal.classList.remove('active');
+                overlay.classList.remove('active');
+            } else {
+                modal.classList.add('active');
+                overlay.classList.add('active');
+            }
             
             // Atualizar ícones quando modal abre
             if (modal.classList.contains('active')) {
@@ -1625,6 +1906,39 @@
                 }, 10);
             }
         };
+
+        // Função para rolar ao topo respeitando o container com scroll (admin-panel)
+        window.backToTop = () => {
+            const panel = document.getElementById('admin-panel');
+
+            // Priorizar rolagem do painel quando houver overflow
+            try {
+                if (panel && panel.scrollHeight > panel.clientHeight) {
+                    panel.scrollTo({ top: 0, behavior: 'smooth' });
+                    return;
+                }
+            } catch (e) {
+                // ignore
+            }
+
+            // Fallbacks: documentElement e body
+            try { document.documentElement.scrollTo({ top: 0, behavior: 'smooth' }); } catch(e) {}
+            try { document.body.scrollTo({ top: 0, behavior: 'smooth' }); } catch(e) {}
+
+            // Pequeno feedback visual para confirmar que o botão funcionou
+            try { showToast('Rolando ao topo...', 'info'); } catch(e) {}
+        };
+
+        // Garantir que botão funciona mesmo sem onclick inline (mais robusto)
+        document.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById('back-to-top-btn');
+            if (btn) {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    backToTop();
+                });
+            }
+        });
 
         // Fechar modal de navegação
         function closeNavModal() {
@@ -1659,24 +1973,8 @@
             }, 3000);
         }
 
-        // Função Global para o Toggle Autismo
-        window.setAutismo = (val) => {
-            isAutismo = val;
-            const btnYes = document.getElementById('autismo-yes');
-            const btnNo = document.getElementById('autismo-no');
-            
-            if(btnYes && btnNo) {
-                if(val) {
-                    btnYes.classList.add('active-yes');
-                    btnNo.classList.remove('active-no');
-                } else {
-                    btnNo.classList.add('active-no');
-                    btnYes.classList.remove('active-yes');
-                }
-            }
-            updateWarning();
-        };
 
+        // Função Global para o Toggle de Assinatura
         window.setAssinatura = (val) => {
             isAssinatura = val;
             const btnYes = document.getElementById('assinatura-yes');
@@ -1717,7 +2015,7 @@
             const phone = clean.startsWith("55") ? clean : "55" + clean;
             const msg = encodeURIComponent(
                 `Olá, ${nome}! 👋\n\n` +
-                `Sentimos sua falta na *Lopes Barbearia*! ✂️\n` +
+                `Sentimos sua falta na *${window.barberName || 'FLOW BARBER'}*! ✂️\n` +
                 `Já fazem ${dias} dias desde sua última visita.\n\n` +
                 `Que tal agendar um horário pra dar aquele tapa no visual? 😉`
             );
@@ -1739,7 +2037,22 @@
             renderFinanceTable();
         };
 
+        // Atualizar a função switchTab para verificar permissões de configurações
         window.switchTab = (tab) => {
+            // Verificar se o usuário pode acessar configurações
+            // O email principal (saullinho2008@gmail.com) sempre tem acesso
+            const isMainAdmin = currentUserEmail && currentUserEmail.toLowerCase() === 'saullinho2008@gmail.com';
+            if (tab === 'configurações' && !isMainAdmin) {
+                showToast('Acesso negado: apenas o administrador pode acessar configurações.', 'error');
+                return;
+            }
+            
+            // Verificar se assinaturas estão habilitadas
+            if (tab === 'assinaturas' && !subscriptionsEnabled) {
+                showToast('Sistema de assinaturas desabilitado.', 'error');
+                return;
+            }
+            
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.nav-modal-item').forEach(i => i.classList.remove('active'));
             document.getElementById('tab-' + tab).classList.add('active');
@@ -1755,7 +2068,8 @@
             };
             
             const titleText = titles[tab] || tab;
-            document.getElementById('current-tab').innerText = titleText;
+            const currentTabEl = document.getElementById('current-tab');
+            if (currentTabEl) currentTabEl.innerText = titleText;
             
             // Ativar item do menu
             const navItems = document.querySelectorAll('.nav-modal-item');
@@ -1765,8 +2079,10 @@
                 }
             });
             
-            // Fechar modal de navegação
-            closeNavModal();
+            // Fechar modal de navegação (com delay para garantir fechamento em mobile)
+            setTimeout(() => {
+                closeNavModal();
+            }, 50);
             
             // Executar funções específicas da tab
             if(tab === 'dashboard') {
@@ -1777,10 +2093,19 @@
             }
             if(tab === 'agendamentos') {
     renderCalendar();
-    // Garantir que o select de serviços está atualizado
+    // Aguardar um pouco para garantir que os dados estão carregados
     setTimeout(() => {
         populateServiceSelect();
-    }, 100);
+        // Garantir que horariosConfig está carregado
+        if (window.horariosConfig) {
+            renderSlots();
+        } else {
+            // Tentar carregar se não estiver
+            loadHorariosFuncionamento().then(() => {
+                renderSlots();
+            });
+        }
+    }, 300);
 }
             if(tab === 'clientes') renderClients();
             if(tab === 'assinaturas') {
@@ -1791,6 +2116,8 @@
             if(tab === 'configurações') {
                 setTimeout(() => {
                     renderServices();
+                    renderSubscriptionPlans(); // Nova função para renderizar planos de assinatura
+                    renderTabelaEmailsAutorizados(); // Renderizar tabela de emails autorizados
                 }, 100);
             }
             
@@ -1798,13 +2125,151 @@
             window.scrollTo({top: 0, behavior: 'smooth'});
         };
 
+        // Função para carregar emails autorizados do Firestore
+        window.carregarEmailsAutorizados = async () => {
+            try {
+                const docRef = doc(db, 'configuracoes', 'emailsAutorizados');
+                const docSnap = await getDoc(docRef);
+                
+                if (docSnap.exists()) {
+                    emailsAutorizados = docSnap.data().emails || ['saullinho2008@gmail.com'];
+                } else {
+                    emailsAutorizados = ['saullinho2008@gmail.com'];
+                }
+            } catch (error) {
+                console.error('Erro ao carregar emails autorizados:', error);
+                emailsAutorizados = ['saullinho2008@gmail.com'];
+            }
+        };
+
+        // Função para salvar emails autorizados no Firestore
+        window.salvarEmailsAutorizados = async () => {
+            try {
+                const docRef = doc(db, 'configuracoes', 'emailsAutorizados');
+                await setDoc(docRef, { emails: emailsAutorizados }, { merge: true });
+                renderTabelaEmailsAutorizados();
+                showToast('Emails atualizados com sucesso!', 'success');
+            } catch (error) {
+                console.error('Erro ao salvar emails:', error);
+                showToast('Erro ao salvar emails', 'error');
+            }
+        };
+
+        // Função para adicionar um novo email autorizado
+        window.adicionarEmailAutorizado = async () => {
+            const inputEmail = document.getElementById('novo-email-autorizado');
+            const email = inputEmail.value.trim().toLowerCase();
+
+            if (!email) {
+                showToast('Por favor, preencha o campo de email', 'warning');
+                return;
+            }
+
+            // Validar formato de email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showToast('Por favor, insira um email válido', 'warning');
+                return;
+            }
+
+            // Verificar se já existe
+            if (emailsAutorizados.includes(email)) {
+                showToast('Este email já está autorizado', 'warning');
+                return;
+            }
+
+            // Adicionar à lista
+            emailsAutorizados.push(email);
+            await salvarEmailsAutorizados();
+            inputEmail.value = '';
+        };
+
+        // Função para remover um email autorizado
+        window.removerEmailAutorizado = async (email) => {
+            // Não permitir remover o email principal
+            if (email === 'saullinho2008@gmail.com') {
+                showToast('Não é possível remover o email principal', 'warning');
+                return;
+            }
+
+            if (confirm(`Deseja remover o email ${email}?`)) {
+                emailsAutorizados = emailsAutorizados.filter(e => e !== email);
+                await salvarEmailsAutorizados();
+            }
+        };
+
+        // Função para renderizar a tabela de emails autorizados
+        window.renderTabelaEmailsAutorizados = () => {
+            const tbody = document.getElementById('list-emails-autorizados');
+            if (!tbody) return;
+
+            tbody.innerHTML = '';
+
+            emailsAutorizados.forEach(email => {
+                const isMain = email === 'saullinho2008@gmail.com';
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${email}</td>
+                    <td>${isMain ? '<span style="color: var(--warn);">Completo (Admin)</span>' : '<span style="color: var(--success);">Painel (sem Config.)</span>'}</td>
+                    <td>
+                        <button class="btn-action" onclick="removerEmailAutorizado('${email}')" style="background: ${isMain ? '#666; cursor: not-allowed; opacity: 0.5;' : 'var(--danger);'}; padding: 6px 12px; font-size: 0.85rem;" ${isMain ? 'disabled' : ''}>
+                            <i data-lucide="trash-2"></i> REMOVER
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            lucide.createIcons();
+        };
+
         onAuthStateChanged(auth, user => {
             if (user) {
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('admin-panel').style.display = 'block';
-                initListeners();
-                showToast('Login realizado com sucesso!', 'success');
+                currentUserEmail = user.email;
+                
+
+                
+                // Carregar emails autorizados e verificar acesso
+                carregarEmailsAutorizados().then(() => {
+                    // Verificar se o email está autorizado
+                    const emailAutorizado = emailsAutorizados.includes(currentUserEmail.toLowerCase());
+                    
+                    if (!emailAutorizado) {
+                        // Email não está autorizado
+                        signOut(auth);
+                        document.getElementById('login-screen').style.display = 'flex';
+                        document.getElementById('admin-panel').style.display = 'none';
+                        const loginError = document.getElementById('login-error');
+                        loginError.innerText = 'Este email não está autorizado para acessar o admin.';
+                        loginError.style.display = 'block';
+                        return;
+                    }
+                    
+                    document.getElementById('login-screen').style.display = 'none';
+                    document.getElementById('admin-panel').style.display = 'block';
+                    
+                    // Atualizar a aba atual para dashboard ao logar
+                    try { switchTab('dashboard'); } catch(e) { /* ignore */ }
+                    
+                    // Esconder item de configurações do menu se não for o email permitido
+                    if (currentUserEmail !== 'saullinho2008@gmail.com') {
+                        const configMenuItem = document.getElementById('configuracoes-menu-item');
+                        if (configMenuItem) {
+                            configMenuItem.style.display = 'none';
+                        }
+                    } else {
+                        // Se for o email principal, mostrar o item de configurações
+                        const configMenuItem = document.getElementById('configuracoes-menu-item');
+                        if (configMenuItem) {
+                            configMenuItem.style.display = 'flex';
+                        }
+                    }
+                    
+                    initListeners();
+                    showToast('Login realizado com sucesso!', 'success');
+                });
             } else {
+                currentUserEmail = null;
                 document.getElementById('login-screen').style.display = 'flex';
                 document.getElementById('admin-panel').style.display = 'none';
             }
@@ -1850,21 +2315,23 @@
         };
 
         function initListeners() {
+            // Carregar emails autorizados
+            carregarEmailsAutorizados();
+            
             onSnapshot(collection(db, "agendamentos"), snap => {
                 agendamentosData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
                 try {
-                    const serviceSelect = document.getElementById('edit-service');
-                    const options = serviceSelect ? Array.from(serviceSelect.options).map(o => {
-                        const parts = o.value.split('|');
-                        return { name: (parts[0] || '').trim(), price: parseFloat(parts[1]) || 0 };
-                    }) : [];
+                    // Usar servicesData do banco de dados em vez do select (mais confiável)
+                    const options = servicesData && servicesData.length > 0 
+                        ? servicesData.map(s => ({ name: (s.name || '').trim(), price: s.price || 0 }))
+                        : [];
 
                     agendamentosData = agendamentosData.map(a => {
                         const out = { ...a };
                         out.preco = Number(out.preco) || 0;
 
-                        if (options.length) {
+                        if (options.length > 0) {
                             const originalServ = (out.servico || '').toString();
                             const target = originalServ.toLowerCase();
 
@@ -1876,8 +2343,7 @@
 
                             if (match) {
                                 if (out.preco === undefined || out.preco === 0) out.preco = match.price;
-                                const hasAutismo = out.autismo === true || /autis/i.test(originalServ);
-                                out.servico = match.name + (hasAutismo ? ' (Autismo)' : '');
+                                out.servico = match.name;
                             }
                         }
 
@@ -1887,8 +2353,11 @@
                     console.warn('Normalization failed:', e);
                 }
 
-                updateDashboard();
-                updateSimpleDashboard();
+                // Só atualizar dashboards se tiver dados suficientes
+                if (isFirstLoadComplete && (agendamentosData.length > 0 || subscriptionsData.length > 0)) {
+                    updateDashboard();
+                    updateSimpleDashboard();
+                }
                 renderClients();
                 renderCalendar();
                 renderSubscriptionUsageHistory();
@@ -1904,8 +2373,16 @@
 
            onSnapshot(collection(db, "services"), snap => {
     servicesData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    console.log('Serviços carregados:', servicesData);
+    console.log('Serviços carregados:', servicesData.length, 'itens');
     
+    // Verificar dados
+    servicesData.forEach((service, index) => {
+        if (!service.name || !service.price || !service.duration) {
+            console.warn(`Serviço ${index} incompleto:`, service);
+        }
+    });
+    
+    // Se não houver serviços, criar padrões
     if (servicesData.length === 0) {
         const defaultServices = [
             { name: "Corte Masculino", duration: 30, price: 25 },
@@ -1914,7 +2391,6 @@
             { name: "Barba Completa", duration: 30, price: 25 },
             { name: "Combos", duration: 60, price: 45 },
             { name: "Corte Infantil", duration: 30, price: 35 },
-            { name: "Corte Infantil (Autismo)", duration: 45, price: 40 },
             { name: "Pezinho", duration: 30, price: 10 },
             { name: "Sobrancelha", duration: 15, price: 15 },
             { name: "Pigmentação", duration: 20, price: 25 },
@@ -1929,20 +2405,22 @@
                 console.error('Erro ao criar serviço:', service.name, e);
             }
         });
-    } else {
-        console.log('Serviços já existem, total:', servicesData.length);
     }
     
-    // PASSO 5: Atualizar a interface com os novos serviços
-    renderServices(); // Atualiza tabela de configurações
+    // Atualizar interfaces que dependem de serviços
+    renderServices();
+    renderServicosAssinaturaForm();
     
-    // Se a aba de agenda estiver aberta, atualiza o select também
-    if (document.getElementById('tab-agendamentos').classList.contains('active')) {
+    // Se a aba de agenda estiver aberta, atualizar o select
+    if (document.getElementById('tab-agendamentos')?.classList.contains('active')) {
+        console.log('Atualizando select de serviços na aba ativa');
         populateServiceSelect();
     }
     
-    // Normalizar agendamentos existentes (removido - função não definida)
-    // normalizeExistingBookings();
+    // Forçar atualização do dashboard se estiver ativo
+    if (document.getElementById('tab-dashboard')?.classList.contains('active')) {
+        updateSimpleDashboard();
+    }
 });
 
             onSnapshot(collection(db, "despesas"), snap => {
@@ -1965,10 +2443,71 @@
                 renderSubscriptionUsageHistory();
                 updateSimpleDashboard();
             });
+            
+            // NOVO LISTENER PARA PLANOS DE ASSINATURA
+            onSnapshot(collection(db, "subscription_plans"), snap => {
+                subscriptionPlansData = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderSubscriptionPlans();
+                populateSubscriptionPlansSelect(); // Atualizar select na aba de assinaturas
+            });
+            
+            // Chamar função de fallback para garantir que os serviços estão carregados
+            ensureServicesLoaded();
+            
+            // Garantir sincronização de todos os dados com maior delay
+            setTimeout(() => {
+                ensureDataSync().then(() => {
+                    console.log('🔄 Inicializando dashboards com dados sincronizados...');
+                    
+                    // Re-normalizar agendamentos com servicesData carregados
+                    if (agendamentosData.length > 0 && servicesData.length > 0) {
+                        console.log('📋 Re-normalizando agendamentos com serviços carregados...');
+                        agendamentosData = agendamentosData.map(a => {
+                            const out = { ...a };
+                            out.preco = Number(out.preco) || 0;
+                            
+                            const originalServ = (out.servico || '').toString();
+                            const target = originalServ.toLowerCase();
+                            
+                            // Tentar casar com serviços cadastrados
+                            const matched = servicesData.find(s => {
+                                const nameLower = (s.name || '').toString().toLowerCase();
+                                return nameLower === target || 
+                                       nameLower.includes(target) || 
+                                       target.includes(nameLower);
+                            });
+                            
+                            if (matched) {
+                                out.servico = matched.name;
+                                if (out.preco === undefined || out.preco === 0) {
+                                    out.preco = matched.price;
+                                }
+                            }
+                            
+                            return out;
+                        });
+                        console.log('✅ Agendamentos re-normalizados:', agendamentosData.length);
+                    }
+                    
+                    updateDashboard();
+                    updateSimpleDashboard();
+                });
+            }, 1500);
         }
 
         // Função para atualizar a visão simplificada
         function updateSimpleDashboard() {
+            // PROTEÇÃO: Garantir que dados essenciais estão carregados
+            if (!agendamentosData || agendamentosData.length === 0 || !subscriptionsData) {
+                console.warn('updateSimpleDashboard: Alguns dados ainda não carregados, aguardando...');
+                setTimeout(() => {
+                    if (agendamentosData && agendamentosData.length > 0 && subscriptionsData) {
+                        updateSimpleDashboard();
+                    }
+                }, 300);
+                return;
+            }
+            
             // 1. Valor arrecadado no mês
             const today = new Date();
             const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -1982,24 +2521,28 @@
             monthRevenue += calculateRevenueExcludingSubscriptions(agendamentosData, monthStart, monthEnd);
             
             // Vendas de produtos no mês
-            entradasData.forEach(e => {
-                if (e.data) {
-                    const saleDate = new Date(e.data + 'T00:00:00');
-                    if (saleDate >= firstDayOfMonth && saleDate <= lastDayOfMonth) {
-                        monthRevenue += Number(e.valor || 0);
+            if (entradasData && Array.isArray(entradasData)) {
+                entradasData.forEach(e => {
+                    if (e.data) {
+                        const saleDate = new Date(e.data + 'T00:00:00');
+                        if (saleDate >= firstDayOfMonth && saleDate <= lastDayOfMonth) {
+                            monthRevenue += Number(e.valor || 0);
+                        }
                     }
-                }
-            });
+                });
+            }
             
             // Assinaturas pagas no mês
-            subscriptionsData.forEach(sub => {
-                if (sub.paymentStatus === 'paid' && sub.lastPaymentDate) {
-                    const paymentDate = new Date(sub.lastPaymentDate + 'T00:00:00');
-                    if (paymentDate >= firstDayOfMonth && paymentDate <= lastDayOfMonth) {
-                        monthRevenue += Number(sub.value || 0);
+            if (subscriptionsData && Array.isArray(subscriptionsData)) {
+                subscriptionsData.forEach(sub => {
+                    if (sub.paymentStatus === 'paid' && sub.lastPaymentDate) {
+                        const paymentDate = new Date(sub.lastPaymentDate + 'T00:00:00');
+                        if (paymentDate >= firstDayOfMonth && paymentDate <= lastDayOfMonth) {
+                            monthRevenue += Number(sub.value || 0);
+                        }
                     }
-                }
-            });
+                });
+            }
             
             document.getElementById('simple-month-revenue').innerText = 
                 `R$ ${monthRevenue.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
@@ -2055,7 +2598,7 @@
                 
                 todaysAgendamentos.forEach(agend => {
                     const clientName = agend.nome || agend.cliente || 'Cliente não informado';
-                    const service = agend.servico || 'Serviço por assinatura';
+                    const service = (agend.servico && agend.servico.trim()) ? agend.servico : (agend.isSubscription ? 'Serviço por assinatura' : 'Serviço não informado');
                     const time = agend.hora || '--:--';
                     
                     // Verificar se é assinante
@@ -2292,9 +2835,14 @@
                 }
             }
 
-            setAutismo(agend?.autismo || false);
             setCortesiaSlots(agend?.slots || 1);
-            setAssinatura(agend?.isSubscription || false);
+            
+            // Resetar estado de assinatura para falso por padrão
+            if (agend && agend.isSubscription === true) {
+                setAssinatura(true);
+            } else {
+                setAssinatura(false);
+            }
 
             // Mostrar detalhes da assinatura se for um agendamento por assinatura
             const subscriptionDetails = document.getElementById('subscription-details');
@@ -2350,7 +2898,7 @@
                     const cleanPhone = telefone.replace(/\D/g, "");
                     const fullPhone = cleanPhone.startsWith("55") ? cleanPhone : "55" + cleanPhone;
                     const displayName = agend.nome || agend.cliente || 'cliente';
-                    const msg = encodeURIComponent(`Olá, ${displayName}! 👋\n\nEstou passando para confirmar o seu agendamento na *Lopes Barbearia*.\n\n📅 Data: ${agend.data.split('-').reverse().join('/')}\n⏰ Hora: ${agend.hora}h\n✂️ Serviço: ${agend.servico}\n\nPodemos confirmar? 😉`);
+                    const msg = encodeURIComponent(`Olá, ${displayName}! 👋\n\nEstou passando para confirmar o seu agendamento na *${window.barberName || 'FLOW BARBER'}*.\n\n📅 Data: ${agend.data.split('-').reverse().join('/')}\n⏰ Hora: ${agend.hora}h\n✂️ Serviço: ${agend.servico}\n\nPodemos confirmar? 😉`);
                     window.open(`https://api.whatsapp.com/send?phone=${fullPhone}&text=${msg}`);
                 };
             } else {
@@ -2369,12 +2917,12 @@
     const isCortesia = servName.includes("Cortesia");
     const isBloqueio = servName.includes("Bloqueio");
     
-    const autismoContainer = document.getElementById('autismo-container');
     const cortesiaContainer = document.getElementById('cortesia-slots-container');
     const assinaturaContainer = document.getElementById('assinatura-container');
+    const observationsContainer = document.getElementById('observations-container');
     
-    autismoContainer.style.display = isInfantil ? 'block' : 'none';
     cortesiaContainer.style.display = isCortesia ? 'block' : 'none';
+    observationsContainer.style.display = isInfantil ? 'block' : 'block'; // Sempre mostrar observações
     
     // Mostrar container de assinatura para todos os serviços EXCETO Cortesia e Bloqueio
     if (isCortesia || isBloqueio) {
@@ -2387,10 +2935,7 @@
         assinaturaContainer.style.display = 'block';
     }
 
-    if (!isInfantil && isAutismo) setAutismo(false);
-
     let slotsNeeded = parseInt(servRaw[2]);
-    if (isAutismo) slotsNeeded = 2;
     if (isCortesia) slotsNeeded = cortesiaSlots;
 
     const warning = document.getElementById('warning-double');
@@ -2480,7 +3025,6 @@
                 hora: selectedSlot.time,
                 status: 'confirmed',
                 slots: serviceSlots,
-                autismo: isAutismo,
                 observacoes: observations,
                 timestamp: new Date()
             };
@@ -2595,17 +3139,92 @@
         }
 
         function updateDashboard() {
+            // PROTEÇÃO: Garantir que dados essenciais estão carregados
+            if (!agendamentosData || agendamentosData.length === 0) {
+                console.warn('updateDashboard: agendamentosData ainda não carregado, aguardando...');
+                setTimeout(() => {
+                    if (agendamentosData && agendamentosData.length > 0) {
+                        updateDashboard();
+                    }
+                }, 500);
+                return;
+            }
+            
+            console.log('📊 updateDashboard chamado com', agendamentosData.length, 'agendamentos');
+            console.log('📦 servicesData tem', servicesData.length, 'serviços');
+            
             const range = getPeriodRange(currentPeriod);
             let rev = 0; 
             const sMap = {};
 
+            // Função auxiliar: normaliza e contabiliza serviços (suporta múltiplos serviços por registro)
+            function addServiceToMap(rawService) {
+                let txt = (rawService || '').toString().trim();
+                
+                // Tratar vazio
+                if (!txt) {
+                    sMap['Outros'] = (sMap['Outros'] || 0) + 1;
+                    console.debug('addServiceToMap: Serviço vazio, adicionado como "Outros"');
+                    return;
+                }
+                
+                // Remover prefixos e textos desnecessários
+                txt = txt.replace(/^Venda:\s*/i, '').trim();
+
+                // Remover sufixos entre parênteses como "(Assinatura)" ou "(Autismo)"
+                txt = txt.replace(/\s*\([^)]*\)\s*/g, ' ').trim();
+
+                // Separadores comuns -> suportar múltiplos serviços em um único campo
+                const parts = txt.split(/[;,\/\|\+]/).map(p => p.trim()).filter(Boolean);
+                
+                parts.forEach(p => {
+                    if (!p) { sMap['Outros'] = (sMap['Outros'] || 0) + 1; return; }
+
+                    // Tentativa de casar com serviços cadastrados (normalizar pelo nome)
+                    let key = 'Outros';
+                    const pLower = p.toLowerCase();
+                    
+                    // PRIMEIRA PRIORIDADE: Casar com servicesData do banco
+                    if (servicesData && Array.isArray(servicesData) && servicesData.length > 0) {
+                        const matched = servicesData.find(s => {
+                            const nameLower = (s.name || '').toString().toLowerCase();
+                            return nameLower === pLower || 
+                                   nameLower.includes(pLower) || 
+                                   pLower.includes(nameLower);
+                        });
+                        if (matched) {
+                            key = matched.name;
+                        }
+                    }
+                    
+                    // FALLBACK: Heurísticas se ainda está como "Outros"
+                    if (key === 'Outros') {
+                        if (/combo completo/i.test(p)) key = 'Combo Completo: Cabelo, Barba e Sombrancelha';
+                        else if (/combo.*corte.*barba/i.test(p) || /corte.*barba/i.test(p)) key = 'Combo Corte + Barba';
+                        else if (/^combo/i.test(p)) key = 'Combos';
+                        else if (/corte infantil/i.test(p)) key = 'Corte Infantil';
+                        else if (/corte masculino/i.test(p)) key = 'Corte Masculino';
+                        else if (/barba/i.test(p)) key = 'Barba Completa';
+                        else if (/cortesia/i.test(p)) key = 'Cortesia';
+                        else if (/bloqueio/i.test(p)) key = 'Bloqueio';
+                        else if (/assinatura/i.test(p)) key = 'Assinatura';
+                        else key = p; // Usar o nome original se não combinar com nada
+                    }
+
+                    sMap[key] = (sMap[key] || 0) + 1;
+                });
+            }
+
             // Adicionar serviços concluídos (excluindo assinaturas)
             agendamentosData.forEach(a => { 
-                if(a.status === 'completed' && (a.nome || a.cliente) !== 'BLOQUEADO' && !a.isSubscription) {
-                    const dt = new Date(a.data + 'T00:00:00');
-                    if (dt >= range.start && dt < range.end) {
+                const status = (a.status || '').toString().toLowerCase();
+                const ownerName = (a.nome || a.cliente || '').toString().trim();
+                const isBlocked = ownerName.toUpperCase() === 'BLOQUEADO';
+                if(status === 'completed' && !isBlocked && !a.isSubscription) {
+                    const dt = a.data ? new Date(a.data + 'T00:00:00') : null;
+                    if (dt && dt >= range.start && dt < range.end) {
                         rev += Number(a.preco || 0);
-                        sMap[a.servico] = (sMap[a.servico] || 0) + 1;
+                        addServiceToMap(a.servico);
                     }
                 }
             });
@@ -2619,23 +3238,27 @@
             });
 
             // ADICIONADO: Adicionar assinaturas pagas no período
-            subscriptionsData.forEach(sub => {
-                if (sub.paymentStatus === 'paid' && sub.lastPaymentDate) {
-                    const dt = new Date(sub.lastPaymentDate + 'T00:00:00');
-                    if (dt >= range.start && dt < range.end) {
-                        rev += Number(sub.value || 0);
-                        sMap['Assinatura'] = (sMap['Assinatura'] || 0) + 1;
+            if (subscriptionsData && Array.isArray(subscriptionsData)) {
+                subscriptionsData.forEach(sub => {
+                    if ((sub.paymentStatus || '').toString().toLowerCase() === 'paid' && sub.lastPaymentDate) {
+                        const dt = new Date(sub.lastPaymentDate + 'T00:00:00');
+                        if (dt >= range.start && dt < range.end) {
+                            rev += Number(sub.value || 0);
+                            addServiceToMap('Assinatura');
+                        }
                     }
-                }
-            });
+                });
+            }
 
             let exp = 0; 
-            despesasData.forEach(e => {
-                const dt = new Date(e.data + 'T00:00:00');
-                if (dt >= range.start && dt < range.end) {
-                    exp += Number(e.valor || 0);
-                }
-            });
+            if (despesasData && Array.isArray(despesasData)) {
+                despesasData.forEach(e => {
+                    const dt = new Date(e.data + 'T00:00:00');
+                    if (dt >= range.start && dt < range.end) {
+                        exp += Number(e.valor || 0);
+                    }
+                });
+            }
 
             const profit = rev - exp;
             document.getElementById('dash-revenue').innerText = `R$ ${rev.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
@@ -2645,10 +3268,12 @@
             profitEl.innerText = `R$ ${profit.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
             profitEl.style.color = profit > 0 ? 'var(--success)' : (profit < 0 ? 'var(--danger)' : 'var(--text-muted)');
             
+            console.log('📈 Mapa de serviços para o gráfico:', Object.entries(sMap).map(([k, v]) => `${k}: ${v}`).join(', '));
             updateCharts(rev, exp, sMap);
         }
 
         function updateCharts(rev, exp, sMap) {
+            console.log('🎨 updateCharts chamado com:', { revenue: rev, expense: exp, services: sMap });
             const c1 = document.getElementById('mainChart')?.getContext('2d');
             if(c1) {
                 if(mainChart) mainChart.destroy();
@@ -2680,16 +3305,20 @@
             const c2 = document.getElementById('pieChart')?.getContext('2d');
             if(c2) {
                 const labels = Object.keys(sMap).sort((a, b) => {
-                    const order = ["Corte Masculino", "Barba Completa", "Combo Corte + Barba", "Corte Infantil", "Corte Infantil (Autismo)", "Cortesia", "Assinatura"];
+                    const order = ["Corte Masculino", "Barba Completa", "Combo Corte + Barba", "Combo Completo: Cabelo, Barba e Sombrancelha", "Combos", "Corte Infantil", "Cortesia", "Bloqueio", "Assinatura", "Outros"];
                     const indexA = order.findIndex(o => a === o);
                     const indexB = order.findIndex(o => b === o);
                     return (indexA === -1 ? 99 : indexA) - (indexB === -1 ? 99 : indexB);
                 });
                 
                 const data = labels.map(label => sMap[label]);
-                const labelsWithValues = labels.map((label, index) => `${label}: ${data[index]}`);
+                // Filtrar serviços com valor > 0 para melhor visualização
+                const filteredIndices = data.map((val, idx) => val > 0 ? idx : -1).filter(idx => idx !== -1);
+                const filteredLabels = filteredIndices.map(idx => labels[idx]);
+                const filteredData = filteredIndices.map(idx => data[idx]);
+                const labelsWithValues = filteredLabels.map((label, index) => `${label}: ${filteredData[index]}`);
 
-                const backgroundColors = labels.map(label => {
+                const backgroundColors = filteredLabels.map(label => {
                     const cleanLabel = label.replace("Venda: ", "");
                     return serviceColors[cleanLabel] || serviceColors["Outros"];
                 });
@@ -2700,7 +3329,7 @@
                     data: { 
                         labels: labelsWithValues, 
                         datasets: [{ 
-                            data: data, 
+                            data: filteredData, 
                             backgroundColor: backgroundColors, 
                             borderWidth: 0 
                         }] 
@@ -3057,7 +3686,7 @@
             const fullPhone = clean.startsWith("55") ? clean : "55" + clean;
             const msg = encodeURIComponent(
                 `Olá, ${clientName}! 👋\n\n` +
-                `Estou passando para lembrá-lo da sua assinatura na *Lopes Barbearia*! ✂️\n\n` +
+                `Estou passando para lembrá-lo da sua assinatura na *${window.barberName || 'FLOW BARBER'}*! ✂️\n\n` +
                 `Valor: *R$ ${amount.toLocaleString('pt-BR', {minimumFractionDigits: 2})}*\n` +
                 `PIX: *28999082741*\n\n` +
                 `Pode nos enviar o comprovante após o pagamento? 😉`
@@ -3240,7 +3869,7 @@
             "Depilação Nariz/Orelha"
         ];
 
-        // --- FUNÇÃO ATUALIZADA PARA ORDENAÇÃO DE SERVIÇOS ---
+        // --- FUNÇÃO ATUALIZADA PARA ORDENAÇÃO DE SERVIÇOS COM DESCRIÇÃO ---
         window.renderServices = () => {
     const tbody = document.getElementById('list-services');
     if (!tbody) {
@@ -3256,7 +3885,7 @@
     if (servicosOrdenados.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.9rem;">
+                <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.9rem;">
                     Nenhum serviço cadastrado. Adicione seu primeiro serviço acima.
                 </td>
             </tr>
@@ -3271,6 +3900,7 @@
             <td style="color: var(--primary)">R$ ${servico.price.toFixed(2)}</td>
             <td>${servico.duration} min</td>
             <td>${Math.ceil(servico.duration / 30)} slot(s)</td>
+            <td>${servico.description || '-'}</td>
             <td style="display: flex; gap: 8px;">
                 <button class="btn-action" style="background: var(--primary); padding: 6px 12px; font-size: 0.8rem;" onclick="editarServico('${servico.id}')">
                     <i data-lucide="edit-2"></i> Editar
@@ -3286,16 +3916,17 @@
     lucide.createIcons();
 };
 
-// Salvar serviço (criar ou atualizar)
+// Salvar serviço (criar ou atualizar) com descrição
 window.salvarServico = async () => {
     const nome = document.getElementById('servico-nome').value;
     const preco = parseFloat(document.getElementById('servico-preco').value);
     const duracao = parseInt(document.getElementById('servico-duracao').value);
     const slots = parseInt(document.getElementById('servico-slots').value);
+    const descricao = document.getElementById('servico-descricao').value;
     const servicoId = document.getElementById('servico-id-editando').value;
 
     if (!nome || isNaN(preco) || isNaN(duracao) || isNaN(slots)) {
-        showToast('Preencha todos os campos corretamente.', 'warning');
+        showToast('Preencha todos os campos obrigatórios corretamente.', 'warning');
         return;
     }
 
@@ -3319,6 +3950,7 @@ window.salvarServico = async () => {
         price: preco,
         duration: duracao,
         slots: slots,
+        description: descricao,
         timestamp: new Date()
     };
 
@@ -3338,6 +3970,7 @@ window.salvarServico = async () => {
         document.getElementById('servico-preco').value = '';
         document.getElementById('servico-duracao').value = '30';
         document.getElementById('servico-slots').value = '1';
+        document.getElementById('servico-descricao').value = '';
         document.getElementById('servico-id-editando').value = '';
         document.getElementById('btn-cancelar-edicao').style.display = 'none';
 
@@ -3346,7 +3979,7 @@ window.salvarServico = async () => {
     }
 };
 
-// Editar serviço
+// Editar serviço com descrição
 window.editarServico = async (id) => {
     const servico = servicesData.find(s => s.id === id);
     if (!servico) return;
@@ -3355,6 +3988,7 @@ window.editarServico = async (id) => {
     document.getElementById('servico-preco').value = servico.price;
     document.getElementById('servico-duracao').value = servico.duration;
     document.getElementById('servico-slots').value = servico.slots || Math.ceil(servico.duration / 30);
+    document.getElementById('servico-descricao').value = servico.description || '';
     document.getElementById('servico-id-editando').value = servico.id;
     document.getElementById('btn-cancelar-edicao').style.display = 'block';
 
@@ -3371,6 +4005,7 @@ window.cancelarEdicaoServico = () => {
     document.getElementById('servico-preco').value = '';
     document.getElementById('servico-duracao').value = '30';
     document.getElementById('servico-slots').value = '1';
+    document.getElementById('servico-descricao').value = '';
     document.getElementById('servico-id-editando').value = '';
     document.getElementById('btn-cancelar-edicao').style.display = 'none';
     showToast('Edição cancelada.', 'info');
@@ -3404,19 +4039,373 @@ window.excluirServico = async (id) => {
     }
 };
 
+        // --- NOVAS FUNÇÕES PARA PLANOS DE ASSINATURA ---
+        
+        // Renderizar serviços no formulário de assinatura
+        function renderServicosAssinaturaForm() {
+            const container = document.getElementById('assinatura-servicos-container');
+            if (!container) return;
+
+            if (!servicesData || servicesData.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted);">Nenhum serviço cadastrado.</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            servicesData.forEach(service => {
+                const div = document.createElement('div');
+                div.style.cssText = 'padding: 12px; background: #111111; border: 1px solid var(--border); border-radius: 8px;';
+                div.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                        <input type="checkbox" id="service-${service.id}" data-service-id="${service.id}" data-service-name="${service.name}" style="width: 18px; height: 18px; cursor: pointer;">
+                        <label for="service-${service.id}" style="flex: 1; cursor: pointer; margin: 0;">${service.name}</label>
+                    </div>
+                    <div>
+                        <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Quantidade máxima/mês:</label>
+                        <input type="number" class="service-quantity" data-service-id="${service.id}" min="1" value="1" style="width: 100%; padding: 6px; background: #0a0a0a; border: 1px solid var(--border); color: #fff; border-radius: 4px;" disabled>
+                    </div>
+                `;
+                container.appendChild(div);
+
+                const checkbox = div.querySelector('input[type="checkbox"]');
+                const quantityInput = div.querySelector('.service-quantity');
+                
+                checkbox.addEventListener('change', () => {
+                    quantityInput.disabled = !checkbox.checked;
+                });
+            });
+        }
+
+        // Renderizar planos de assinatura
+        function renderSubscriptionPlans() {
+            const tbody = document.getElementById('list-services-assinatura');
+            if (!tbody) {
+                console.error('Elemento list-services-assinatura não encontrado');
+                return;
+            }
+
+            tbody.innerHTML = '';
+
+            if (subscriptionPlansData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.9rem;">
+                            Nenhum plano de assinatura cadastrado. Adicione seu primeiro plano acima.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            subscriptionPlansData.forEach(plano => {
+                const frequenciaMap = {
+                    'monthly': 'Mensal',
+                    'quarterly': 'Trimestral',
+                    'semiannual': 'Semestral',
+                    'annual': 'Anual'
+                };
+
+                // Formatar serviços inclusos
+                let servicosDisplay = '-';
+                if (plano.servicesIncluded && Array.isArray(plano.servicesIncluded) && plano.servicesIncluded.length > 0) {
+                    servicosDisplay = plano.servicesIncluded.map(s => `${s.name} (${s.maxPerMonth}x)`).join(', ');
+                }
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${plano.name}</strong></td>
+                    <td style="color: var(--primary)">R$ ${plano.price.toFixed(2)}</td>
+                    <td>${frequenciaMap[plano.frequency] || plano.frequency}</td>
+                    <td>${plano.description || '-'}</td>
+                    <td style="font-size: 0.85rem; color: var(--text-muted);">${servicosDisplay}</td>
+                    <td style="display: flex; gap: 8px;">
+                        <button class="btn-action" style="background: var(--primary); padding: 6px 12px; font-size: 0.8rem;" onclick="editarServicoAssinatura('${plano.id}')">
+                            <i data-lucide="edit-2"></i> Editar
+                        </button>
+                        <button class="btn-action" style="background: var(--danger); padding: 6px 12px; font-size: 0.8rem;" onclick="excluirServicoAssinatura('${plano.id}')">
+                            <i data-lucide="trash-2"></i> Excluir
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            lucide.createIcons();
+        }
+
+        // Salvar plano de assinatura
+        window.salvarServicoAssinatura = async () => {
+            const nome = document.getElementById('assinatura-nome').value;
+            const valor = parseFloat(document.getElementById('assinatura-valor').value);
+            const frequencia = document.getElementById('assinatura-frequencia').value;
+            const descricao = document.getElementById('assinatura-descricao').value;
+            const assinaturaId = document.getElementById('assinatura-id-editando').value;
+
+            if (!nome || isNaN(valor)) {
+                showToast('Preencha todos os campos obrigatórios corretamente.', 'warning');
+                return;
+            }
+
+            // Coletar serviços selecionados
+            const servicesIncluded = [];
+            const checkboxes = document.querySelectorAll('#assinatura-servicos-container input[type="checkbox"]:checked');
+            checkboxes.forEach(checkbox => {
+                const serviceId = checkbox.dataset.serviceId;
+                const serviceName = checkbox.dataset.serviceName;
+                const quantity = parseInt(document.querySelector(`.service-quantity[data-service-id="${serviceId}"]`).value);
+                servicesIncluded.push({
+                    id: serviceId,
+                    name: serviceName,
+                    maxPerMonth: quantity
+                });
+            });
+
+            const planoData = {
+                name: nome,
+                price: valor,
+                frequency: frequencia,
+                description: descricao,
+                servicesIncluded: servicesIncluded,
+                timestamp: new Date()
+            };
+
+            try {
+                if (assinaturaId) {
+                    // Atualizar plano existente
+                    await updateDoc(doc(db, "subscription_plans", assinaturaId), planoData);
+                    showToast('Plano de assinatura atualizado com sucesso!', 'success');
+                } else {
+                    // Criar novo plano
+                    await addDoc(collection(db, "subscription_plans"), planoData);
+                    showToast('Plano de assinatura criado com sucesso!', 'success');
+                }
+
+                // Limpar formulário
+                document.getElementById('assinatura-nome').value = '';
+                document.getElementById('assinatura-valor').value = '';
+                document.getElementById('assinatura-frequencia').value = 'monthly';
+                document.getElementById('assinatura-descricao').value = '';
+                document.getElementById('assinatura-id-editando').value = '';
+                document.getElementById('btn-cancelar-edicao-assinatura').style.display = 'none';
+                
+                // Limpar seleção de serviços
+                document.querySelectorAll('#assinatura-servicos-container input[type="checkbox"]').forEach(cb => cb.checked = false);
+                document.querySelectorAll('.service-quantity').forEach(input => input.disabled = true);
+
+            } catch (e) {
+                showToast('Erro ao salvar plano de assinatura: ' + e.message, 'error');
+            }
+        };
+
+        // Editar plano de assinatura
+        window.editarServicoAssinatura = async (id) => {
+            const plano = subscriptionPlansData.find(p => p.id === id);
+            if (!plano) return;
+
+            document.getElementById('assinatura-nome').value = plano.name;
+            document.getElementById('assinatura-valor').value = plano.price;
+            document.getElementById('assinatura-frequencia').value = plano.frequency;
+            document.getElementById('assinatura-descricao').value = plano.description || '';
+            document.getElementById('assinatura-id-editando').value = plano.id;
+            document.getElementById('btn-cancelar-edicao-assinatura').style.display = 'block';
+
+            // Renderizar serviços e marcar os já selecionados
+            renderServicosAssinaturaForm();
+            if (plano.servicesIncluded && Array.isArray(plano.servicesIncluded)) {
+                plano.servicesIncluded.forEach(service => {
+                    const checkbox = document.querySelector(`#service-${service.id}`);
+                    const quantityInput = document.querySelector(`.service-quantity[data-service-id="${service.id}"]`);
+                    if (checkbox) {
+                        checkbox.checked = true;
+                        quantityInput.disabled = false;
+                        quantityInput.value = service.maxPerMonth || 1;
+                    }
+                });
+            }
+
+            // Rolar para o formulário
+            document.getElementById('assinatura-nome').scrollIntoView({ behavior: 'smooth' });
+            document.getElementById('assinatura-nome').focus();
+
+            showToast(`Editando: ${plano.name}`, 'info');
+        };
+
+        // Cancelar edição de plano de assinatura
+        window.cancelarEdicaoServicoAssinatura = () => {
+            document.getElementById('assinatura-nome').value = '';
+            document.getElementById('assinatura-valor').value = '';
+            document.getElementById('assinatura-frequencia').value = 'monthly';
+            document.getElementById('assinatura-descricao').value = '';
+            document.getElementById('assinatura-id-editando').value = '';
+            document.getElementById('btn-cancelar-edicao-assinatura').style.display = 'none';
+            showToast('Edição cancelada.', 'info');
+        };
+
+        // Excluir plano de assinatura
+        window.excluirServicoAssinatura = async (id) => {
+            const plano = subscriptionPlansData.find(p => p.id === id);
+            if (!plano) return;
+
+            if (!confirm(`Tem certeza que deseja excluir o plano "${plano.name}"?`)) {
+                return;
+            }
+
+            // Verificar se o plano está sendo usado em assinaturas
+            const assinaturasComPlano = subscriptionsData.filter(sub =>
+                sub.plan === plano.name || sub.planName === plano.name
+            );
+
+            if (assinaturasComPlano.length > 0) {
+                if (!confirm(`Este plano está em ${assinaturasComPlano.length} assinatura(s). A exclusão pode afetar esses registros. Deseja continuar?`)) {
+                    return;
+                }
+            }
+
+            try {
+                await deleteDoc(doc(db, "subscription_plans", id));
+                showToast('Plano de assinatura excluído com sucesso!', 'success');
+            } catch (e) {
+                showToast('Erro ao excluir plano de assinatura: ' + e.message, 'error');
+            }
+        };
+
+        // Preencher select de planos na aba de assinaturas
+        function populateSubscriptionPlansSelect() {
+            const select = document.getElementById('sub-service');
+            if (!select) return;
+
+            // Limpar opções atuais, mantendo a primeira opção
+            select.innerHTML = '<option value="">Selecione um plano...</option>';
+
+            // Adicionar planos do banco de dados
+            subscriptionPlansData.forEach(plano => {
+                const frequenciaMap = {
+                    'monthly': '/mês',
+                    'quarterly': '/trimestre',
+                    'semiannual': '/semestre',
+                    'annual': '/ano'
+                };
+
+                const option = document.createElement('option');
+                option.value = plano.id; // Usar ID como valor
+                option.textContent = `${plano.name} - R$ ${plano.price.toFixed(2)}${frequenciaMap[plano.frequency] || ''}`;
+                select.appendChild(option);
+            });
+        }
+
+        // Atualizar função updatePlanDetails para usar os planos do banco
+        window.updatePlanDetails = () => {
+            const planId = document.getElementById('sub-service').value;
+            const valueInput = document.getElementById('sub-value');
+            
+            // Encontrar o plano selecionado
+            const planoSelecionado = subscriptionPlansData.find(p => p.id === planId);
+            
+            if (planoSelecionado) {
+                valueInput.value = planoSelecionado.price;
+            } else {
+                valueInput.value = '';
+            }
+        };
+
+        // Atualizar função addSubscription para usar os planos do banco
+        window.addSubscription = async () => {
+            const client = document.getElementById('sub-client').value.trim();
+            const telefone = document.getElementById('sub-phone').value.trim();
+            const planId = document.getElementById('sub-service').value;
+            const value = parseFloat(document.getElementById('sub-value').value);
+            const startDate = document.getElementById('sub-start-date').value;
+            const status = document.getElementById('sub-status').value;
+
+            if (!client || !planId || !value || !startDate) {
+                showToast('Preencha os campos obrigatórios!', 'warning');
+                return;
+            }
+
+            // Encontrar o plano selecionado
+            const planoSelecionado = subscriptionPlansData.find(p => p.id === planId);
+            if (!planoSelecionado) {
+                showToast('Plano selecionado não encontrado!', 'error');
+                return;
+            }
+
+            const nextBilling = new Date(startDate);
+            
+            // Calcular próxima cobrança baseado na frequência
+            if (planoSelecionado.frequency === 'monthly') {
+                nextBilling.setMonth(nextBilling.getMonth() + 1);
+            } else if (planoSelecionado.frequency === 'quarterly') {
+                nextBilling.setMonth(nextBilling.getMonth() + 3);
+            } else if (planoSelecionado.frequency === 'semiannual') {
+                nextBilling.setMonth(nextBilling.getMonth() + 6);
+            } else if (planoSelecionado.frequency === 'annual') {
+                nextBilling.setFullYear(nextBilling.getFullYear() + 1);
+            }
+
+            try {
+                await addDoc(collection(db, "assinaturas"), {
+                    client, 
+                    telefone, 
+                    plan: planoSelecionado.name, // Usar o nome do plano
+                    planName: planoSelecionado.name,
+                    planId: planoSelecionado.id, // Salvar também o ID do plano
+                    frequency: planoSelecionado.frequency,
+                    value, 
+                    startDate, 
+                    nextBilling: nextBilling.toISOString().split('T')[0], 
+                    status, 
+                    paymentStatus: 'pending', // Status de pagamento padrão
+                    createdAt: new Date(),
+                    usedServices: 0
+                });
+
+                // Limpar formulário
+                document.getElementById('sub-client').value = '';
+                document.getElementById('sub-phone').value = '';
+                document.getElementById('sub-service').value = '';
+                document.getElementById('sub-value').value = '';
+                document.getElementById('sub-start-date').value = '';
+                
+                showToast('Assinatura adicionada com sucesso!', 'success');
+            } catch(e) {
+                showToast('Erro ao adicionar assinatura: ' + e.message, 'error');
+            }
+        };
+
         function populateServiceSelect() {
     const serviceSelect = document.getElementById('edit-service');
-    if (!serviceSelect) return;
+    if (!serviceSelect) {
+        console.error('Elemento edit-service não encontrado');
+        return;
+    }
 
     // Limpar opções atuais
     serviceSelect.innerHTML = '';
+
+    // Verificar se servicesData existe e tem itens
+    if (!servicesData || servicesData.length === 0) {
+        console.warn('Nenhum serviço disponível em servicesData');
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'Carregando serviços...';
+        serviceSelect.appendChild(option);
+        
+        // Tentar recarregar após 1 segundo
+        setTimeout(() => {
+            if (servicesData && servicesData.length > 0) {
+                populateServiceSelect();
+            }
+        }, 1000);
+        return;
+    }
+
+    console.log('Populando select com', servicesData.length, 'serviços');
 
     // Ordenar serviços de forma amigável
     const sortedServices = [...servicesData].sort((a, b) => {
         const indexA = serviceOrder.indexOf(a.name);
         const indexB = serviceOrder.indexOf(b.name);
         
-        // Se um serviço não estiver na lista de ordem, colocar no final
         if (indexA === -1 && indexB === -1) return 0;
         if (indexA === -1) return 1;
         if (indexB === -1) return -1;
@@ -3426,6 +4415,11 @@ window.excluirServico = async (id) => {
 
     // Adicionar cada serviço como uma opção
     sortedServices.forEach(service => {
+        if (!service.name) {
+            console.warn('Serviço sem nome:', service);
+            return;
+        }
+        
         // Calcular quantos slots são necessários (30 min = 1 slot)
         const slotsNeeded = Math.ceil(service.duration / 30);
         
@@ -3444,6 +4438,8 @@ window.excluirServico = async (id) => {
     cortesiaOption.value = 'Cortesia|0|1';
     cortesiaOption.textContent = 'Cortesia (R$ 0)';
     serviceSelect.appendChild(cortesiaOption);
+
+    console.log('Select de serviços populado com sucesso');
 }
 
         window.updateService = (id, field, value) => {
@@ -3471,6 +4467,24 @@ window.excluirServico = async (id) => {
 
         // --- FUNÇÃO ATUALIZADA PARA RELATÓRIO FISCAL COM ASSINATURAS ---
         window.generateFiscalReport = () => {
+            // Verificar se a funcionalidade está habilitada
+            if (!fiscalReportEnabled) {
+                showToast('❌ Relatório fiscal está desabilitado. Converse com o administrador.', 'error');
+                return;
+            }
+            
+            // PROTEÇÃO: Garantir que os dados estão sincronizados
+            if (!agendamentosData || !subscriptionsData || !entradasData) {
+                console.warn('generateFiscalReport: Aguardando sincronização de dados...');
+                showToast('⏳ Sincronizando dados... Por favor, aguarde.', 'info');
+                setTimeout(() => {
+                    if (agendamentosData && subscriptionsData && entradasData) {
+                        generateFiscalReport();
+                    }
+                }, 1000);
+                return;
+            }
+
             const year = document.getElementById('report-year').value;
             const month = document.getElementById('report-month').value;
             const week = document.getElementById('report-week').value;
@@ -3539,56 +4553,62 @@ window.excluirServico = async (id) => {
             let countAssinaturas = 0;
 
             // 1. Filtrar Agendamentos (Comparação de String é mais segura para datas ISO)
-            agendamentosData.forEach(agendamento => {
-                // Verifica se está concluído E se a data está dentro do range
-                if (agendamento.status === 'completed' && agendamento.data) {
-                    if (agendamento.data >= startStr && agendamento.data <= endStr) {
-                        reportData.push({
-                            data: agendamento.data,
-                            tipo: 'Serviço',
-                            cliente: agendamento.nome || agendamento.cliente || 'Cliente não informado',
-                            descricao: agendamento.servico || 'Serviço por assinatura',
-                            valor: Number(agendamento.preco || 0)
-                        });
-                        totalServicos += Number(agendamento.preco || 0);
-                        countServicos++;
+            if (agendamentosData && Array.isArray(agendamentosData)) {
+                agendamentosData.forEach(agendamento => {
+                    // Verifica se está concluído E se a data está dentro do range
+                    if (agendamento.status === 'completed' && agendamento.data) {
+                        if (agendamento.data >= startStr && agendamento.data <= endStr) {
+                            reportData.push({
+                                data: agendamento.data,
+                                tipo: 'Serviço',
+                                cliente: agendamento.nome || agendamento.cliente || 'Cliente não informado',
+                                descricao: agendamento.servico || 'Serviço por assinatura',
+                                valor: Number(agendamento.preco || 0)
+                            });
+                            totalServicos += Number(agendamento.preco || 0);
+                            countServicos++;
+                        }
                     }
-                }
-            });
+                });
+            }
 
             // 2. Filtrar Vendas de Produtos
-            entradasData.forEach(entrada => {
-                if (entrada.data) {
-                    if (entrada.data >= startStr && entrada.data <= endStr) {
-                        reportData.push({
-                            data: entrada.data,
-                            tipo: 'Produto',
-                            cliente: 'Venda Balcão',
-                            descricao: entrada.descricao || entrada.category || 'Produto',
-                            valor: Number(entrada.valor || 0)
-                        });
-                        totalProdutos += Number(entrada.valor || 0);
-                        countProdutos++;
+            if (entradasData && Array.isArray(entradasData)) {
+                entradasData.forEach(entrada => {
+                    if (entrada.data) {
+                        if (entrada.data >= startStr && entrada.data <= endStr) {
+                            reportData.push({
+                                data: entrada.data,
+                                tipo: 'Produto',
+                                cliente: 'Venda Balcão',
+                                descricao: entrada.descricao || entrada.category || 'Produto',
+                                valor: Number(entrada.valor || 0)
+                            });
+                            totalProdutos += Number(entrada.valor || 0);
+                            countProdutos++;
+                        }
                     }
-                }
-            });
+                });
+            }
 
             // 3. ADICIONADO: Filtrar Assinaturas Pagas
-            subscriptionsData.forEach(sub => {
-                if (sub.paymentStatus === 'paid' && sub.lastPaymentDate) {
-                    if (sub.lastPaymentDate >= startStr && sub.lastPaymentDate <= endStr) {
-                        reportData.push({
-                            data: sub.lastPaymentDate,
-                            tipo: 'Assinatura',
-                            cliente: sub.client || 'Cliente não informado',
-                            descricao: sub.planName || 'Assinatura',
-                            valor: Number(sub.value || 0)
-                        });
-                        totalAssinaturas += Number(sub.value || 0);
-                        countAssinaturas++;
+            if (subscriptionsData && Array.isArray(subscriptionsData)) {
+                subscriptionsData.forEach(sub => {
+                    if (sub.paymentStatus === 'paid' && sub.lastPaymentDate) {
+                        if (sub.lastPaymentDate >= startStr && sub.lastPaymentDate <= endStr) {
+                            reportData.push({
+                                data: sub.lastPaymentDate,
+                                tipo: 'Assinatura',
+                                cliente: sub.client || 'Cliente não informado',
+                                descricao: sub.planName || 'Assinatura',
+                                valor: Number(sub.value || 0)
+                            });
+                            totalAssinaturas += Number(sub.value || 0);
+                            countAssinaturas++;
+                        }
                     }
-                }
-            });
+                });
+            }
 
             // Ordenar por data
             reportData.sort((a, b) => {
@@ -3644,6 +4664,10 @@ window.excluirServico = async (id) => {
 
         // FUNÇÃO PARA EXPORTAR RELATÓRIO FISCAL
         window.exportFiscalReport = () => {
+            if (!fiscalReportEnabled) {
+                showToast('❌ Relatório fiscal está desabilitado. Converse com o administrador.', 'error');
+                return;
+            }
             if (!window.currentFiscalReportData || window.currentFiscalReportData.data.length === 0) {
                 showToast('Nenhum dado para exportar.', 'warning');
                 return;
@@ -3687,301 +4711,16 @@ window.excluirServico = async (id) => {
             return months[parseInt(monthNumber) - 1] || '';
         }
 
-        // --- FUNÇÕES DE CONTROLE DE ACESSO E SEEDING ---
-        async function loadUsuarioAuth(uid) {
-            try {
-                const docRef = doc(db, 'usuarios_auth', uid);
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    window.currentUserAuth = docSnap.data();
-                    window.currentUserAuth.uid = uid;
-                    console.log('Usuario auth carregado:', window.currentUserAuth);
-                    applyPermissionsUI();
-                } else {
-                    console.warn('usuarios_auth não encontrado para uid', uid);
-                    window.currentUserAuth = null;
-                    applyPermissionsUI();
-                }
-            } catch (e) { console.error('Erro carregando usuarios_auth', e); }
-        }
-
-        function applyPermissionsUI() {
-            const ua = window.currentUserAuth;
-            // Mostrar/ocultar botões do menu
-            document.querySelectorAll('.nav-modal-item').forEach(item => {
-                const txt = item.textContent.trim();
-                // Esconder Finanças e Configurações para não-admin
-                if (ua && ua.nivelAcesso !== 'admin' && (txt.includes('Finanças') || txt.includes('Configurações'))) {
-                    item.style.display = 'none';
-                } else {
-                    item.style.display = '';
-                }
-            });
-
-            // Mostrar botão de seed apenas para admin
-            const btnSeed = document.getElementById('btn-seed-users');
-            if (btnSeed) btnSeed.style.display = (ua && ua.nivelAcesso === 'admin') ? 'inline-block' : 'none';
-
-            // Se usuário for funcionário, renderizar dashboard pessoal
-            if (ua && ua.nivelAcesso !== 'admin') {
-                renderFuncionarioDashboard();
-            } else {
-                // Restaurar dashboard admin quando voltar a admin
-                const dash = document.getElementById('tab-dashboard');
-                if (dash && dash.dataset._adminHtml) {
-                    dash.innerHTML = dash.dataset._adminHtml;
-                    updateDashboard();
-                    updateSimpleDashboard();
-                }
-            }
-        }
-
-        async function criarUsuarioBarbeiro({ email, nome, nivelAcesso, comissao = 0, permissoes = {} }) {
-            try {
-                // Criar usuário no Auth (padrão senha temporária - altere conforme necessário)
-                const tempPass = 'SenhaTemp@123';
-                const userCred = await createUserWithEmailAndPassword(auth, email, tempPass);
-                const uid = userCred.user.uid;
-
-                // Criar documento em barbeiros
-                const barbRef = await addDoc(collection(db, 'barbeiros'), {
-                    nome: nome,
-                    email: email,
-                    ativo: true,
-                    nivelAcesso: nivelAcesso,
-                    comissao: comissao,
-                    criadoEm: new Date()
-                });
-
-                // Criar documento em usuarios_auth
-                await setDoc(doc(db, 'usuarios_auth', uid), {
-                    uid: uid,
-                    email: email,
-                    barbeiroId: barbRef.id,
-                    nivelAcesso: nivelAcesso,
-                    permissoes: permissoes,
-                    criadoEm: new Date()
-                });
-
-                console.log('Usuario barbeiro criado:', email);
-                return { uid, barbRefId: barbRef.id };
-            } catch (e) {
-                console.error('Erro criando usuario barbeiro:', e);
-                throw e;
-            }
-        }
-
-        async function setupUsuariosIniciais() {
-            try {
-                await criarUsuarioBarbeiro({
-                    email: 'saullinho2008@gmail.com',
-                    nome: 'Barbeiro 1 (Admin)',
-                    nivelAcesso: 'admin',
-                    comissao: 0,
-                    permissoes: { verTodosAgendamentos: true, verFinancasGerais: true, editarServicos: true, editarBarbeiros: true, verRelatoriosCompletos: true }
-                });
-
-                await criarUsuarioBarbeiro({
-                    email: 'saullogabriel18@hotmail.com',
-                    nome: 'Barbeiro 2 (Funcionário)',
-                    nivelAcesso: 'funcionario',
-                    comissao: 10,
-                    permissoes: { verTodosAgendamentos: false, verFinancasGerais: false, editarServicos: false, editarBarbeiros: false, verRelatoriosCompletos: false }
-                });
-
-                showToast('Usuários iniciais criados (verifique Auth para senhas).', 'success');
-            } catch (e) {
-                showToast('Erro ao criar usuários iniciais: ' + e.message, 'error');
-            }
-        }
-
-        async function getMinhaAgenda(barbeiroId) {
-            const hoje = new Date();
-            const inicioDia = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
-            const fimDia = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate() + 1);
-
-            const q = query(collection(db, 'agendamentos'), where('barbeiroId', '==', barbeiroId), where('dataHora', '>=', inicioDia), where('dataHora', '<', fimDia), where('status', 'in', ['confirmado', 'em_andamento', 'concluido']), );
-            const snap = await getDocs(q);
-            return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        }
-
-        async function calcularComissaoBarbeiro(barbeiroId, mesAno) {
-            const [ano, mes] = mesAno.split('-');
-            const inicioMes = new Date(parseInt(ano), parseInt(mes) - 1, 1);
-            const fimMes = new Date(parseInt(ano), parseInt(mes), 0, 23, 59, 59);
-
-            const q = query(collection(db, 'agendamentos'), where('barbeiroId', '==', barbeiroId), where('dataHora', '>=', inicioMes), where('dataHora', '<=', fimMes), where('status', '==', 'concluido'), where('pagamentoStatus', '==', 'pago'));
-            const snap = await getDocs(q);
-            let total = 0;
-            const servs = [];
-            snap.forEach(d => { total += (d.data().preco || 0); servs.push(d.id); });
-            const comissao = total * 0.10;
-            return { totalArrecadado: total, comissao };
-        }
-
-        async function renderFuncionarioDashboard() {
-            const ua = window.currentUserAuth;
-            if (!ua) return;
-            const dash = document.getElementById('tab-dashboard');
-            if (dash && !dash.dataset._adminHtml) dash.dataset._adminHtml = dash.innerHTML;
-
-            const hoje = new Date();
-            const mesRef = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}`;
-            const minhaAgenda = await getMinhaAgenda(ua.barbeiroId);
-            const { totalArrecadado, comissao } = await calcularComissaoBarbeiro(ua.barbeiroId, mesRef);
-
-            dash.innerHTML = `
-                <div style="padding:20px;">
-                    <h2>Meu Painel</h2>
-                    <p>Serviços hoje: <strong>${minhaAgenda.length}</strong></p>
-                    <p>Total arrecadado (mês): <strong>R$ ${totalArrecadado.toFixed(2)}</strong></p>
-                    <p>Minha comissão (10%): <strong>R$ ${comissao.toFixed(2)}</strong></p>
-                    <h4>Atendimentos de hoje</h4>
-                    <ul>
-                        ${minhaAgenda.map(a => `<li>${a.dataHora ? new Date(a.dataHora.seconds*1000).toLocaleString() : a.dataHora} - ${a.servicoId || a.servicoNome || a.servico} - ${a.clienteNome}</li>`).join('')}
-                    </ul>
-                </div>
-            `;
-        }
-
-        // Inicializar quando o DOM estiver pronto
-        document.addEventListener('DOMContentLoaded', () => {
-            // Configurar data atual nos campos
-            const today = new Date().toISOString().split('T')[0];
-            const subStart = document.getElementById('sub-start-date');
-            if(subStart) subStart.value = today;
-            
-            const expDate = document.getElementById('exp-date');
-            if(expDate) expDate.value = today;
-
-            // Definir ano atual no relatório
-            const currentYear = new Date().getFullYear().toString();
-            const yearSelect = document.getElementById('report-year');
-            if(yearSelect) yearSelect.value = currentYear;
-
-            // Inicializar ícones
-            lucide.createIcons();
-            
-            // Mostrar/ocultar botão voltar ao topo baseado no scroll
-            window.addEventListener('scroll', () => {
-                const backToTop = document.querySelector('.back-to-top');
-                if (backToTop) {
-                    if (window.scrollY > 300) {
-                        backToTop.style.display = 'flex';
-                    } else {
-                        backToTop.style.display = 'none';
-                    }
-                }
-                // No final do script, dentro do DOMContentLoaded:
-
-// Inicializar a visão simplificada
-updateSimpleDashboard();
-
-// Inicializar configurações
-loadConfiguracoesGerais();
-renderHorariosConfig();
-loadHorariosFuncionamento();
-loadDuracaoAgendamento();
-
-// Preencher o select de serviços se a aba de agenda estiver ativa
-if (document.getElementById('tab-agendamentos').classList.contains('active')) {
-    populateServiceSelect();
-}
-
-// Tornar a função switchTab global depois que o DOM estiver pronto
-window.switchTab = (tab) => {
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    document.querySelectorAll('.nav-modal-item').forEach(i => i.classList.remove('active'));
-    
-    const tabElement = document.getElementById('tab-' + tab);
-    if (tabElement) {
-        tabElement.classList.add('active');
-    }
-    
-    // Atualizar título
-    const titles = {
-        'dashboard': 'Dashboard',
-        'agendamentos': 'Agenda',
-        'clientes': 'Clientes',
-        'assinaturas': 'Assinaturas',
-        'finanças': 'Finanças',
-        'configurações': 'Configurações'
-    };
-    
-    const titleText = titles[tab] || tab;
-    
-    // Verificar se o elemento existe antes de definir o texto
-    const currentTabElement = document.getElementById('current-tab');
-    if (currentTabElement) {
-        currentTabElement.innerText = titleText;
-    }
-    
-    // Ativar item do menu
-    const navItems = document.querySelectorAll('.nav-modal-item');
-    navItems.forEach(item => {
-        if (item.textContent.includes(titleText)) {
-            item.classList.add('active');
-        }
-    });
-    
-    // Fechar modal de navegação
-    closeNavModal();
-    
-    // Executar funções específicas da tab
-    if(tab === 'dashboard') {
-        setTimeout(() => {
-            updateDashboard();
-            updateSimpleDashboard();
-        }, 50);
-    }
-    if(tab === 'agendamentos') {
-        renderCalendar();
-        setTimeout(() => {
-            populateServiceSelect();
-        }, 100);
-    }
-    if(tab === 'clientes') renderClients();
-    if(tab === 'assinaturas') {
-        renderSubscriptions();
-        renderSubscriptionUsageHistory();
-    }
-    if(tab === 'finanças') switchFinanceMode('despesas');
-    if(tab === 'configurações') {
-        setTimeout(() => {
-            renderServices();
-        }, 100);
-    }
-    
-    // Scroll para o topo
-    window.scrollTo({top: 0, behavior: 'smooth'});
-};
-            });
-            
-            // Fechar modal ao pressionar ESC
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    closeNavModal();
-                }
-            });
-            
-            // Prevenir zoom duplo em mobile
-            let lastTouchEnd = 0;
-            document.addEventListener('touchend', function(event) { 
-                const now = (new Date()).getTime();
-                if (now - lastTouchEnd <= 300) {
-                    event.preventDefault();
-                }
-                lastTouchEnd = now;
-            }, false);
-
-            // Inicializar a visão simplificada
-            updateSimpleDashboard();
-        });
-
         // === NOVAS FUNÇÕES PARA CONFIGURAÇÕES ===
         
         // Salvar informações da barbearia
         async function salvarInformacoesBarbearia() {
+            // Verificar se o usuário tem permissão
+            if (currentUserEmail !== 'saullinho2008@gmail.com') {
+                showToast('Acesso negado: apenas o administrador pode modificar configurações.', 'error');
+                return;
+            }
+            
             try {
                 const configData = {
                     barberName: document.getElementById('barbearia-nome').value.trim(),
@@ -4003,11 +4742,13 @@ window.switchTab = (tab) => {
                 
                 showToast("✅ Informações da barbearia salvas com sucesso!", "success");
                 
-                // Atualizar nome no header se estiver na aba configurações
-                const headerTitle = document.querySelector('.header-title');
-                if (headerTitle) {
-                    headerTitle.textContent = configData.barberName;
+                // Atualizar apenas o nome da barbearia no header (sem substituir a estrutura)
+                const logoEl = document.querySelector('.header-title .logo');
+                if (logoEl) {
+                    logoEl.textContent = configData.barberName;
                 }
+                // Atualizar variável global usada em mensagens
+                window.barberName = configData.barberName || window.barberName;
                 
             } catch (error) {
                 console.error("Erro ao salvar informações da barbearia:", error);
@@ -4017,7 +4758,7 @@ window.switchTab = (tab) => {
         
         // Definir valores padrão
         function setarValoresPadrao() {
-            document.getElementById('barbearia-nome').value = 'Lopes Barbearia';
+            document.getElementById('barbearia-nome').value = 'FLOW BARBER';
             document.getElementById('barbearia-telefone').value = '5528999082741';
             document.getElementById('barbearia-endereco').value = 'Av. Central, 149-21 - Alto Lagoa Funda, Marataízes - ES, 29345-000';
             document.getElementById('barbearia-maps-link').value = 'https://maps.app.goo.gl/tMqWDAU2Eh14hp9bA';
@@ -4098,6 +4839,12 @@ window.switchTab = (tab) => {
         
         // Salvar horários de funcionamento (com auto-save)
         async function salvarHorariosFuncionamento(diaParaMostrarStatus = null) {
+    // Verificar se o usuário tem permissão
+    if (currentUserEmail !== 'saullinho2008@gmail.com') {
+        showToast('Acesso negado: apenas o administrador pode modificar configurações.', 'error');
+        return;
+    }
+    
     try {
         const horariosData = {};
         const diasSemana = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
@@ -4231,6 +4978,9 @@ window.switchTab = (tab) => {
                     const config = docSnap.data();
                     console.log('Configurações encontradas:', config);
                     
+                    // Salvar nome globalmente para mensagens WhatsApp
+                    window.barberName = config.barberName || 'FLOW BARBER';
+                    
                     // Preencher campos de informações da barbearia
                     const nomeField = document.getElementById('barbearia-nome');
                     const telefoneField = document.getElementById('barbearia-telefone');
@@ -4242,11 +4992,13 @@ window.switchTab = (tab) => {
                     if (enderecoField) enderecoField.value = config.barberAddress || '';
                     if (mapsField) mapsField.value = config.barberMapsLink || '';
                     
-                    // Atualizar nome no header
-                    const headerTitle = document.querySelector('.header-title');
-                    if (headerTitle && config.barberName) {
-                        headerTitle.textContent = config.barberName;
+                    // Atualizar apenas o nome da barbearia no header (sem substituir a estrutura)
+                    const logoEl = document.querySelector('.header-title .logo');
+                    if (logoEl && config.barberName) {
+                        logoEl.textContent = config.barberName;
                     }
+                    // Atualizar variável global usada em mensagens
+                    window.barberName = config.barberName || window.barberName;
                 } else {
                     console.log('Nenhuma configuração no Firebase, usando padrões');
                     setarValoresPadrao();
@@ -4257,9 +5009,27 @@ window.switchTab = (tab) => {
             }
         } // Fecha a função loadConfiguracoesGerais
         
+        // Setup listener em tempo real para atualizar barberName nas mensagens WhatsApp
+        function setupBarbeariaListener() {
+            const docRef = doc(db, "configuracoes_gerais", "barbearia");
+            onSnapshot(docRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    const config = snapshot.data();
+                    window.barberName = config.barberName || 'FLOW BARBER';
+                    console.log('Nome da barbearia atualizado para:', window.barberName);
+                }
+            });
+        }
+        
         // === FUNÇÕES PARA DURAÇÃO DE AGENDAMENTOS ===
         
         async function salvarDuracaoAgendamento() {
+    // Verificar se o usuário tem permissão
+    if (currentUserEmail !== 'saullinho2008@gmail.com') {
+        showToast('Acesso negado: apenas o administrador pode modificar configurações.', 'error');
+        return;
+    }
+    
     try {
         const duracao = document.getElementById('duracao-agendamento').value;
         
@@ -4319,15 +5089,158 @@ window.switchTab = (tab) => {
     }
 }
         
-        // Tornar funções globais para serem acessíveis via onclick
+        // Variável global para status de assinaturas
+        let subscriptionsEnabled = true;
+        
+        // Carregar status de assinaturas
+        async function loadSubscriptionsStatus() {
+            try {
+                const docRef = doc(db, "configuracoes_gerais", "assinaturas");
+                const docSnap = await getDoc(docRef);
+                
+                if (docSnap.exists()) {
+                    const dados = docSnap.data();
+                    subscriptionsEnabled = dados.enabled !== false;
+                } else {
+                    subscriptionsEnabled = true;
+                }
+                
+                updateSubscriptionsStatusUI();
+            } catch (error) {
+                console.error("Erro ao carregar status de assinaturas:", error);
+                subscriptionsEnabled = true;
+            }
+        }
+        
+        // Atualizar UI de status de assinaturas
+        function updateSubscriptionsStatusUI() {
+            const statusText = document.getElementById('subscriptions-status');
+            const enableBtn = document.getElementById('btn-enable-subscriptions');
+            const disableBtn = document.getElementById('btn-disable-subscriptions');
+            const menuItem = document.getElementById('assinaturas-menu-item');
+            
+            if (subscriptionsEnabled) {
+                if (statusText) statusText.innerHTML = '✅ <strong>ATIVADO</strong> - Sistema de assinaturas está funcionando';
+                if (enableBtn) enableBtn.style.opacity = '1';
+                if (disableBtn) disableBtn.style.opacity = '0.5';
+                if (menuItem) menuItem.style.display = '';
+            } else {
+                if (statusText) statusText.innerHTML = '❌ <strong>DESATIVADO</strong> - Sistema de assinaturas está desligado';
+                if (enableBtn) enableBtn.style.opacity = '0.5';
+                if (disableBtn) disableBtn.style.opacity = '1';
+                if (menuItem) menuItem.style.display = 'none';
+                // If currently viewing the subscriptions tab, switch to dashboard
+                if (document.getElementById('tab-assinaturas') && document.getElementById('tab-assinaturas').classList.contains('active')) {
+                    switchTab('dashboard');
+                }
+            }
+        }
+        
+        // Toggle assinaturas
+        window.toggleSubscriptionsEnabled = async (enabled) => {
+            // Verificar permissão
+            if (currentUserEmail !== 'saullinho2008@gmail.com') {
+                showToast('Acesso negado: apenas o administrador pode modificar configurações.', 'error');
+                return;
+            }
+            
+            try {
+                subscriptionsEnabled = enabled;
+                
+                await setDoc(doc(db, "configuracoes_gerais", "assinaturas"), {
+                    enabled: enabled,
+                    updatedAt: new Date(),
+                    updatedBy: auth.currentUser?.uid || 'admin'
+                }, { merge: true });
+                
+                updateSubscriptionsStatusUI();
+                showToast(enabled ? '✅ Assinaturas ativadas!' : '❌ Assinaturas desativadas!', 'success');
+            } catch (error) {
+                console.error("Erro ao atualizar status de assinaturas:", error);
+                showToast("❌ Erro ao atualizar: " + error.message, "error");
+            }
+        };
+        
+        // Variável global para status de relatório fiscal
+        let fiscalReportEnabled = false;
+        
+        // Carregar status de relatório fiscal
+        async function loadFiscalReportStatus() {
+            try {
+                const docRef = doc(db, "configuracoes_gerais", "fiscal_report");
+                const docSnap = await getDoc(docRef);
+                
+                if (docSnap.exists()) {
+                    const dados = docSnap.data();
+                    fiscalReportEnabled = dados.enabled === true;
+                } else {
+                    fiscalReportEnabled = false;
+                }
+                
+                updateFiscalReportStatusUI();
+            } catch (error) {
+                console.error("Erro ao carregar status de relatório fiscal:", error);
+                fiscalReportEnabled = false;
+            }
+        }
+        
+        // Atualizar UI de status de relatório fiscal
+        function updateFiscalReportStatusUI() {
+            const statusText = document.getElementById('fiscal-report-status');
+            const enableBtn = document.getElementById('btn-enable-fiscal-report');
+            const disableBtn = document.getElementById('btn-disable-fiscal-report');
+            
+            if (fiscalReportEnabled) {
+                if (statusText) statusText.innerHTML = '✅ <strong>ATIVADO</strong> - Relatório fiscal está disponível';
+                if (enableBtn) enableBtn.style.opacity = '0.5';
+                if (disableBtn) disableBtn.style.opacity = '1';
+            } else {
+                if (statusText) statusText.innerHTML = '❌ <strong>DESATIVADO</strong> - Converse com o Admin para alterar para um plano que tenha esse recurso';
+                if (enableBtn) enableBtn.style.opacity = '1';
+                if (disableBtn) disableBtn.style.opacity = '0.5';
+            }
+        }
+        
+        // Toggle relatório fiscal
+        window.toggleFiscalReport = async (enabled) => {
+            // Verificar permissão
+            if (currentUserEmail !== 'saullinho2008@gmail.com') {
+                showToast('Acesso negado: apenas o administrador pode modificar configurações.', 'error');
+                return;
+            }
+            
+            try {
+                fiscalReportEnabled = enabled;
+                
+                const configRef = doc(db, "configuracoes_gerais", "fiscal_report");
+                await setDoc(configRef, {
+                    enabled: enabled,
+                    updatedAt: new Date().toISOString(),
+                    updatedBy: auth.currentUser?.email || 'admin'
+                });
+                
+                updateFiscalReportStatusUI();
+                showToast(enabled ? '✅ Relatório fiscal ativado!' : '❌ Relatório fiscal desativado!', 'success');
+                console.log('Status do relatório fiscal atualizado para:', enabled);
+            } catch (error) {
+                console.error("Erro ao atualizar status de relatório fiscal:", error);
+                showToast("❌ Erro ao atualizar: " + error.message, "error");
+                // Recarregar status anterior
+                loadFiscalReportStatus();
+            }
+        };
         window.salvarInformacoesBarbearia = salvarInformacoesBarbearia;
         window.renderHorariosConfig = renderHorariosConfig;
         window.salvarHorariosFuncionamento = salvarHorariosFuncionamento;
         window.loadHorariosFuncionamento = loadHorariosFuncionamento;
         window.salvarDuracaoAgendamento = salvarDuracaoAgendamento;
         window.loadDuracaoAgendamento = loadDuracaoAgendamento;
+        window.loadSubscriptionsStatus = loadSubscriptionsStatus;
         window.loadConfiguracoesGerais = loadConfiguracoesGerais;
+        window.setupBarbeariaListener = setupBarbeariaListener;
         window.setarValoresPadrao = setarValoresPadrao;
+        window.ensureServicesLoaded = ensureServicesLoaded;
+        window.ensureDataSync = ensureDataSync;
         
         // Inicializar configurações ao carregar página
         console.log('=== Script admin.html carregado ===');
@@ -4337,17 +5250,23 @@ window.switchTab = (tab) => {
                 console.log('DOMContentLoaded - Carregando configurações...');
                 setTimeout(() => {
                     loadConfiguracoesGerais();
+                    setupBarbeariaListener();
                     renderHorariosConfig();
                     loadHorariosFuncionamento();
                     loadDuracaoAgendamento();
+                    loadSubscriptionsStatus();
+                    loadFiscalReportStatus();
                 }, 300);
             });
         } else {
             console.log('DOM já pronto - Carregando configurações imediatamente...');
             loadConfiguracoesGerais();
+            setupBarbeariaListener();
             renderHorariosConfig();
             loadHorariosFuncionamento();
             loadDuracaoAgendamento();
+            loadSubscriptionsStatus();
+            loadFiscalReportStatus();
         }
         
         // Adicionar evento para atualizar o select de serviços quando abrir a aba de agendamentos
@@ -4406,7 +5325,146 @@ window.switchTab = (tab) => {
     
     return slots;
 }
-        
+
+        // Função para garantir sincronização de todos os dados
+        function ensureDataSync() {
+            return new Promise((resolve) => {
+                let attempts = 0;
+                const maxAttempts = 30; // ~9 segundos (30 * 300ms)
+                
+                const checkData = () => {
+                    attempts++;
+                    
+                    // Verificar se temos dados carregados
+                    const hasAgendamentos = Array.isArray(agendamentosData) && agendamentosData.length > 0;
+                    const hasSubscriptions = Array.isArray(subscriptionsData);
+                    const hasExpenses = Array.isArray(despesasData);
+                    const hasEntries = Array.isArray(entradasData);
+                    const hasServices = Array.isArray(servicesData) && servicesData.length > 0;
+                    
+                    // Se temos todos os dados principais carregados
+                    const allChecked = hasAgendamentos && hasSubscriptions && hasExpenses && hasEntries && hasServices;
+                    const isComplete = allChecked || attempts >= maxAttempts;
+                    
+                    if (isComplete) {
+                        console.log('✅ Dados sincronizados (tentativa ' + attempts + '):', {
+                            agendamentos: agendamentosData.length,
+                            subscriptions: subscriptionsData.length,
+                            expenses: despesasData.length,
+                            entries: entradasData.length,
+                            services: servicesData.length,
+                            allDataLoaded: allChecked
+                        });
+                        isFirstLoadComplete = true;
+                        resolve();
+                    } else {
+                        if (attempts % 5 === 0) {
+                            console.log(`⏳ Aguardando sincronização (${attempts}/${maxAttempts})...`);
+                        }
+                        setTimeout(checkData, 300);
+                    }
+                };
+                checkData();
+            });
+        }
+
+        function ensureServicesLoaded() {
+            // Verificar se servicesData está carregado após 2 segundos
+            setTimeout(() => {
+                if (!servicesData || servicesData.length === 0) {
+                    console.log('ServicesData ainda vazio após 2s, tentando recarregar...');
+                    
+                    
+                    // Tentar forçar recarregamento
+                    const servicesRef = collection(db, "services");
+                    getDocs(servicesRef).then(snap => {
+                        servicesData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                        console.log('Serviços recarregados manualmente:', servicesData.length);
+                        
+                        // Se ainda vazio, criar serviços padrão
+                        if (servicesData.length === 0) {
+                            console.log('Serviços ainda vazios, criando padrões...');
+                            // Chama o listener que criará os padrões
+                        } else {
+                            // Atualizar interfaces
+                            renderServices();
+                            populateServiceSelect();
+                        }
+                    }).catch(err => {
+                        console.error('Erro ao recarregar serviços:', err);
+                    });
+                } else {
+                    console.log('ServicesData carregado corretamente:', servicesData.length, 'itens');
+                }
+            }, 2000);
+        }
+    
+
+
+
+        if ("serviceWorker" in navigator && window.location.protocol !== 'file:') {
+          navigator.serviceWorker.register("/service-worker.js").catch(err => {
+            console.warn('Erro ao registrar service-worker.js:', err.message);
+          });
+          navigator.serviceWorker.register("/firebase-messaging-sw.js").catch(err => {
+            console.warn('Erro ao registrar firebase-messaging-sw.js:', err.message);
+          });
+        }
+
+const messaging = getMessaging(app);
+// `auth` and `db` were already initialized earlier in this module — don't redeclare them.
+// `currentUserEmail` was defined earlier; avoid redeclaration here.
+
+async function enableNotifications() {
+  try {
+    // Verificar se está rodando em um protocolo seguro (não local file://)
+    if (window.location.protocol === 'file:') {
+      console.warn('ServiceWorker não pode ser registrado em arquivo local (file://). Use um servidor HTTP.');
+      return;
+    }
+
+    const permission = await Notification.requestPermission();
+    if (permission !== "granted") return;
+
+    // Registra o Service Worker
+    await navigator.serviceWorker.register("/firebase-messaging-sw.js");
+    const registration = await navigator.serviceWorker.ready;
+
+    // Gera o token FCM
+    const token = await getToken(messaging, {
+      vapidKey: "BFCyx38SAwPFbLIIErfFmaJlk1TksQ_6MAxwBfSAyyQ4-DmH5btXX5RZ0bjO_RmhcWzcYWnD7rsjBaFd1QjL1no",
+      serviceWorkerRegistration: registration
+    });
+
+    console.log("FCM TOKEN:", token);
+
+    // 🔥 Salva sem sobrescrever (suporta vários dispositivos) — registra email+token como pedido
+    if (token && currentUserEmail) {
+      await addDoc(
+        collection(db, "barbeirosTokens"),
+        {
+          email: currentUserEmail,
+          token,
+          createdAt: serverTimestamp()
+        }
+      );
+    }
+  } catch (error) {
+    console.warn('Erro ao configurar notificações:', error.message);
+    // Não impede o funcionamento do app se houver erro de notificações
+  }
+}
+
+// Ativa notificações quando o barbeiro logar
+onAuthStateChanged(auth, user => {
+  if (user) {
+    currentUserEmail = user.email;
+    enableNotifications();
+  }
+});
+
+
+
     </script>
 </body>
 </html>
